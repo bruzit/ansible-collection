@@ -1,0 +1,13 @@
+---
+namespace: bruzit
+name: ansible
+version: 0.0.0
+readme: README.md
+authors:
+  - Martin Bružina
+description: A collection of Kubuntu desktop and Ubuntu server roles.
+license:
+  - MIT
+license_file: LICENSE
+repository: https://github.com/bruzit/ansible-collection
+homepage: https://github.com/bruzit/ansible-collection
