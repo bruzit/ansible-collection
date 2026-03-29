@@ -9,7 +9,10 @@ plugins:
   - "@semantic-release/github"
   - - "@semantic-release/changelog"
     - changelogTitle: '# Changelog'
+  - - "@semantic-release/exec"
+    - prepareCmd: "sed -i 's/^version: .*$/version: ${nextRelease.version}/' 'galaxy.yml'"
   - - "@semantic-release/git"
     - assets:
       - CHANGELOG.md
+      - galaxy.yml
   - semantic-release-major-tag
