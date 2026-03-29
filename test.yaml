@@ -2,3 +2,4 @@
 - hosts: all
   roles:
     - role: bruzit.ansible.ping
+    - role: bruzit.ansible.git
