@@ -4,3 +4,9 @@
   ansible.builtin.package:
     name: git
     state: present
+
+- name: Set git push.autoSetupRemote to true
+  community.general.git_config:
+    name: push.autoSetupRemote
+    scope: global
+    value: "true"
