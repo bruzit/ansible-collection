@@ -10,7 +10,14 @@
       changed_when: false
       failed_when: git_version.rc != 0
 
+    - name: Check git is configured
+      ansible.builtin.command: git config --get push.autoSetupRemote
+      register: git_config_push_auto_setup_remote
+      changed_when: false
+      failed_when: git_config_push_auto_setup_remote.rc != 0
+
     - name: Assert git output
       ansible.builtin.assert:
         that:
           - "'git version' in git_version.stdout"
+          - "'true' in git_config_push_auto_setup_remote.stdout"
