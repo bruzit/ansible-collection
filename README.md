@@ -6,9 +6,9 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 
 ### Roles
 
-| Role | Description |
-|---|---
-| `bruzit.ansible.git` | Git setup |
+| Role | Description | Tested |
+|---|---|---|
+| `bruzit.ansible.git` | Git setup | Yes |
 
 ## Installation and Configuration
 
@@ -43,7 +43,9 @@ Run the Ansible playbook:
 ansible-playbook -i localhost, playbook.yaml
 ```
 
-## Development
+## Contributing
+
+### Development
 
 ```shell
 GALAXY_BUILD_OUTPUT=$(ansible-galaxy collection build --force)
@@ -51,6 +53,10 @@ ansible-galaxy collection install --force "${GALAXY_BUILD_OUTPUT##* }"
 
 ansible-playbook test.yaml -i localhost, -kK
 ```
+
+### Testing
+
+Use Ansible Molecule to test each role. All Ubuntu versions with standard support should be tested.
 
 ## Copyright and Licensing
 
