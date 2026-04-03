@@ -24,7 +24,8 @@ jobs:
         run: >
           pip install
           ansible
-          molecule[docker]
+          molecule
+          molecule-docker
           docker
 
       - name: Run Molecule
