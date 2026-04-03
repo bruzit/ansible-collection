@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check git is installed
+      ansible.builtin.command: git --version
+      register: git_version
+      changed_when: false
+      failed_when: git_version.rc != 0
+
+    - name: Assert git output
+      ansible.builtin.assert:
+        that:
+          - "'git version' in git_version.stdout"
