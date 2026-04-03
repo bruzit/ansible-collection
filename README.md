@@ -9,7 +9,6 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 | Role | Description |
 |---|---
 | `bruzit.ansible.git` | Git setup |
-| `bruzit.ansible.ping` | Pings a machine |
 
 ## Installation and Configuration
 
@@ -35,7 +34,7 @@ Create an Ansible playbook:
 ---
 - hosts: all
   roles:
-    - role: bruzit.ansible.ping
+    - role: bruzit.ansible.git
 ```
 
 Run the Ansible playbook:
