@@ -28,6 +28,9 @@ jobs:
           molecule-docker
           docker
 
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install -r requirements.yml
+
       - name: Run Molecule
         working-directory: roles/${{ matrix.role }}
         run: molecule test
