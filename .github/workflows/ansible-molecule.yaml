@@ -1,0 +1,32 @@
+name: Ansible Molecule Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        role:
+          - git
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+
+      - name: Install dependencies
+        run: >
+          pip install
+          ansible
+          molecule[docker]
+          docker
+
+      - name: Run Molecule
+        working-directory: roles/${{ matrix.role }}
+        run: molecule test
