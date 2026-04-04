@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.0](https://github.com/bruzit/ansible-collection/compare/v0.4.0...v0.5.0) (2026-04-04)
+
+### Features
+
+* add terraform role bash autocomplete setup ([5ace881](https://github.com/bruzit/ansible-collection/commit/5ace881afd07edb2c602f0adfa604ccbc4488859))
+
+### Bug Fixes
+
+* replace role terraform bash autocomplete check ([28017f1](https://github.com/bruzit/ansible-collection/commit/28017f1e610f2e336a51e61290ac7d74e20bfb83))
+* terraform role autocomplete tasks import task name ([6e254c8](https://github.com/bruzit/ansible-collection/commit/6e254c8b88a1e4baa27d63513a2b45ed3845427c))
+
 ## [0.4.0](https://github.com/bruzit/ansible-collection/compare/v0.3.0...v0.4.0) (2026-04-04)
 
 ### Features
