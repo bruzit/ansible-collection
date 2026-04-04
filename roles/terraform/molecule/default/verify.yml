@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check Terraform is installed
+      ansible.builtin.command: terraform -version
+      register: terraform_version
+      changed_when: false
+      failed_when: terraform_version.rc != 0
+
+    - name: Assert git output
+      ansible.builtin.assert:
+        that:
+          - "'Terraform' in terraform_version.stdout"
