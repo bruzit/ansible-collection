@@ -1,0 +1,26 @@
+---
+- name: Get all versions of Terraform
+  ansible.builtin.uri:
+    url: https://releases.hashicorp.com/terraform/index.json
+    return_content: true
+  register: terraform_index
+  check_mode: false
+
+- name: Get the latest Terraform version
+  ansible.builtin.set_fact:
+    terraform_version: "{{ (terraform_index.content | from_json).versions | reject('search', '-') | list | community.general.version_sort | last }}"
+
+- name: Check if Terraform is present with the right version
+  ansible.builtin.command: "terraform -version"
+  register: terraform_installed_version
+  ignore_errors: true
+  changed_when: false
+  failed_when: false
+
+- name: Install Terraform
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip"
+    dest: /usr/local/bin/
+    remote_src: true
+  when: terraform_version not in ( terraform_installed_version.stdout_lines | default(['empty'], true) | first )
