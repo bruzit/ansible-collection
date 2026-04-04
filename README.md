@@ -10,7 +10,7 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 |---|---|---|---|
 | `bruzit.ansible.download` | Download tools | Yes | |
 | `bruzit.ansible.git` | Git setup | Yes | |
-| `bruzit.ansible.terraform` | Terraform setup; if Bash is installed, autocompletion is configured. | Yes | `bruzit.ansible.download` |
+| `bruzit.ansible.terraform` | Terraform setup; if Bash autocompletion directory is present, autocompletion is configured. | Yes | `bruzit.ansible.download` |
 
 ## Installation and Configuration
 

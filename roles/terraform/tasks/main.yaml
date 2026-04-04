@@ -25,5 +25,5 @@
     remote_src: true
   when: terraform_version not in ( terraform_installed_version.stdout_lines | default(['empty'], true) | first )
 
-- name: Import firewall tasks
+- name: Import Bash autocomplete setup tasks
   ansible.builtin.import_tasks: bash_autocomplete.yaml
