@@ -1,0 +1,16 @@
+---
+- name: Check if Bash is installed
+  ansible.builtin.command: which bash
+  register: bash_installed
+  changed_when: false
+  failed_when: false
+
+- name: Add Terraform bash autocomplete
+  become: true
+  ansible.builtin.copy:
+    content: 'complete -C /usr/bin/terraform terraform'
+    dest: /etc/bash_completion.d/terraform
+    owner: root
+    group: root
+    mode: '0644'
+  when: bash_installed.rc == 0
