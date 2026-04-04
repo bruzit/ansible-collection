@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0](https://github.com/bruzit/ansible-collection/compare/v0.2.0...v0.3.0) (2026-04-04)
+
+### Features
+
+* remove ping role ([fbbec1e](https://github.com/bruzit/ansible-collection/commit/fbbec1e1b20aa961f5763719007d80a4997e4c6c))
+
 ## [0.2.0](https://github.com/bruzit/ansible-collection/compare/v0.1.0...v0.2.0) (2026-04-03)
 
 ### Features
