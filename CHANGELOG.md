@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/bruzit/ansible-collection/compare/v0.3.0...v0.4.0) (2026-04-04)
+
+### Features
+
+* add role download ([435f9c5](https://github.com/bruzit/ansible-collection/commit/435f9c5b496b6481cd5a81640a1fc5da1ad74d7a))
+* add terraform role ([a16e82b](https://github.com/bruzit/ansible-collection/commit/a16e82b0a8994bd580961c84ff23899fa1df7dbf))
+
 ## [0.3.0](https://github.com/bruzit/ansible-collection/compare/v0.2.0...v0.3.0) (2026-04-04)
 
 ### Features
