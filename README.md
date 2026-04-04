@@ -6,11 +6,11 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 
 ### Roles
 
-| Role | Description | Tested |
-|---|---|---|
-| `bruzit.ansible.download` | Download tools | Yes |
-| `bruzit.ansible.git` | Git setup | Yes |
-| `bruzit.ansible.terraform` | Terraform setup | Yes |
+| Role | Description | Tests | Dependencies |
+|---|---|---|---|
+| `bruzit.ansible.download` | Download tools | Yes | |
+| `bruzit.ansible.git` | Git setup | Yes | |
+| `bruzit.ansible.terraform` | Terraform setup | Yes | `bruzit.ansible.download` |
 
 ## Installation and Configuration
 
