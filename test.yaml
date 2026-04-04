@@ -1,5 +1,5 @@
 ---
 - hosts: all
   roles:
-    - role: bruzit.ansible.ping
     - role: bruzit.ansible.git
+    - role: bruzit.ansible.terraform

@@ -9,6 +9,7 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 | Role | Description | Tested |
 |---|---|---|
 | `bruzit.ansible.git` | Git setup | Yes |
+| `bruzit.ansible.terraform` | Terraform setup | Yes |
 
 ## Installation and Configuration
 
@@ -35,6 +36,7 @@ Create an Ansible playbook:
 - hosts: all
   roles:
     - role: bruzit.ansible.git
+    - role: bruzit.ansible.terraform
 ```
 
 Run the Ansible playbook:
