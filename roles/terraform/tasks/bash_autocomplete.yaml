@@ -1,9 +1,8 @@
 ---
-- name: Check if Bash is installed
-  ansible.builtin.command: which bash
-  register: bash_installed
-  changed_when: false
-  failed_when: false
+- name: Stat Bash autocompletion directory
+  ansible.builtin.stat:
+    path: /etc/bash_completion.d
+  register: bash_completion_dir
 
 - name: Add Terraform bash autocomplete
   become: true
@@ -13,4 +12,4 @@
     owner: root
     group: root
     mode: '0644'
-  when: bash_installed.rc == 0
+  when: bash_completion_dir.stat.exists
