@@ -12,6 +12,7 @@ jobs:
       matrix:
         role:
           - git
+          - terraform
 
     steps:
       - name: Checkout repository
