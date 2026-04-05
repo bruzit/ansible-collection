@@ -1,0 +1,24 @@
+---
+- name: Check if the system reboot is required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+  register: reboot_required
+  changed_when: reboot_required.stat.exists
+  listen: Reboot system when required
+  notify: Reboot system
+
+- name: Reboot the system
+  become: true
+  ansible.builtin.reboot:
+  when: reboot_when_needed | default(false)
+  listen: Reboot system
+
+- name: Reboot the system
+  become: true
+  ansible.builtin.debug:
+    msg: "Reboot skipped because `reboot_when_needed` is set to false"
+  when: not reboot_when_needed | default(false)
+  listen: Reboot system
