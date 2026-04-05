@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/bruzit/ansible-collection/compare/v0.5.0...v0.6.0) (2026-04-05)
+
+### Features
+
+* add apt role ([7704012](https://github.com/bruzit/ansible-collection/commit/7704012d7a0b264f33c90ec08613a52160ff7f6a))
+* add system role ([e0f90fc](https://github.com/bruzit/ansible-collection/commit/e0f90fc78b2ee7f785a78c9c4e6dbdb522143f0d))
+
 ## [0.5.0](https://github.com/bruzit/ansible-collection/compare/v0.4.0...v0.5.0) (2026-04-04)
 
 ### Features
