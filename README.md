@@ -8,6 +8,7 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 
 | Role | Description | Tests | Dependencies |
 |---|---|---|---|
+| `bruzit.ansible.apt` | Deb package updates and upgrades using the apt package manager. Cleans up unused packages and reboot the system if required. | | `bruzit.ansible.system` |
 | `bruzit.ansible.download` | Download tools | Yes | |
 | `bruzit.ansible.git` | Git setup | Yes | |
 | `bruzit.ansible.system` | System-related tasks reboot handler or reboot when required handler. `reboot_when_needed` [boolean, default `false`] Reboots a system only when true. | Yes | |
@@ -37,6 +38,7 @@ Create an Ansible playbook:
 ---
 - hosts: all
   roles:
+    - role: bruzit.ansible.apt
     - role: bruzit.ansible.git
     - role: bruzit.ansible.terraform
 ```

@@ -1,0 +1,10 @@
+---
+- name: Upgrade deb packages
+  become: true
+  ansible.builtin.apt:
+    autoclean: true
+    autoremove: true
+    purge: true
+    upgrade: full
+  listen: Upgrade deb packages
+  notify: Reboot system when required

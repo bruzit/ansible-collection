@@ -1,5 +1,6 @@
 ---
 - hosts: all
   roles:
+    - role: bruzit.ansible.apt
     - role: bruzit.ansible.git
     - role: bruzit.ansible.terraform
