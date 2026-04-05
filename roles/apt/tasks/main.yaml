@@ -1,0 +1,10 @@
+---
+- name: Update and upgrade all deb packages
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+  notify: Upgrade deb packages
+
+- name: Enforce upgrade and reboot now rather than at the end of the playbook
+  ansible.builtin.meta: flush_handlers
+  
