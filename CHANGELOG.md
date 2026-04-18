@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0](https://github.com/bruzit/ansible-collection/compare/v0.6.0...v0.7.0) (2026-04-18)
+
+### Features
+
+* add flatpak role ([4224d7f](https://github.com/bruzit/ansible-collection/commit/4224d7f5ff528e5aa5d6e7457876c3b7c9e2ad18))
+
 ## [0.6.0](https://github.com/bruzit/ansible-collection/compare/v0.5.0...v0.6.0) (2026-04-05)
 
 ### Features
