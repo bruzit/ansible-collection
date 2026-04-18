@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.0](https://github.com/bruzit/ansible-collection/compare/v0.7.0...v0.8.0) (2026-04-18)
+
+### Features
+
+* add obsidian role ([fb44c60](https://github.com/bruzit/ansible-collection/commit/fb44c60da5ef4cd5978e0e6626961f4a7c142daa))
+
 ## [0.7.0](https://github.com/bruzit/ansible-collection/compare/v0.6.0...v0.7.0) (2026-04-18)
 
 ### Features
