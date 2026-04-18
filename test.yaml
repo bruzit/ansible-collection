@@ -2,6 +2,6 @@
 - hosts: all
   roles:
     - role: bruzit.ansible.apt
-    - role: bruzit.ansible.flatpak
+    - role: bruzit.ansible.obsidian
     - role: bruzit.ansible.git
     - role: bruzit.ansible.terraform

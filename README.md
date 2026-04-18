@@ -12,6 +12,7 @@ This Ansible collection provides a set of roles designed for configuring Kubuntu
 | `bruzit.ansible.download` | Download tools | Yes | |
 | `bruzit.ansible.flatpak` | Flatpak | | |
 | `bruzit.ansible.git` | Git setup | Yes | |
+| `bruzit.ansible.obsidian` | Obsidian | | `bruzit.ansible.flatpak` |
 | `bruzit.ansible.system` | System-related tasks reboot handler or reboot when required handler. `reboot_when_needed` [boolean, default `false`] Reboots a system only when true. | Yes | |
 | `bruzit.ansible.terraform` | Terraform setup; if Bash autocompletion directory is present, autocompletion is configured. | Yes | `bruzit.ansible.download` |
 
