@@ -1,0 +1,13 @@
+---
+- name: Add Flatpak remote repository
+  become: true
+  community.general.flatpak_remote:
+    name: flathub
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    state: present
+
+- name: Install Widelands
+  become: true
+  community.general.flatpak:
+    name: org.widelands.Widelands
+    state: present
