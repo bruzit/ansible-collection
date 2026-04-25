@@ -5,3 +5,4 @@
     - role: bruzit.ansible.obsidian
     - role: bruzit.ansible.git
     - role: bruzit.ansible.terraform
+    - role: bruzit.ansible.widelands
