@@ -1,0 +1,6 @@
+---
+- name: Install snapd
+  become: true
+  ansible.builtin.package:
+    name: snapd
+    state: present
