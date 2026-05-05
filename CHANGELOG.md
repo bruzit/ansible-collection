@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.10.0](https://github.com/bruzit/ansible-collection/compare/v0.9.0...v0.10.0) (2026-05-05)
+
+### Features
+
+* add snap role ([c9beb3b](https://github.com/bruzit/ansible-collection/commit/c9beb3be975e9e0d0b321650ac03de1823385386))
+
 ## [0.9.0](https://github.com/bruzit/ansible-collection/compare/v0.8.0...v0.9.0) (2026-04-25)
 
 ### Features
