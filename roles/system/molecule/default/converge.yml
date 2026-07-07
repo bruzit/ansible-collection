@@ -1,0 +1,33 @@
+- name: Converge — no reboot required
+  hosts: all
+  become: true
+
+  vars:
+    reboot_when_needed: true
+
+  pre_tasks:
+    - name: Ensure /var/run/reboot-required is absent
+      ansible.builtin.file:
+        path: /var/run/reboot-required
+        state: absent
+
+    - name: Record uptime before triggering handler
+      ansible.builtin.command: cat /proc/uptime
+      register: uptime_before
+      changed_when: false
+
+    - name: Store boot time as a fact for the verify phase
+      ansible.builtin.set_fact:
+        boot_time_before: "{{ uptime_before.stdout.split()[0] | float }}"
+
+  roles:
+    - role: system
+
+  tasks:
+    - name: Simulate a task that requires a reboot
+      ansible.builtin.debug:
+        msg: >
+          Notifying 'Reboot system when required'; the stat handler will find
+          no sentinel file and will NOT chain-notify 'Reboot system'.
+      changed_when: true
+      notify: Reboot system when required
