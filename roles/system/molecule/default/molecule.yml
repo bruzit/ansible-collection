@@ -1,0 +1,46 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: default
+  options:
+    managed: false          # molecule connects only; QEMU is booted by CI script
+
+platforms:
+  - name: ubuntu-22
+
+provisioner:
+  name: ansible
+  options:
+    diff: true
+  inventory:
+    links:
+      host_vars: ../../../../.github/molecule-vm-inventory/host_vars
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+    ssh_connection:
+      pipelining: true
+  env:
+    ANSIBLE_ROLES_PATH: "../../.."
+
+verifier:
+  name: ansible
+
+scenario:
+  # The converge deliberately notifies the reboot handler via an
+  # always-changed task to exercise the no-reboot path, so it can never
+  # be idempotent. Skip molecule's idempotence step.
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - side_effect
+    - verify
+    - cleanup
+    - destroy
