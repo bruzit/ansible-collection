@@ -40,7 +40,7 @@ jobs:
 
   vm:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     strategy:
       fail-fast: false
@@ -81,11 +81,13 @@ jobs:
       - name: Install Ansible collections
         run: ansible-galaxy collection install -r requirements.yml
 
-      - name: Cache Ubuntu cloud image
+      - name: Cache Ubuntu cloud images
         uses: actions/cache@v4
         with:
-          path: /tmp/molecule-vm/ubuntu-22.img
-          key: cloud-image-server-22-v1
+          path: |
+            /tmp/molecule-vm/ubuntu-24.img
+            /tmp/molecule-vm/ubuntu-26.img
+          key: cloud-images-24-26-v1
 
       - name: Boot VMs
         run: bash "$GITHUB_WORKSPACE/.github/scripts/molecule-vm-up.sh"
