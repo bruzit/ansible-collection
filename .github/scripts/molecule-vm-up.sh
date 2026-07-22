@@ -16,8 +16,8 @@ ssh_authorized_keys:
 package_update: false
 EOF
 
-declare -A IMAGES=( [ubuntu-22]=22.04 )
-declare -A PORTS=(  [ubuntu-22]=2222 )
+declare -A IMAGES=( [ubuntu-24]=24.04 [ubuntu-26]=26.04 )
+declare -A PORTS=(  [ubuntu-24]=2404  [ubuntu-26]=2604  )
 
 for vm in "${!IMAGES[@]}"; do
   ver=${IMAGES[$vm]}; port=${PORTS[$vm]}
