@@ -15,7 +15,7 @@ jobs:
       issues: write
       pull-requests: write
     with:
-      GH_APP_ID: ${{ vars.GH_APP_ID }}
+      GH_SEM_REL_APP_ID: ${{ vars.GH_SEM_REL_APP_ID }}
       semantic_release_plugins: "@semantic-release/exec"
     secrets:
-      GH_APP_PEM_FILE: ${{ secrets.GH_APP_PEM_FILE }}
+      GH_SEM_REL_APP_PEM_FILE: ${{ secrets.GH_SEM_REL_APP_PEM_FILE }}
