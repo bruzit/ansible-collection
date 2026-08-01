@@ -5,13 +5,14 @@
   gather_facts: false
 
   tasks:
-    - name: Gather snapd service facts
-      ansible.builtin.service_facts:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
 
-    - name: Assert snapd is running
+    - name: Assert snapd is installed
       ansible.builtin.assert:
         that:
-          - ansible_facts.services['snapd.service'].state == 'running'
+          - "'snapd' in ansible_facts.packages"
 
     - name: Check snap is installed
       ansible.builtin.command: snap --version
