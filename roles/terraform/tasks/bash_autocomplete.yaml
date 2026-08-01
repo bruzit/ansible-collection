@@ -7,7 +7,7 @@
 - name: Add Terraform bash autocomplete
   become: true
   ansible.builtin.copy:
-    content: 'complete -C /usr/bin/terraform terraform'
+    content: 'complete -C /usr/local/bin/terraform terraform'
     dest: /etc/bash_completion.d/terraform
     owner: root
     group: root
