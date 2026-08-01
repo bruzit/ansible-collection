@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather snapd service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert snapd is running
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['snapd.service'].state == 'running'
+
+    - name: Check snap is installed
+      ansible.builtin.command: snap --version
+      register: snap_version
+      changed_when: false
+      failed_when: snap_version.rc != 0
+
+    - name: Assert snap output
+      ansible.builtin.assert:
+        that:
+          - "'snap' in snap_version.stdout"
