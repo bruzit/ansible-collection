@@ -25,7 +25,7 @@ Add to `requirements.yaml`:
 ```yaml
 ---
 collections:
-  - name: git+https://github.com/bruzit/ansible-collection.git,main
+  - name: git+https://github.com/bruzit/ansible-collection.git,v0
 ```
 
 Install dependencies:
