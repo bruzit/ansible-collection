@@ -13,6 +13,7 @@ jobs:
       matrix:
         role:
           - download
+          - flatpak
           - git
           - terraform
 
