@@ -14,8 +14,8 @@ platforms:
     image: docker.io/library/ubuntu:24.04
     pre_build_image: true
 
-  - name: ubuntu-25.10
-    image: docker.io/library/ubuntu:25.10
+  - name: ubuntu-26
+    image: docker.io/library/ubuntu:26.04
     pre_build_image: true
 
 provisioner:
