@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check Flatpak is installed
+      ansible.builtin.command: flatpak --version
+      register: flatpak_version
+      changed_when: false
+      failed_when: flatpak_version.rc != 0
+
+    - name: Assert flatpak output
+      ansible.builtin.assert:
+        that:
+          - "'Flatpak' in flatpak_version.stdout"
