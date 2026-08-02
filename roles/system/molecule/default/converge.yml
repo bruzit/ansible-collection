@@ -1,3 +1,4 @@
+---
 - name: Converge — no reboot required
   hosts: all
   become: true
@@ -10,15 +11,6 @@
       ansible.builtin.file:
         path: /var/run/reboot-required
         state: absent
-
-    - name: Record uptime before triggering handler
-      ansible.builtin.command: cat /proc/uptime
-      register: uptime_before
-      changed_when: false
-
-    - name: Store boot time as a fact for the verify phase
-      ansible.builtin.set_fact:
-        boot_time_before: "{{ uptime_before.stdout.split()[0] | float }}"
 
   roles:
     - role: system

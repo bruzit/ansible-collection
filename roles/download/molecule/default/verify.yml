@@ -8,14 +8,12 @@
       ansible.builtin.stat:
         path: /etc/ssl/certs
       register: ca_certificates
-      changed_when: false
       failed_when: not ca_certificates.stat.exists
 
     - name: Check unzip is installed
       ansible.builtin.command: unzip -v
       register: unzip_version
       changed_when: false
-      failed_when: unzip_version.rc != 0
 
     - name: Assert unzip output
       ansible.builtin.assert:
