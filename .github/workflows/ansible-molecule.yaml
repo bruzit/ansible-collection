@@ -4,9 +4,17 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   molecule-docker-driver:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -68,8 +76,6 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v7
-        with:
-          cache: pip
 
       - name: Install Ansible and Molecule
         run: pip install "ansible-core<2.19" molecule
@@ -83,13 +89,17 @@ jobs:
       - name: Install Ansible collections
         run: ansible-galaxy collection install -r requirements.yml
 
+      - name: Compute cache week
+        id: cache-week
+        run: echo "week=$(date +%Y-%U)" >> "$GITHUB_OUTPUT"
+
       - name: Cache Ubuntu cloud images
         uses: actions/cache@v4
         with:
           path: |
             /tmp/molecule-vm/ubuntu-24.img
             /tmp/molecule-vm/ubuntu-26.img
-          key: cloud-images-24-26-v1
+          key: cloud-images-24-26-v1-${{ steps.cache-week.outputs.week }}
 
       - name: Boot VMs
         run: bash "$GITHUB_WORKSPACE/.github/scripts/molecule-vm-up.sh"
