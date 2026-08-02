@@ -19,17 +19,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
 
       - name: Install dependencies
         run: >
           pip install
           "ansible-core<2.19"
           molecule
-          molecule-docker
+          "molecule-plugins[docker]"
           docker
 
       - name: Install Ansible collections
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Enable KVM access for runner user
         run: |
@@ -67,7 +67,7 @@ jobs:
           kvm-ok || (echo "KVM not available" && exit 1)
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           cache: pip
 
