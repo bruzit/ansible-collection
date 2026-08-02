@@ -6,5 +6,4 @@
     autoremove: true
     purge: true
     upgrade: full
-  listen: Upgrade deb packages
   notify: Reboot system when required

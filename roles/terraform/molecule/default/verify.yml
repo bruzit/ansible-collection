@@ -8,9 +8,8 @@
       ansible.builtin.command: terraform -version
       register: terraform_version
       changed_when: false
-      failed_when: terraform_version.rc != 0
 
-    - name: Assert git output
+    - name: Assert terraform output
       ansible.builtin.assert:
         that:
           - "'Terraform' in terraform_version.stdout"

@@ -16,7 +16,7 @@
   when: reboot_when_needed | default(false)
   listen: Reboot system
 
-- name: Reboot the system
+- name: Report reboot skipped
   become: true
   ansible.builtin.debug:
     msg: "Reboot skipped because `reboot_when_needed` is set to false"
