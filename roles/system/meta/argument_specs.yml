@@ -1,0 +1,9 @@
+---
+argument_specs:
+  main:
+    short_description: System handlers rebooting the system when required.
+    options:
+      reboot_when_needed:
+        type: bool
+        default: false
+        description: Reboot the system when a reboot is required.

@@ -11,3 +11,17 @@ license:
 license_file: LICENSE
 repository: https://github.com/bruzit/ansible-collection
 homepage: https://github.com/bruzit/ansible-collection
+dependencies:
+  community.general: "*"
+tags:
+  - linux
+  - ubuntu
+  - kubuntu
+  - desktop
+  - server
+  - tools
+build_ignore:
+  - roles/*/molecule
+  - .github
+  - test.yaml
+  - "*.log"
