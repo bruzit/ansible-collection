@@ -22,10 +22,15 @@ declare -A PORTS=(  [ubuntu-24]=2404  [ubuntu-26]=2604  )
 for vm in "${!IMAGES[@]}"; do
   ver=${IMAGES[$vm]}; port=${PORTS[$vm]}
 
-  # Cached by actions/cache; only download on miss.
+  # Cached by actions/cache; only download and verify on miss.
   if [ ! -f "$vm.img" ]; then
     curl -fL --retry 3 -o "$vm.img" \
       "https://cloud-images.ubuntu.com/releases/$ver/release/ubuntu-$ver-server-cloudimg-amd64.img"
+    curl -fL --retry 3 -o "$vm.sums" \
+      "https://cloud-images.ubuntu.com/releases/$ver/release/SHA256SUMS"
+    sha=$(awk -v f="ubuntu-$ver-server-cloudimg-amd64.img" '$2 == f || $2 == "*" f {print $1}' "$vm.sums")
+    [ -n "$sha" ] || { echo "ERROR: no checksum for $vm.img in SHA256SUMS" >&2; exit 1; }
+    echo "$sha  $vm.img" | sha256sum -c -
   fi
 
   printf 'instance-id: %s\nlocal-hostname: %s\n' "$vm" "$vm" > meta-data
