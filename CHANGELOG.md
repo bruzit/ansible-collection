@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.11.1](https://github.com/bruzit/ansible-collection/compare/v0.11.0...v0.11.1) (2026-08-02)
+
 ## [0.11.0](https://github.com/bruzit/ansible-collection/compare/v0.10.1...v0.11.0) (2026-08-02)
 
 ## [0.10.1](https://github.com/bruzit/ansible-collection/compare/v0.10.0...v0.10.1) (2026-08-02)
