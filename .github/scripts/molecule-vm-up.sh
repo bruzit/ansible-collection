@@ -46,7 +46,7 @@ for vm in "${!IMAGES[@]}"; do
     -drive "file=$vm-seed.iso,format=raw,if=virtio" \
     -netdev "user,id=net0,hostfwd=tcp::$port-:22" \
     -device "virtio-net-pci,netdev=net0" \
-    -display none -serial null -daemonize -pidfile "$vm.pid"
+    -display none -serial "file:$vm.serial.log" -daemonize -pidfile "$vm.pid"
 done
 
 # Wait for SSH on each VM (can take ~30-90s).
