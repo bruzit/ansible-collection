@@ -1,7 +1,4 @@
 ---
-dependency:
-  name: galaxy
-
 driver:
   name: default
   options:
@@ -12,7 +9,8 @@ platforms:
   - name: ubuntu-26
 
 provisioner:
-  name: ansible
+  playbooks:
+    prepare: ../../../../.config/molecule/prepare-vm.yaml
   options:
     diff: true
   inventory:
@@ -23,8 +21,6 @@ provisioner:
       interpreter_python: auto_silent
     ssh_connection:
       pipelining: true
-  env:
-    ANSIBLE_ROLES_PATH: "../../.."
 
 verifier:
   name: ansible

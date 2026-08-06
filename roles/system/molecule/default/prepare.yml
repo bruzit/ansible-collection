@@ -1,9 +1,0 @@
----
-- name: Prepare
-  hosts: all
-  gather_facts: false
-
-  tasks:
-    - name: Wait for cloud-init to settle
-      ansible.builtin.raw: cloud-init status --wait || true
-      changed_when: false
