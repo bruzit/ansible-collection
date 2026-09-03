@@ -22,6 +22,7 @@ jobs:
         role:
           - download
           - flatpak
+          - gh
           - git
           - terraform
 

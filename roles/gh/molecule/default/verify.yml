@@ -1,0 +1,47 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert gh is installed
+      ansible.builtin.assert:
+        that:
+          - "'gh' in ansible_facts.packages"
+
+    - name: Check gh is installed
+      ansible.builtin.command: gh --version
+      register: gh_version
+      changed_when: false
+      failed_when: gh_version.rc != 0
+
+    - name: Assert gh output
+      ansible.builtin.assert:
+        that:
+          - "'GitHub CLI' in gh_version.stdout"
+
+    - name: Check apt source file exists
+      ansible.builtin.stat:
+        path: /etc/apt/sources.list.d/github-cli.list
+      register: apt_source
+
+    - name: Assert apt source file exists
+      ansible.builtin.assert:
+        that:
+          - apt_source.stat.exists
+
+    - name: Read apt source file
+      ansible.builtin.slurp:
+        src: /etc/apt/sources.list.d/github-cli.list
+      register: apt_source_content
+
+    - name: Assert apt source contains expected content
+      ansible.builtin.assert:
+        that:
+          - "'cli.github.com' in (apt_source_content.content | b64decode)"
+          - "'stable' in (apt_source_content.content | b64decode)"
