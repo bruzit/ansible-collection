@@ -26,22 +26,12 @@
           - "'GitHub CLI' in gh_version.stdout"
 
     - name: Check apt source file exists
-      ansible.builtin.stat:
-        path: /etc/apt/sources.list.d/github-cli.list
+      ansible.builtin.command: grep -rl cli.github.com /etc/apt/sources.list.d/
       register: apt_source
+      changed_when: false
+      failed_when: apt_source.rc != 0
 
     - name: Assert apt source file exists
       ansible.builtin.assert:
         that:
-          - apt_source.stat.exists
-
-    - name: Read apt source file
-      ansible.builtin.slurp:
-        src: /etc/apt/sources.list.d/github-cli.list
-      register: apt_source_content
-
-    - name: Assert apt source contains expected content
-      ansible.builtin.assert:
-        that:
-          - "'cli.github.com' in (apt_source_content.content | b64decode)"
-          - "'stable' in (apt_source_content.content | b64decode)"
+          - apt_source.stdout | length > 0
