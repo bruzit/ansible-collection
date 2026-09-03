@@ -23,7 +23,7 @@
     - name: Assert gh output
       ansible.builtin.assert:
         that:
-          - "'GitHub CLI' in gh_version.stdout"
+          - "'gh version' in gh_version.stdout"
 
     - name: Check apt source file exists
       ansible.builtin.command: grep -rl cli.github.com /etc/apt/sources.list.d/
