@@ -1,4 +1,12 @@
 ---
+- name: Install CA certificates and GPG
+  become: true
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - gnupg
+    state: present
+
 - name: Install GitHub CLI signing key
   become: true
   ansible.builtin.get_url:
