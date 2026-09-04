@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/bruzit/ansible-collection/compare/v0.11.1...v0.12.0) (2026-09-04)
+
+### Features
+
+* add gh role installing github cli from vendor apt repo ([0ca8723](https://github.com/bruzit/ansible-collection/commit/0ca8723ee917ec63169f058f55c94d1555cef2d9))
+
+### Bug Fixes
+
+* assert gh version output not github cli name ([800e9a1](https://github.com/bruzit/ansible-collection/commit/800e9a1f5dca76d0338cdd889f349ac40031db23))
+* capture qemu serial logs for vm molecule runs ([faa8d35](https://github.com/bruzit/ansible-collection/commit/faa8d356bf48ed5a2d53d785ab7b43805960d559))
+* install ca-certificates and gnupg before adding gh apt repo ([3f9c449](https://github.com/bruzit/ansible-collection/commit/3f9c449d5d30f51f9c16c2f07501a75ab4362191))
+
 ## [0.11.1](https://github.com/bruzit/ansible-collection/compare/v0.11.0...v0.11.1) (2026-08-02)
 
 ## [0.11.0](https://github.com/bruzit/ansible-collection/compare/v0.10.1...v0.11.0) (2026-08-02)
