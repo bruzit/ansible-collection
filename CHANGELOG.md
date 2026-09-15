@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1](https://github.com/bruzit/ansible-collection/compare/v0.12.0...v0.12.1) (2026-09-15)
+
+### Bug Fixes
+
+* **ci:** branch pushes with tags-ignore ([f361be7](https://github.com/bruzit/ansible-collection/commit/f361be730050b473fbe5506fbee3a82067cbc033))
+* **ci:** run molecule exactly once per commit ([a6142c2](https://github.com/bruzit/ansible-collection/commit/a6142c2bfcb3482696fb3a620e7ed4bf0eb08ea9))
+
 ## [0.12.0](https://github.com/bruzit/ansible-collection/compare/v0.11.1...v0.12.0) (2026-09-04)
 
 ### Features
