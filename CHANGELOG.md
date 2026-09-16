@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.2](https://github.com/bruzit/ansible-collection/compare/v0.12.1...v0.12.2) (2026-09-16)
+
+### Bug Fixes
+
+* **ci:** use ubuntu-latest for vm job ([5f10f98](https://github.com/bruzit/ansible-collection/commit/5f10f984c6d5446d24df2449ce7be46eaa67353b))
+
 ## [0.12.1](https://github.com/bruzit/ansible-collection/compare/v0.12.0...v0.12.1) (2026-09-15)
 
 ### Bug Fixes
