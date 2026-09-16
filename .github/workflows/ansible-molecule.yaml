@@ -73,7 +73,7 @@ jobs:
   vm:
     needs: gate
     if: needs.gate.outputs.run == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 25
 
     strategy:
