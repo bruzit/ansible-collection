@@ -5,7 +5,7 @@ version: 0.12.2
 readme: README.md
 authors:
   - Martin Bružina
-description: A collection of Kubuntu desktop and Ubuntu server roles.
+description: Molecule-tested roles that provision and maintain Kubuntu desktops and Ubuntu servers.
 license:
   - MIT
 license_file: LICENSE

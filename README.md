@@ -1,6 +1,6 @@
 # Ansible Collection
 
-This Ansible collection provides a set of roles designed for configuring Kubuntu desktop and Ubuntu server environments.
+Ansible collection of Molecule-tested roles that provision and maintain Kubuntu desktops and Ubuntu servers.
 
 ## Features
 
