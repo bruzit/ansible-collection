@@ -5,6 +5,7 @@ driver:
     managed: false          # molecule connects only; QEMU is booted by CI script
 
 platforms:
+  - name: ubuntu-22
   - name: ubuntu-24
   - name: ubuntu-26
 
