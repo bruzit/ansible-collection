@@ -122,9 +122,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            /tmp/molecule-vm/ubuntu-22.img
             /tmp/molecule-vm/ubuntu-24.img
             /tmp/molecule-vm/ubuntu-26.img
-          key: cloud-images-24-26-v1-${{ steps.cache-week.outputs.week }}
+          key: cloud-images-22-24-26-v1-${{ steps.cache-week.outputs.week }}
 
       - name: Boot VMs
         run: bash "$GITHUB_WORKSPACE/.github/scripts/molecule-vm-up.sh"
