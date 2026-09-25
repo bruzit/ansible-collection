@@ -1,0 +1,43 @@
+---
+- name: Get the latest Claude Code version
+  ansible.builtin.uri:
+    url: https://downloads.claude.ai/claude-code-releases/latest
+    return_content: true
+  register: claude_latest
+  check_mode: false
+
+- name: Set Claude Code version and platform
+  ansible.builtin.set_fact:
+    claude_version: "{{ claude_latest.content | trim }}"
+    claude_platform: "linux-{{ {'x86_64': 'x64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+
+- name: Check if Claude Code is present with the right version
+  ansible.builtin.command: "{{ ansible_facts['env']['HOME'] }}/.local/bin/claude --version"
+  register: claude_installed_version
+  changed_when: false
+  failed_when: false
+
+- name: Install Claude Code
+  when: claude_version not in (claude_installed_version.stdout | default(''))
+  block:
+    - name: Get Claude Code release manifest
+      ansible.builtin.uri:
+        url: "https://downloads.claude.ai/claude-code-releases/{{ claude_version }}/manifest.json"
+        return_content: true
+      register: claude_manifest
+
+    - name: Download Claude Code and verify its checksum
+      ansible.builtin.get_url:
+        url: "https://downloads.claude.ai/claude-code-releases/{{ claude_version }}/{{ claude_platform }}/claude"
+        dest: "/tmp/claude-{{ claude_version }}-{{ claude_platform }}"
+        checksum: "sha256:{{ claude_manifest.json.platforms[claude_platform].checksum }}"
+        mode: "0755"
+
+    - name: Install Claude Code launcher
+      ansible.builtin.command: "/tmp/claude-{{ claude_version }}-{{ claude_platform }} install latest"
+      changed_when: true
+
+    - name: Remove downloaded Claude Code binary
+      ansible.builtin.file:
+        path: "/tmp/claude-{{ claude_version }}-{{ claude_platform }}"
+        state: absent
