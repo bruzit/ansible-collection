@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.14.0](https://github.com/bruzit/ansible-collection/compare/v0.13.0...v0.14.0) (2026-09-26)
+
+### Features
+
+* require ansible-core 2.20 and test every supported core in ci ([2dc1a81](https://github.com/bruzit/ansible-collection/commit/2dc1a8187de4497191bcb6e03d399badfd45cc2d))
+
 ## [0.13.0](https://github.com/bruzit/ansible-collection/compare/v0.12.2...v0.13.0) (2026-09-26)
 
 ### Features
