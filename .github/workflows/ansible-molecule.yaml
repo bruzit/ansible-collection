@@ -55,6 +55,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -96,6 +98,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Enable KVM access for runner user
         run: |
@@ -115,8 +119,8 @@ jobs:
       - name: Install Ansible and Molecule
         run: pip install "ansible-core~=${{ matrix.core }}.0" molecule "molecule-plugins[docker]"
 
-      - name: Cache Ansible collections
-        uses: actions/cache@v4
+      - name: Cache Ansible collections  # zizmor: ignore[cache-poisoning] written only by this repository's own runs; nothing is published
+        uses: actions/cache@v5
         with:
           path: ~/.ansible/collections
           key: ansible-collections-${{ hashFiles('requirements.yaml') }}
@@ -128,8 +132,8 @@ jobs:
         id: cache-week
         run: echo "week=$(date +%Y-%U)" >> "$GITHUB_OUTPUT"
 
-      - name: Cache Ubuntu cloud images
-        uses: actions/cache@v4
+      - name: Cache Ubuntu cloud images  # zizmor: ignore[cache-poisoning] written only by this repository's own runs; nothing is published
+        uses: actions/cache@v5
         with:
           path: |
             /tmp/molecule-vm/ubuntu-22.img
