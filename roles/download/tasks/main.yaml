@@ -1,6 +1,0 @@
----
-- name: Install download packages
-  become: true
-  ansible.builtin.package:
-    name: unzip
-    state: present
