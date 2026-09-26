@@ -1,0 +1,30 @@
+---
+- name: Converge — reboot required
+  hosts: all
+  become: true
+
+  vars:
+    reboot_when_needed: true
+
+  pre_tasks:
+    - name: Record boot id before converge
+      ansible.builtin.command: cp /proc/sys/kernel/random/boot_id /root/boot_id_before
+      changed_when: true
+
+    - name: Create /var/run/reboot-required
+      ansible.builtin.file:
+        path: /var/run/reboot-required
+        state: touch
+        mode: "0644"
+
+  roles:
+    - role: system
+
+  tasks:
+    - name: Simulate a task that requires a reboot
+      ansible.builtin.debug:
+        msg: >
+          Notifying 'Reboot system when required'; the stat handler will find
+          the sentinel file and chain-notify 'Reboot system', which reboots.
+      changed_when: true
+      notify: Reboot system when required

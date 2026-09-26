@@ -87,6 +87,11 @@ jobs:
         role:
           - snap
           - system
+        include:
+          - role: snap
+            scenario: default
+          - role: system
+            scenario: reboot
 
     steps:
       - name: Checkout repository
@@ -137,7 +142,7 @@ jobs:
 
       - name: Run Molecule
         working-directory: roles/${{ matrix.role }}
-        run: molecule test
+        run: molecule test -s ${{ matrix.scenario }}
 
       - name: Stop VMs
         if: always()
