@@ -1,0 +1,22 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Simulate upgrade
+      ansible.builtin.command: apt-get -s dist-upgrade
+      register: apt_upgrade
+      changed_when: false
+
+    - name: Simulate autoremove
+      ansible.builtin.command: apt-get -s autoremove
+      register: apt_autoremove
+      changed_when: false
+
+    - name: Assert nothing left to upgrade or remove
+      ansible.builtin.assert:
+        that:
+          - "'0 upgraded, 0 newly installed' in apt_upgrade.stdout"
+          - "'0 to remove' in apt_autoremove.stdout"
