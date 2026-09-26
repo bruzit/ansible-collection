@@ -1,11 +1,10 @@
 ---
 - name: Verify
   hosts: all
-  gather_facts: false
 
   tasks:
     - name: Check Claude Code is installed
-      ansible.builtin.command: "{{ lookup('env', 'HOME') }}/.local/bin/claude --version"
+      ansible.builtin.command: "{{ ansible_facts['env']['HOME'] }}/.local/bin/claude --version"
       register: claude_version
       changed_when: false
 
