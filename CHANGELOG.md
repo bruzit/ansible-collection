@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.13.0](https://github.com/bruzit/ansible-collection/compare/v0.12.2...v0.13.0) (2026-09-26)
+
+### Features
+
+* add claude role installing claude code natively ([feb5651](https://github.com/bruzit/ansible-collection/commit/feb5651f355b8f6e4193cbfdf74cd13560e91973))
+
+### Bug Fixes
+
+* depend claude role on download role for ca-certificates ([95b81bf](https://github.com/bruzit/ansible-collection/commit/95b81bf24a0582fbc88ae81d1dacb5e7b805bc89))
+* resolve home directory on the target in claude molecule verify ([09de981](https://github.com/bruzit/ansible-collection/commit/09de9816a8b925cc4e52591dcdfd00b7a349d622))
+
 ## [0.12.2](https://github.com/bruzit/ansible-collection/compare/v0.12.1...v0.12.2) (2026-09-16)
 
 ### Bug Fixes
