@@ -2,7 +2,5 @@
 - name: Install download packages
   become: true
   ansible.builtin.package:
-    name:
-      - ca-certificates
-      - unzip
+    name: unzip
     state: present

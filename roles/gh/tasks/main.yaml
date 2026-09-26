@@ -1,10 +1,8 @@
 ---
-- name: Install CA certificates and GPG
+- name: Install GnuPG required by apt_repository
   become: true
   ansible.builtin.apt:
-    name:
-      - ca-certificates
-      - gnupg
+    name: gnupg
     state: present
 
 - name: Install GitHub CLI signing key
