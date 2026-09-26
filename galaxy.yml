@@ -23,5 +23,4 @@ tags:
 build_ignore:
   - roles/*/molecule
   - .github
-  - test.yaml
   - "*.log"
