@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.15.0](https://github.com/bruzit/ansible-collection/compare/v0.14.1...v0.15.0) (2026-09-26)
+
+### Features
+
+* rename reboot_when_needed to system_reboot_when_needed ([8fb21ad](https://github.com/bruzit/ansible-collection/commit/8fb21ada6891bd2f9c3a8e225adedb16ea566f12))
+
 ## [0.14.1](https://github.com/bruzit/ansible-collection/compare/v0.14.0...v0.14.1) (2026-09-26)
 
 ### Bug Fixes
