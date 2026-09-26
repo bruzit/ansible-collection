@@ -1,14 +1,14 @@
 ---
 - name: Stat Bash autocompletion directory
   ansible.builtin.stat:
-    path: /etc/bash_completion.d
+    path: /usr/share/bash-completion/completions
   register: terraform_bash_completion_dir
 
 - name: Add Terraform bash autocomplete
   become: true
   ansible.builtin.copy:
-    content: 'complete -C /usr/local/bin/terraform terraform'
-    dest: /etc/bash_completion.d/terraform
+    content: 'complete -C /usr/bin/terraform terraform'
+    dest: /usr/share/bash-completion/completions/terraform
     owner: root
     group: root
     mode: '0644'
