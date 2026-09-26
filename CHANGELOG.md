@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://github.com/bruzit/ansible-collection/compare/v0.15.0...v0.16.0) (2026-09-26)
+
+### Features
+
+* add ca_certificates role ([6e04adc](https://github.com/bruzit/ansible-collection/commit/6e04adc4ce29c091c7cffee5d9277af993c07683))
+* install terraform from the hashicorp apt repository ([c19dc0b](https://github.com/bruzit/ansible-collection/commit/c19dc0b7f474d6a7f19e647608346129802e0cb8))
+
 ## [0.15.0](https://github.com/bruzit/ansible-collection/compare/v0.14.1...v0.15.0) (2026-09-26)
 
 ### Features
