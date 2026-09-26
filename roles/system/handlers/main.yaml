@@ -5,8 +5,8 @@
     get_attributes: false
     get_checksum: false
     get_mime: false
-  register: reboot_required
-  changed_when: reboot_required.stat.exists
+  register: system_reboot_required
+  changed_when: system_reboot_required.stat.exists
   listen: Reboot system when required
   notify: Reboot system
 

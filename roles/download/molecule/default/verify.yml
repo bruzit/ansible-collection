@@ -7,15 +7,15 @@
     - name: Check ca-certificates is installed
       ansible.builtin.stat:
         path: /etc/ssl/certs
-      register: ca_certificates
-      failed_when: not ca_certificates.stat.exists
+      register: download_ca_certificates
+      failed_when: not download_ca_certificates.stat.exists
 
     - name: Check unzip is installed
-      ansible.builtin.command: unzip -v
-      register: unzip_version
+      ansible.builtin.command: unzip -v  # noqa: command-instead-of-module
+      register: download_unzip_version
       changed_when: false
 
     - name: Assert unzip output
       ansible.builtin.assert:
         that:
-          - "'UnZip' in unzip_version.stdout"
+          - "'UnZip' in download_unzip_version.stdout"

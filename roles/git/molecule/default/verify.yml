@@ -5,12 +5,12 @@
 
   tasks:
     - name: Check git is installed
-      ansible.builtin.command: git --version
+      ansible.builtin.command: git --version  # noqa: command-instead-of-module
       register: git_version
       changed_when: false
 
     - name: Check git is configured
-      ansible.builtin.command: git config --get push.autoSetupRemote
+      ansible.builtin.command: git config --get push.autoSetupRemote  # noqa: command-instead-of-module
       register: git_config_push_auto_setup_remote
       changed_when: false
 

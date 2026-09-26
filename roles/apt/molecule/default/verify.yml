@@ -6,12 +6,12 @@
 
   tasks:
     - name: Simulate upgrade
-      ansible.builtin.command: apt-get -s dist-upgrade
+      ansible.builtin.command: apt-get -s dist-upgrade  # noqa: command-instead-of-module
       register: apt_upgrade
       changed_when: false
 
     - name: Simulate autoremove
-      ansible.builtin.command: apt-get -s autoremove
+      ansible.builtin.command: apt-get -s autoremove  # noqa: command-instead-of-module
       register: apt_autoremove
       changed_when: false
 

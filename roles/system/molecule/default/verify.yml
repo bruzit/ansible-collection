@@ -11,14 +11,14 @@
         get_attributes: false
         get_checksum: false
         get_mime: false
-      register: sentinel_check
+      register: system_sentinel_check
 
     - name: Fail if sentinel file appeared unexpectedly
       ansible.builtin.fail:
         msg: >
           /var/run/reboot-required was found but the scenario did not create it.
           Something outside the handler wrote the file.
-      when: sentinel_check.stat.exists
+      when: system_sentinel_check.stat.exists
 
     - name: Assert connectivity is healthy
       ansible.builtin.ping:
