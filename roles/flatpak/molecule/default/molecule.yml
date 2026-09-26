@@ -1,1 +1,9 @@
 ---
+platforms:
+  - name: ubuntu-24
+    image: docker.io/library/ubuntu:24.04
+    pre_build_image: true
+
+  - name: ubuntu-26
+    image: docker.io/library/ubuntu:26.04
+    pre_build_image: true
