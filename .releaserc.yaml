@@ -15,4 +15,3 @@ plugins:
     - assets:
         - CHANGELOG.md
         - galaxy.yml
-  - semantic-release-major-tag
