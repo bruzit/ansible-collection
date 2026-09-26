@@ -2,7 +2,7 @@
 - name: Stat Bash autocompletion directory
   ansible.builtin.stat:
     path: /etc/bash_completion.d
-  register: bash_completion_dir
+  register: terraform_bash_completion_dir
 
 - name: Add Terraform bash autocomplete
   become: true
@@ -12,4 +12,4 @@
     owner: root
     group: root
     mode: '0644'
-  when: bash_completion_dir.stat.exists
+  when: terraform_bash_completion_dir.stat.exists

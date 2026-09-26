@@ -8,12 +8,12 @@
     - name: Read boot id recorded before converge
       ansible.builtin.slurp:
         src: /root/boot_id_before
-      register: boot_id_before
+      register: system_boot_id_before
 
     - name: Read current boot id
       ansible.builtin.slurp:
         src: /proc/sys/kernel/random/boot_id
-      register: boot_id_now
+      register: system_boot_id_now
 
     - name: Check /var/run/reboot-required
       ansible.builtin.stat:
@@ -21,11 +21,11 @@
         get_attributes: false
         get_checksum: false
         get_mime: false
-      register: sentinel
+      register: system_sentinel
 
     - name: Assert the system rebooted
       ansible.builtin.assert:
         that:
-          - (boot_id_before.content | b64decode | trim) != (boot_id_now.content | b64decode | trim)
-          - not sentinel.stat.exists
+          - (system_boot_id_before.content | b64decode | trim) != (system_boot_id_now.content | b64decode | trim)
+          - not system_sentinel.stat.exists
         fail_msg: boot id unchanged or sentinel survived, the reboot handler did not reboot

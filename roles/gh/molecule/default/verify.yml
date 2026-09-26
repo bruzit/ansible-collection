@@ -27,11 +27,11 @@
 
     - name: Check apt source file exists
       ansible.builtin.command: grep -rl cli.github.com /etc/apt/sources.list.d/
-      register: apt_source
+      register: gh_apt_source
       changed_when: false
-      failed_when: apt_source.rc != 0
+      failed_when: gh_apt_source.rc != 0
 
     - name: Assert apt source file exists
       ansible.builtin.assert:
         that:
-          - apt_source.stdout | length > 0
+          - gh_apt_source.stdout | length > 0
