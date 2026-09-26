@@ -46,7 +46,6 @@ jobs:
           - apt
           - ca_certificates
           - claude
-          - download
           - flatpak
           - gh
           - git
