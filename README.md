@@ -6,19 +6,20 @@ Ansible collection of Molecule-tested roles that provision and maintain Kubuntu 
 
 ### Roles
 
-| Role                       | Description                                                                                                                                                  | Tests | Dependencies              |
-|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|---------------------------|
-| `bruzit.ansible.apt`       | Deb package updates and upgrades using the apt package manager. Cleans up unused packages and reboot the system if required.                                 | Yes   | `bruzit.ansible.system`   |
-| `bruzit.ansible.claude`    | Claude Code native install to `~/.local/bin`, latest version, checksum verified.                                                                             | Yes   | `bruzit.ansible.download` |
-| `bruzit.ansible.download`  | Download tools                                                                                                                                               | Yes   |                           |
-| `bruzit.ansible.flatpak`   | Flatpak                                                                                                                                                      | Yes   |                           |
-| `bruzit.ansible.gh`        | GitHub CLI from the GitHub apt repository.                                                                                                                   | Yes   |                           |
-| `bruzit.ansible.git`       | Git setup                                                                                                                                                    | Yes   |                           |
-| `bruzit.ansible.obsidian`  | Obsidian                                                                                                                                                     |       | `bruzit.ansible.flatpak`  |
-| `bruzit.ansible.snap`      | Snap                                                                                                                                                         |       |                           |
-| `bruzit.ansible.system`    | System-related tasks reboot handler or reboot when required handler. `system_reboot_when_needed` [boolean, default `false`] Reboots a system only when true. | Yes   |                           |
-| `bruzit.ansible.terraform` | Terraform from the HashiCorp apt repository; if the Bash autocompletion directory is present, autocompletion is configured.                                  | Yes   |                           |
-| `bruzit.ansible.widelands` | Widelands game setup via Flatpak                                                                                                                             |       | `bruzit.ansible.flatpak`  |
+| Role                             | Description                                                                                                                                                  | Tests | Dependencies              |
+|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|---------------------------|
+| `bruzit.ansible.apt`             | Deb package updates and upgrades using the apt package manager. Cleans up unused packages and reboot the system if required.                                 | Yes   | `bruzit.ansible.system`   |
+| `bruzit.ansible.ca_certificates` | CA certificates for HTTPS downloads and vendor apt repositories.                                                                                             | Yes   |                           |
+| `bruzit.ansible.claude`          | Claude Code native install to `~/.local/bin`, latest version, checksum verified.                                                                             | Yes   | `bruzit.ansible.download` |
+| `bruzit.ansible.download`        | Download tools                                                                                                                                               | Yes   |                           |
+| `bruzit.ansible.flatpak`         | Flatpak                                                                                                                                                      | Yes   |                           |
+| `bruzit.ansible.gh`              | GitHub CLI from the GitHub apt repository.                                                                                                                   | Yes   |                           |
+| `bruzit.ansible.git`             | Git setup                                                                                                                                                    | Yes   |                           |
+| `bruzit.ansible.obsidian`        | Obsidian                                                                                                                                                     |       | `bruzit.ansible.flatpak`  |
+| `bruzit.ansible.snap`            | Snap                                                                                                                                                         |       |                           |
+| `bruzit.ansible.system`          | System-related tasks reboot handler or reboot when required handler. `system_reboot_when_needed` [boolean, default `false`] Reboots a system only when true. | Yes   |                           |
+| `bruzit.ansible.terraform`       | Terraform from the HashiCorp apt repository; if the Bash autocompletion directory is present, autocompletion is configured.                                  | Yes   |                           |
+| `bruzit.ansible.widelands`       | Widelands game setup via Flatpak                                                                                                                             |       | `bruzit.ansible.flatpak`  |
 
 ## Installation and Configuration
 

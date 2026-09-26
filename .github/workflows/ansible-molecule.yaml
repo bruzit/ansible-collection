@@ -44,6 +44,7 @@ jobs:
         core: ["2.20", "2.21"]
         role:
           - apt
+          - ca_certificates
           - claude
           - download
           - flatpak
