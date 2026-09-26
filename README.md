@@ -17,7 +17,7 @@ Ansible collection of Molecule-tested roles that provision and maintain Kubuntu 
 | `bruzit.ansible.obsidian`  | Obsidian                                                                                                                                                     |       | `bruzit.ansible.flatpak`  |
 | `bruzit.ansible.snap`      | Snap                                                                                                                                                         |       |                           |
 | `bruzit.ansible.system`    | System-related tasks reboot handler or reboot when required handler. `system_reboot_when_needed` [boolean, default `false`] Reboots a system only when true. | Yes   |                           |
-| `bruzit.ansible.terraform` | Terraform setup; if Bash autocompletion directory is present, autocompletion is configured.                                                                  | Yes   | `bruzit.ansible.download` |
+| `bruzit.ansible.terraform` | Terraform from the HashiCorp apt repository; if the Bash autocompletion directory is present, autocompletion is configured.                                  | Yes   |                           |
 | `bruzit.ansible.widelands` | Widelands game setup via Flatpak                                                                                                                             |       | `bruzit.ansible.flatpak`  |
 
 ## Installation and Configuration
