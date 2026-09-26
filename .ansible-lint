@@ -1,0 +1,4 @@
+---
+skip_list:
+  # ansible-lint lags behind ansible-core releases and rejects the current floor
+  - meta-runtime[unsupported-version]
