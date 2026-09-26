@@ -1,2 +1,3 @@
 .ansible/
 *.tar.gz
+megalinter-reports/
