@@ -49,6 +49,7 @@ jobs:
           - flatpak
           - gh
           - git
+          - system
           - terraform
 
     steps:
@@ -107,7 +108,7 @@ jobs:
         uses: actions/setup-python@v7
 
       - name: Install Ansible and Molecule
-        run: pip install "ansible-core~=${{ matrix.core }}.0" molecule
+        run: pip install "ansible-core~=${{ matrix.core }}.0" molecule "molecule-plugins[docker]"
 
       - name: Cache Ansible collections
         uses: actions/cache@v4
