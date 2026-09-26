@@ -1,0 +1,6 @@
+---
+- name: Install CA certificates
+  become: true
+  ansible.builtin.apt:
+    name: ca-certificates
+    state: present
