@@ -43,6 +43,7 @@ jobs:
       matrix:
         core: ["2.20", "2.21"]
         role:
+          - apt
           - claude
           - download
           - flatpak
