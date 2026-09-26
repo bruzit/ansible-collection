@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    reboot_when_needed: true
+    system_reboot_when_needed: true
 
   pre_tasks:
     - name: Ensure /var/run/reboot-required is absent
