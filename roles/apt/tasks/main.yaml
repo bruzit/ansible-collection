@@ -1,10 +1,21 @@
 ---
-- name: Update and upgrade all deb packages
+- name: Update cache and upgrade all deb packages
   become: true
   ansible.builtin.apt:
     update_cache: true
-  notify: Upgrade deb packages
+    upgrade: full
+  notify: Reboot system when required
 
-- name: Enforce upgrade and reboot now rather than at the end of the playbook
+- name: Remove and purge unused deb packages
+  become: true
+  ansible.builtin.apt:
+    autoremove: true
+    purge: true
+
+- name: Clean the local deb package cache
+  become: true
+  ansible.builtin.apt:
+    autoclean: true
+
+- name: Enforce reboot now rather than at the end of the playbook
   ansible.builtin.meta: flush_handlers
-  
