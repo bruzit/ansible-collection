@@ -41,6 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        core: ["2.20", "2.21"]
         role:
           - claude
           - download
@@ -59,7 +60,7 @@ jobs:
       - name: Install dependencies
         run: >
           pip install
-          "ansible-core<2.19"
+          "ansible-core~=${{ matrix.core }}.0"
           molecule
           "molecule-plugins[docker]"
           docker
@@ -80,6 +81,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        core: ["2.20", "2.21"]
         role:
           - snap
           - system
@@ -104,7 +106,7 @@ jobs:
         uses: actions/setup-python@v7
 
       - name: Install Ansible and Molecule
-        run: pip install "ansible-core<2.19" molecule
+        run: pip install "ansible-core~=${{ matrix.core }}.0" molecule
 
       - name: Cache Ansible collections
         uses: actions/cache@v4
