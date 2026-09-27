@@ -1,0 +1,31 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert direnv is installed
+      ansible.builtin.assert:
+        that:
+          - "'direnv' in ansible_facts.packages"
+
+    - name: Check direnv runs
+      ansible.builtin.command: direnv version
+      register: direnv_version
+      changed_when: false
+
+    - name: Check the bash hook is loaded in an interactive shell
+      ansible.builtin.command: bash -ic "declare -F _direnv_hook"
+      register: direnv_hook
+      changed_when: false
+
+    - name: Assert direnv output
+      ansible.builtin.assert:
+        that:
+          - direnv_version.stdout | trim | length > 0
+          - "'_direnv_hook' in direnv_hook.stdout"

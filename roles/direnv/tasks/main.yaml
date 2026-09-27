@@ -1,0 +1,13 @@
+---
+- name: Install direnv
+  become: true
+  ansible.builtin.apt:
+    name: direnv
+    state: present
+
+- name: Hook direnv into interactive bash shells
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/bash.bashrc
+    marker: "# {mark} ANSIBLE MANAGED BLOCK direnv"
+    block: eval "$(direnv hook bash)"
