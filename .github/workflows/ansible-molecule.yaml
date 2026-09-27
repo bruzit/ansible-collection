@@ -46,6 +46,7 @@ jobs:
           - apt
           - ca_certificates
           - claude
+          - direnv
           - flatpak
           - gh
           - git
