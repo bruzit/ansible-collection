@@ -58,6 +58,7 @@ jobs:
           - kubectl
           - kubeseal
           - oras
+          - pwgen
           - system
           - talosctl
           - terraform
