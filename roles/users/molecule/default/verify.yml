@@ -1,0 +1,31 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the account entries
+      ansible.builtin.getent:
+        database: passwd
+
+    - name: Read the AccountsService metadata
+      ansible.builtin.slurp:
+        src: /var/lib/AccountsService/users/molecule
+      register: users_accountsservice
+
+    - name: Stat the AccountsService metadata of the account without email
+      ansible.builtin.stat:
+        path: /var/lib/AccountsService/users/plain
+      register: users_plain_accountsservice
+
+    - name: Assert accounts and metadata
+      ansible.builtin.assert:
+        that:
+          - "'molecule' in ansible_facts.getent_passwd"
+          - ansible_facts.getent_passwd['molecule'][3] == 'Molecule Tester'
+          - ansible_facts.getent_passwd['molecule'][4] == '/home/molecule'
+          - ansible_facts.getent_passwd['molecule'][5] == '/bin/bash'
+          - "'plain' in ansible_facts.getent_passwd"
+          - "'Email=molecule@example.com' in (users_accountsservice.content | b64decode)"
+          - not users_plain_accountsservice.stat.exists
