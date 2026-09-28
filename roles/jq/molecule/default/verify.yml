@@ -1,0 +1,26 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert jq is installed
+      ansible.builtin.assert:
+        that:
+          - "'jq' in ansible_facts['packages']"
+
+    - name: Check jq runs
+      ansible.builtin.command:
+        argv: [jq, -n, "[1, 2] | length"]
+      register: jq_output
+      changed_when: false
+
+    - name: Assert jq output
+      ansible.builtin.assert:
+        that:
+          - jq_output.stdout | trim == '2'

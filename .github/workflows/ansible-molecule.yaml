@@ -53,6 +53,7 @@ jobs:
           - gh
           - git
           - helm
+          - jq
           - k9s
           - kubectl
           - kubeseal
