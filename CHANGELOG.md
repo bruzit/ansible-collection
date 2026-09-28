@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.0](https://github.com/bruzit/ansible-collection/compare/v0.17.0...v0.18.0) (2026-09-28)
+
+### Features
+
+* add users role ([06a9fa9](https://github.com/bruzit/ansible-collection/commit/06a9fa9c35f8b1098ee74c0b76abb4a3c7a6ff08))
+* configure git per user ([6532c2f](https://github.com/bruzit/ansible-collection/commit/6532c2f5c36bf774282527cf89e431682f8f1c60))
+
 ## [0.17.0](https://github.com/bruzit/ansible-collection/compare/v0.16.0...v0.17.0) (2026-09-27)
 
 ### Features
