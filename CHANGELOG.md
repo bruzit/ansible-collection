@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.22.0](https://github.com/bruzit/ansible-collection/compare/v0.21.0...v0.22.0) (2026-09-28)
+
+### Features
+
+* add az_cli role ([741010c](https://github.com/bruzit/ansible-collection/commit/741010c2bcf9bec509de0adf0696b60f9922f310))
+
 ## [0.21.0](https://github.com/bruzit/ansible-collection/compare/v0.20.0...v0.21.0) (2026-09-28)
 
 ### Features
