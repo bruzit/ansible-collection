@@ -1,0 +1,10 @@
+---
+- name: Install argocd
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: argocd
+    github_binary_repository: argoproj/argo-cd
+    github_binary_asset: argocd-linux-amd64
+    github_binary_sums: cli_checksums.txt
+    github_binary_version_command: argocd version --client

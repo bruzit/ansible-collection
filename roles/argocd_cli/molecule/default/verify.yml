@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check argocd runs
+      ansible.builtin.command: argocd version --client
+      register: argocd_cli_version
+      changed_when: false
+
+    - name: Assert argocd output
+      ansible.builtin.assert:
+        that:
+          - "'argocd:' in argocd_cli_version.stdout"
