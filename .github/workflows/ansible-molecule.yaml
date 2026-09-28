@@ -55,6 +55,7 @@ jobs:
           - k9s
           - kubectl
           - kubeseal
+          - oras
           - system
           - talosctl
           - terraform
