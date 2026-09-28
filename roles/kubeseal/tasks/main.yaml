@@ -1,0 +1,11 @@
+---
+- name: Install kubeseal
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: kubeseal
+    github_binary_repository: bitnami/sealed-secrets
+    github_binary_asset: "kubeseal-{version}-linux-amd64.tar.gz"
+    github_binary_sums: "sealed-secrets_{version}_checksums.txt"
+    github_binary_member: kubeseal
+    github_binary_version_command: kubeseal --version

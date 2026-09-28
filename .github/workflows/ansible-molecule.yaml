@@ -53,6 +53,7 @@ jobs:
           - git
           - helm
           - kubectl
+          - kubeseal
           - system
           - terraform
           - users
