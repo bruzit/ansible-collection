@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check helm runs
+      ansible.builtin.command: helm version
+      register: helm_version
+      changed_when: false
+
+    - name: Assert helm output
+      ansible.builtin.assert:
+        that:
+          - "'Version:' in helm_version.stdout"

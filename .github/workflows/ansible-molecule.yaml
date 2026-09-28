@@ -51,6 +51,7 @@ jobs:
           - flatpak
           - gh
           - git
+          - helm
           - kubectl
           - system
           - terraform

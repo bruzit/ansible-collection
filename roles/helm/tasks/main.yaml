@@ -1,0 +1,12 @@
+---
+- name: Install helm
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: helm
+    github_binary_repository: helm/helm
+    github_binary_download_url: https://get.helm.sh
+    github_binary_asset: "helm-v{version}-linux-amd64.tar.gz"
+    github_binary_sums: "helm-v{version}-linux-amd64.tar.gz.sha256sum"
+    github_binary_member: linux-amd64/helm
+    github_binary_version_command: helm version
