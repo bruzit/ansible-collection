@@ -1,0 +1,6 @@
+---
+- name: Install pwgen
+  become: true
+  ansible.builtin.apt:
+    name: pwgen
+    state: present

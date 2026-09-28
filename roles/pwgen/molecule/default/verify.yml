@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert pwgen is installed
+      ansible.builtin.assert:
+        that:
+          - "'pwgen' in ansible_facts['packages']"
+
+    - name: Generate a password
+      ansible.builtin.command: pwgen 12 1
+      register: pwgen_output
+      changed_when: false
+
+    - name: Assert pwgen output
+      ansible.builtin.assert:
+        that:
+          - pwgen_output.stdout | trim | length == 12
