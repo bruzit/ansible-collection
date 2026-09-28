@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check cosign runs
+      ansible.builtin.command: cosign version
+      register: cosign_version
+      changed_when: false
+
+    - name: Assert cosign output
+      ansible.builtin.assert:
+        that:
+          - "'GitVersion' in cosign_version.stdout"

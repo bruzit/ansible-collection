@@ -1,0 +1,10 @@
+---
+- name: Install cosign
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: cosign
+    github_binary_repository: sigstore/cosign
+    github_binary_asset: cosign-linux-amd64
+    github_binary_sums: cosign_checksums.txt
+    github_binary_version_command: cosign version
