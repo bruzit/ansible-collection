@@ -1,0 +1,11 @@
+---
+argument_specs:
+  main:
+    short_description: Install kubectl from the Kubernetes apt repository of one Kubernetes minor.
+    options:
+      kubectl_minor:
+        type: str
+        default: ""
+        description:
+          - Kubernetes minor to track, e.g. C("1.36"), to match a cluster.
+          - Empty resolves the latest stable release from C(https://dl.k8s.io/release/stable.txt).

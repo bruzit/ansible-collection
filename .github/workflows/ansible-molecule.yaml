@@ -50,6 +50,7 @@ jobs:
           - flatpak
           - gh
           - git
+          - kubectl
           - system
           - terraform
           - users
