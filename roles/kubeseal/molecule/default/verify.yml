@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check kubeseal runs
+      ansible.builtin.command: kubeseal --version
+      register: kubeseal_version
+      changed_when: false
+
+    - name: Assert kubeseal output
+      ansible.builtin.assert:
+        that:
+          - "'kubeseal version' in kubeseal_version.stdout"
