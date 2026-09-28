@@ -1,0 +1,41 @@
+---
+- name: Install GnuPG required by apt_repository
+  become: true
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+
+- name: Resolve the latest stable Kubernetes release
+  ansible.builtin.uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: true
+  register: kubectl_stable
+  check_mode: false
+  when: kubectl_minor | length == 0
+
+- name: Set the Kubernetes minor to track
+  ansible.builtin.set_fact:
+    kubectl_minor: "{{ kubectl_stable.content | trim | regex_replace('^v([0-9]+\\.[0-9]+).*$', '\\1') }}"
+  when: kubectl_minor | length == 0
+
+- name: Install Kubernetes signing key
+  become: true
+  ansible.builtin.get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/v{{ kubectl_minor }}/deb/Release.key"
+    dest: /usr/share/keyrings/kubernetes-apt-keyring.asc
+    mode: "0644"
+
+- name: Add Kubernetes apt repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes-apt-keyring.asc]
+      https://pkgs.k8s.io/core:/stable:/v{{ kubectl_minor }}/deb/ /
+    filename: kubernetes
+
+- name: Install kubectl
+  become: true
+  ansible.builtin.apt:
+    name: kubectl
+    state: present
+    update_cache: true
