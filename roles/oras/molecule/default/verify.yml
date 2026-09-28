@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check oras runs
+      ansible.builtin.command: oras version
+      register: oras_version
+      changed_when: false
+
+    - name: Assert oras output
+      ansible.builtin.assert:
+        that:
+          - "'Version:' in oras_version.stdout"
