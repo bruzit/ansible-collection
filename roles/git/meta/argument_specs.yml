@@ -1,0 +1,13 @@
+---
+argument_specs:
+  main:
+    short_description: Install git and configure it for the Ansible user and, optionally, per user.
+    options:
+      git_users:
+        type: list
+        elements: dict
+        default: []
+        description:
+          - Users to configure. Keys used by this role are C(name) (required), C(full_name) (C(user.name))
+            and C(email) (C(user.email)).
+          - Other keys are ignored, so the same list can be passed to other roles, such as C(users).

@@ -3,5 +3,15 @@
   hosts: all
   become: true
 
+  pre_tasks:
+    - name: Create a user to configure
+      ansible.builtin.user:
+        name: molecule
+        create_home: true
+
   roles:
     - role: git
+      git_users:
+        - name: molecule
+          full_name: Molecule Tester
+          email: molecule@example.com
