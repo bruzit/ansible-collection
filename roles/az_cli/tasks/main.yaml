@@ -1,0 +1,28 @@
+---
+- name: Install GnuPG required by apt_repository
+  become: true
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+
+- name: Install Microsoft signing key
+  become: true
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /usr/share/keyrings/microsoft.asc
+    mode: "0644"
+
+- name: Add Azure CLI apt repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.asc]
+      https://packages.microsoft.com/repos/azure-cli/ {{ ansible_facts['distribution_release'] }} main
+    filename: azure-cli
+
+- name: Install Azure CLI
+  become: true
+  ansible.builtin.apt:
+    name: azure-cli
+    state: present
+    update_cache: true

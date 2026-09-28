@@ -1,0 +1,35 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert azure-cli is installed
+      ansible.builtin.assert:
+        that:
+          - "'azure-cli' in ansible_facts.packages"
+
+    - name: Check az is installed
+      ansible.builtin.command: az version
+      register: az_cli_version
+      changed_when: false
+
+    - name: Assert az output
+      ansible.builtin.assert:
+        that:
+          - "'azure-cli' in az_cli_version.stdout"
+
+    - name: Check apt source file exists
+      ansible.builtin.command: grep -rl packages.microsoft.com/repos/azure-cli /etc/apt/sources.list.d/
+      register: az_cli_apt_source
+      changed_when: false
+
+    - name: Assert apt source file exists
+      ansible.builtin.assert:
+        that:
+          - az_cli_apt_source.stdout | length > 0
