@@ -47,6 +47,7 @@ jobs:
           - argocd_cli
           - ca_certificates
           - claude
+          - cosign
           - direnv
           - flatpak
           - gh
