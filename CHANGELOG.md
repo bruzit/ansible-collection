@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/bruzit/ansible-collection/compare/v0.19.0...v0.20.0) (2026-09-28)
+
+### Features
+
+* add cosign role ([3b616d7](https://github.com/bruzit/ansible-collection/commit/3b616d74f0abcdad31140317dc84cebf6405235d))
+* add oras role ([3cee0ed](https://github.com/bruzit/ansible-collection/commit/3cee0edc691fff64478f9c93d429551af20bdb6b))
+
 ## [0.19.0](https://github.com/bruzit/ansible-collection/compare/v0.18.0...v0.19.0) (2026-09-28)
 
 ### Features
