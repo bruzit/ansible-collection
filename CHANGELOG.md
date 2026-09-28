@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.21.0](https://github.com/bruzit/ansible-collection/compare/v0.20.0...v0.21.0) (2026-09-28)
+
+### Features
+
+* add jq role ([e48622e](https://github.com/bruzit/ansible-collection/commit/e48622e4d81c6dc01d4e186f97199082f5c8ad33))
+* add pwgen role ([ef591bf](https://github.com/bruzit/ansible-collection/commit/ef591bff28cec5b828a67a79014a761fa9f96404))
+* add yq role ([8b519ff](https://github.com/bruzit/ansible-collection/commit/8b519ffb4a389232a2d564c95b9cc7b667c4e0ab))
+
 ## [0.20.0](https://github.com/bruzit/ansible-collection/compare/v0.19.0...v0.20.0) (2026-09-28)
 
 ### Features
