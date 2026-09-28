@@ -52,6 +52,7 @@ jobs:
           - git
           - system
           - terraform
+          - users
 
     steps:
       - name: Checkout repository

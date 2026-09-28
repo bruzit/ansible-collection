@@ -1,0 +1,32 @@
+---
+- name: Ensure user accounts exist
+  become: true
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.full_name | default(omit) }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    create_home: true
+  loop: "{{ users_accounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Set the email in AccountsService user metadata
+  become: true
+  community.general.ini_file:
+    path: "/var/lib/AccountsService/users/{{ item.name }}"
+    section: User
+    option: Email
+    value: "{{ item.email }}"
+    no_extra_spaces: true
+    owner: root
+    group: root
+    mode: "0600"
+  loop: "{{ users_accounts | selectattr('email', 'defined') }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "'accountsservice' in ansible_facts.packages"
+  notify: Restart accounts-daemon

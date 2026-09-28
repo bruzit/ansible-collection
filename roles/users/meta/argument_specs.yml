@@ -1,0 +1,13 @@
+---
+argument_specs:
+  main:
+    short_description: Ensure user accounts exist, with their full name and email as user metadata.
+    options:
+      users_accounts:
+        type: list
+        elements: dict
+        default: []
+        description:
+          - Accounts to ensure. Keys used by this role are C(name) (required), C(full_name) (GECOS),
+            C(email) (AccountsService, when installed) and C(shell) (default C(/bin/bash)).
+          - Other keys are ignored, so the same list can be passed to other roles, such as C(git).
