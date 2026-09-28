@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.19.0](https://github.com/bruzit/ansible-collection/compare/v0.18.0...v0.19.0) (2026-09-28)
+
+### Features
+
+* add argocd_cli role ([c851393](https://github.com/bruzit/ansible-collection/commit/c851393900ca4ad12181ce4d54a9dc090a964179))
+* add github_binary mechanism role for checksum verified release binaries ([5764358](https://github.com/bruzit/ansible-collection/commit/57643580a2f7c516d5b68b9e9f43ea255543f0f4))
+* add helm role ([9a7d2e7](https://github.com/bruzit/ansible-collection/commit/9a7d2e7337184683fb96dc6dc0088715d408dc1e))
+* add k9s role ([d6783ce](https://github.com/bruzit/ansible-collection/commit/d6783ce8db8109fbb0aeb1229c592f873969e346))
+* add kubectl role installing kubectl from the kubernetes apt repository ([8831ce4](https://github.com/bruzit/ansible-collection/commit/8831ce494b84add175d9347bcdd56c017e7831fe))
+* add kubeseal role ([d05d88c](https://github.com/bruzit/ansible-collection/commit/d05d88c2ce6d0d526df9d5b0f4f9df0b27d1bf5c))
+* add talosctl role ([401d457](https://github.com/bruzit/ansible-collection/commit/401d457de1138568f9ae3292d4d2e9d2db443b7f))
+
 ## [0.18.0](https://github.com/bruzit/ansible-collection/compare/v0.17.0...v0.18.0) (2026-09-28)
 
 ### Features
