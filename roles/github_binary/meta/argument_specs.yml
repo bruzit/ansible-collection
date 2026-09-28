@@ -1,0 +1,35 @@
+---
+argument_specs:
+  main:
+    short_description: Install one checksum-verified binary from the latest GitHub release into C(/usr/local/bin).
+    description:
+      - C({version}) in C(github_binary_asset) and C(github_binary_sums) is replaced by the release version without the leading C(v).
+      - C(github_binary_sums_regex) overrides the regex whose first group is the asset's SHA-256 in the checksums file;
+        the default matches C(<sha256>  <asset>) lines. Not declared below, as it is templated lazily from the resolved asset name.
+    options:
+      github_binary_name:
+        type: str
+        required: true
+        description: Binary name in C(/usr/local/bin).
+      github_binary_repository:
+        type: str
+        required: true
+        description: GitHub C(owner/repo) whose latest release is installed.
+      github_binary_asset:
+        type: str
+        required: true
+        description: Release asset file name.
+      github_binary_sums:
+        type: str
+        required: true
+        description: Checksums file name, next to the asset.
+      github_binary_version_command:
+        type: str
+        required: true
+        description: Command whose output contains the installed version; the install is skipped when it does.
+      github_binary_member:
+        type: str
+        description: Path of the binary inside the asset archive; unset when the asset is the binary itself.
+      github_binary_download_url:
+        type: str
+        description: Base URL of the asset and checksums when not on GitHub releases.

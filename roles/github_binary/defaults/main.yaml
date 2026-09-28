@@ -1,0 +1,2 @@
+---
+github_binary_sums_regex: "([0-9a-f]{64})\\s+\\*?{{ github_binary_asset_name | regex_escape }}$"
