@@ -1,0 +1,10 @@
+---
+- name: Install talosctl
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: talosctl
+    github_binary_repository: siderolabs/talos
+    github_binary_asset: talosctl-linux-amd64
+    github_binary_sums: sha256sum.txt
+    github_binary_version_command: talosctl version --client

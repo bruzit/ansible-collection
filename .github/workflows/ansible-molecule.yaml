@@ -55,6 +55,7 @@ jobs:
           - kubectl
           - kubeseal
           - system
+          - talosctl
           - terraform
           - users
 

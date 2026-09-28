@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check talosctl runs
+      ansible.builtin.command: talosctl version --client
+      register: talosctl_version
+      changed_when: false
+
+    - name: Assert talosctl output
+      ansible.builtin.assert:
+        that:
+          - "'Tag:' in talosctl_version.stdout"
