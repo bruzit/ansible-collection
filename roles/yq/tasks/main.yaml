@@ -1,0 +1,11 @@
+---
+- name: Install yq
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: yq
+    github_binary_repository: mikefarah/yq
+    github_binary_asset: yq_linux_amd64
+    github_binary_sums: checksums-bsd
+    github_binary_sums_regex: "^SHA256 +\\(yq_linux_amd64\\) = ([0-9a-f]{64})$"
+    github_binary_version_command: yq --version

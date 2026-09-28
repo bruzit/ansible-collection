@@ -62,6 +62,7 @@ jobs:
           - talosctl
           - terraform
           - users
+          - yq
 
     steps:
       - name: Checkout repository
