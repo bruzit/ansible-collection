@@ -45,6 +45,7 @@ jobs:
         role:
           - apt
           - argocd_cli
+          - az_cli
           - ca_certificates
           - claude
           - direnv
