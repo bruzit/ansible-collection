@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check k9s runs
+      ansible.builtin.command: k9s version --short
+      register: k9s_version
+      changed_when: false
+
+    - name: Assert k9s output
+      ansible.builtin.assert:
+        that:
+          - "'Version' in k9s_version.stdout"

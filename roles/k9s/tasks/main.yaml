@@ -1,0 +1,11 @@
+---
+- name: Install k9s
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: k9s
+    github_binary_repository: derailed/k9s
+    github_binary_asset: k9s_Linux_amd64.tar.gz
+    github_binary_sums: checksums.sha256
+    github_binary_member: k9s
+    github_binary_version_command: k9s version --short
