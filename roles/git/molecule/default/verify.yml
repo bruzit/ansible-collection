@@ -14,8 +14,25 @@
       register: git_config_push_auto_setup_remote
       changed_when: false
 
+    - name: Read the per-user git configuration
+      become: true
+      become_user: molecule
+      ansible.builtin.command: git config --global --list  # noqa: command-instead-of-module
+      register: git_user_config
+      changed_when: false
+
+    - name: Stat the per-user git configuration
+      ansible.builtin.stat:
+        path: /home/molecule/.gitconfig
+      register: git_user_gitconfig
+
     - name: Assert git output
       ansible.builtin.assert:
         that:
           - "'git version' in git_version.stdout"
           - "'true' in git_config_push_auto_setup_remote.stdout"
+          - "'user.name=Molecule Tester' in git_user_config.stdout_lines"
+          - "'user.email=molecule@example.com' in git_user_config.stdout_lines"
+          - "'push.autosetupremote=true' in git_user_config.stdout_lines"
+          - git_user_gitconfig.stat.exists
+          - git_user_gitconfig.stat.pw_name == 'molecule'

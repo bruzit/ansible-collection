@@ -10,3 +10,36 @@
     name: push.autoSetupRemote
     scope: global
     value: "true"
+
+- name: Set git push.autoSetupRemote per user
+  become: true
+  become_user: "{{ item.name }}"
+  community.general.git_config:
+    name: push.autoSetupRemote
+    scope: global
+    value: "true"
+  loop: "{{ git_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Set git user.name per user
+  become: true
+  become_user: "{{ item.name }}"
+  community.general.git_config:
+    name: user.name
+    scope: global
+    value: "{{ item.full_name }}"
+  loop: "{{ git_users | selectattr('full_name', 'defined') }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Set git user.email per user
+  become: true
+  become_user: "{{ item.name }}"
+  community.general.git_config:
+    name: user.email
+    scope: global
+    value: "{{ item.email }}"
+  loop: "{{ git_users | selectattr('email', 'defined') }}"
+  loop_control:
+    label: "{{ item.name }}"
