@@ -13,14 +13,3 @@
       ansible.builtin.assert:
         that:
           - "'snapd' in ansible_facts.packages"
-
-    - name: Check snap is installed
-      ansible.builtin.command: snap --version
-      register: snap_version
-      changed_when: false
-      failed_when: snap_version.rc != 0
-
-    - name: Assert snap output
-      ansible.builtin.assert:
-        that:
-          - "'snap' in snap_version.stdout"

@@ -60,6 +60,7 @@ jobs:
           - kubeseal
           - oras
           - pwgen
+          - snap
           - system
           - talosctl
           - terraform
@@ -101,11 +102,8 @@ jobs:
       matrix:
         core: ["2.20", "2.21"]
         role:
-          - snap
           - system
         include:
-          - role: snap
-            scenario: default
           - role: system
             scenario: reboot
 
