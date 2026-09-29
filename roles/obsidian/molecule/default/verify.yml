@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: List installed Flatpak applications
+      ansible.builtin.command: flatpak list --app --columns=application
+      register: obsidian_flatpak_apps
+      changed_when: false
+
+    - name: Assert the application is installed
+      ansible.builtin.assert:
+        that:
+          - "'md.obsidian.Obsidian' in obsidian_flatpak_apps.stdout"

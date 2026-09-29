@@ -58,6 +58,7 @@ jobs:
           - k9s
           - kubectl
           - kubeseal
+          - obsidian
           - oras
           - pwgen
           - snap
