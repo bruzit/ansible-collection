@@ -1,0 +1,22 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check starship runs
+      ansible.builtin.command: starship --version
+      register: starship_version
+      changed_when: false
+
+    - name: Check the bash hook is loaded in an interactive shell
+      ansible.builtin.command: bash -ic "declare -F starship_precmd"
+      register: starship_hook
+      changed_when: false
+
+    - name: Assert starship output
+      ansible.builtin.assert:
+        that:
+          - starship_version.stdout is regex('^starship \d+\.\d+\.\d+')
+          - "'starship_precmd' in starship_hook.stdout"
