@@ -16,11 +16,11 @@ ssh_authorized_keys:
 package_update: false
 EOF
 
+# SSH port = release without the dot; must match host_vars ansible_port
 declare -A IMAGES=( [ubuntu-22]=22.04 [ubuntu-24]=24.04 [ubuntu-26]=26.04 )
-declare -A PORTS=(  [ubuntu-22]=2204  [ubuntu-24]=2404  [ubuntu-26]=2604  )
 
 for vm in "${!IMAGES[@]}"; do
-  ver=${IMAGES[$vm]}; port=${PORTS[$vm]}
+  ver=${IMAGES[$vm]}; port=${ver//./}
 
   # Cached by actions/cache; only download and verify on miss.
   if [ ! -f "$vm.img" ]; then
@@ -50,8 +50,8 @@ for vm in "${!IMAGES[@]}"; do
 done
 
 # Wait for SSH on each VM (can take ~30-90s).
-for vm in "${!PORTS[@]}"; do
-  port=${PORTS[$vm]}
+for vm in "${!IMAGES[@]}"; do
+  port=${IMAGES[$vm]//./}
   for i in $(seq 1 120); do
     if ssh -i key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
          -o ConnectTimeout=5 -p "$port" ubuntu@127.0.0.1 'true' 2>/dev/null; then

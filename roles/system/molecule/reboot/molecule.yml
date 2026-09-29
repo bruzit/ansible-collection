@@ -17,6 +17,7 @@ provisioner:
   inventory:
     links:
       host_vars: ../../../../.github/molecule-vm-inventory/host_vars
+      group_vars: ../../../../.github/molecule-vm-inventory/group_vars
   config_options:
     defaults:
       interpreter_python: auto_silent
