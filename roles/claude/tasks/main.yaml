@@ -16,6 +16,7 @@
   register: claude_installed_version
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Install Claude Code
   when: claude_version not in (claude_installed_version.stdout | default(''))
@@ -25,6 +26,7 @@
         url: "https://downloads.claude.ai/claude-code-releases/{{ claude_version }}/manifest.json"
         return_content: true
       register: claude_manifest
+      check_mode: false
 
     - name: Download Claude Code and verify its checksum
       ansible.builtin.get_url:
