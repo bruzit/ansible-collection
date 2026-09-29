@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.23.0](https://github.com/bruzit/ansible-collection/compare/v0.22.0...v0.23.0) (2026-09-29)
+
+### Features
+
+* add starship role ([86af729](https://github.com/bruzit/ansible-collection/commit/86af72993c96b545c21281c60131bf619acfd93a))
+
 ## [0.22.0](https://github.com/bruzit/ansible-collection/compare/v0.21.0...v0.22.0) (2026-09-28)
 
 ### Features
