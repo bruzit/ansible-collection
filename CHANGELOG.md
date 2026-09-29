@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.23.1](https://github.com/bruzit/ansible-collection/compare/v0.23.0...v0.23.1) (2026-09-29)
+
+### Bug Fixes
+
+* support check mode in the claude role ([1d9289d](https://github.com/bruzit/ansible-collection/commit/1d9289d8619c292aeb6d1a4b37088e7bb33fe110))
+* support check mode in the github_binary role ([8d23b1f](https://github.com/bruzit/ansible-collection/commit/8d23b1f4837f365faaf499220bd9f8feb031cb9d))
+
 ## [0.23.0](https://github.com/bruzit/ansible-collection/compare/v0.22.0...v0.23.0) (2026-09-29)
 
 ### Features
