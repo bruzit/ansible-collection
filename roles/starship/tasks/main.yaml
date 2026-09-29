@@ -1,0 +1,19 @@
+---
+- name: Install starship
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: starship
+    github_binary_repository: starship/starship
+    github_binary_asset: starship-x86_64-unknown-linux-gnu.tar.gz
+    github_binary_sums: starship-x86_64-unknown-linux-gnu.tar.gz.sha256
+    github_binary_sums_regex: "^([0-9a-f]{64})"
+    github_binary_member: starship
+    github_binary_version_command: starship --version
+
+- name: Hook starship into interactive bash shells
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/bash.bashrc
+    marker: "# {mark} ANSIBLE MANAGED BLOCK starship"
+    block: eval "$(starship init bash)"
