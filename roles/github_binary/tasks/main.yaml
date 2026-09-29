@@ -25,6 +25,7 @@
   register: github_binary_installed
   changed_when: false
   failed_when: false
+  check_mode: false
 
 - name: Install {{ github_binary_name }}
   when: github_binary_version not in github_binary_installed.stdout | default('')
