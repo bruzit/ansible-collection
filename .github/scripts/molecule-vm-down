@@ -8,3 +8,5 @@ for pid in "$WORK"/*.pid; do
   kill "$(cat "$pid")" 2>/dev/null || true
 done
 exit 0
+
+# temp
