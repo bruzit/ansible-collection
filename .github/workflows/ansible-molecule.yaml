@@ -157,7 +157,7 @@ jobs:
           key: cloud-images-22-24-26-v1-${{ steps.cache-week.outputs.week }}
 
       - name: Boot VMs
-        run: bash "$GITHUB_WORKSPACE/.github/scripts/molecule-vm-up.sh"
+        run: .github/scripts/molecule-vm-up
 
       - name: Run Molecule
         working-directory: roles/${{ matrix.role }}
@@ -165,7 +165,7 @@ jobs:
 
       - name: Stop VMs
         if: always()
-        run: bash "$GITHUB_WORKSPACE/.github/scripts/molecule-vm-down.sh"
+        run: .github/scripts/molecule-vm-down
 
       - name: Collect molecule artifacts on failure
         if: failure()

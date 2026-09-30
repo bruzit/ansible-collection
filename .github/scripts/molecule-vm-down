@@ -1,5 +1,5 @@
 #!/bin/bash
-# Tears down VMs booted by molecule-vm-up.sh.
+# Tears down VMs booted by molecule-vm-up.
 set -uxo pipefail
 
 WORK=/tmp/molecule-vm

@@ -4,6 +4,8 @@ ENABLE:
   - ANSIBLE
   - MARKDOWN
   - YAML
+ENABLE_LINTERS:
+  - BASH_SHELLCHECK
 ANSIBLE_ANSIBLE_LINT_PRE_COMMANDS:
   - command: ansible-galaxy collection install -r requirements.yaml
     cwd: workspace
