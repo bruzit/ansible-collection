@@ -19,6 +19,7 @@
     github_binary_asset_name: "{{ github_binary_asset | replace('{version}', github_binary_version) }}"
     github_binary_sums_name: "{{ github_binary_sums | replace('{version}', github_binary_version) }}"
     github_binary_dir: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}"
+    github_binary_download: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}-{{ github_binary_asset_name }}"
 
 - name: Check the installed version of {{ github_binary_name }}
   ansible.builtin.command: "{{ github_binary_version_command }}"
@@ -46,30 +47,39 @@
         path: "{{ github_binary_dir }}"
         state: directory
         mode: "0755"
+      when: github_binary_member is defined
 
     - name: Download and verify the checksum of {{ github_binary_name }}
       ansible.builtin.get_url:
         url: "{{ github_binary_url }}/{{ github_binary_asset_name }}"
-        dest: "{{ github_binary_dir }}/{{ github_binary_asset_name }}"
+        # Outside github_binary_dir: in check mode get_url needs an existing dest directory.
+        dest: "{{ github_binary_download }}"
         checksum: "sha256:{{ github_binary_checksum }}"
         mode: "0644"
 
     - name: Unpack {{ github_binary_name }}
       ansible.builtin.unarchive:
-        src: "{{ github_binary_dir }}/{{ github_binary_asset_name }}"
+        src: "{{ github_binary_download }}"
         dest: "{{ github_binary_dir }}"
         remote_src: true
-      when: github_binary_member is defined
+      when:
+        - github_binary_member is defined
+        - not ansible_check_mode
 
     - name: Install the binary of {{ github_binary_name }}
       become: true
       ansible.builtin.copy:
-        src: "{{ github_binary_dir }}/{{ github_binary_member | default(github_binary_asset_name) }}"
+        src: "{{ github_binary_dir ~ '/' ~ github_binary_member if github_binary_member is defined else github_binary_download }}"
         dest: "/usr/local/bin/{{ github_binary_name }}"
         remote_src: true
         mode: "0755"
+      when: not ansible_check_mode
 
-    - name: Remove the download directory of {{ github_binary_name }}
+    - name: Remove the downloads of {{ github_binary_name }}
       ansible.builtin.file:
-        path: "{{ github_binary_dir }}"
+        path: "{{ item }}"
         state: absent
+      loop:
+        - "{{ github_binary_dir }}"
+        - "{{ github_binary_download }}"
+      when: not ansible_check_mode
