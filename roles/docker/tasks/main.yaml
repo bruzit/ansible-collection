@@ -30,13 +30,19 @@
     state: present
     update_cache: true
 
+# service_mgr reports systemd once /sbin/init links to it, even when systemd is not PID 1 (WSL, containers)
+- name: Detect running systemd
+  ansible.builtin.stat:
+    path: /run/systemd/system
+  register: docker_systemd
+
 - name: Enable and start Docker
   become: true
   ansible.builtin.systemd_service:
     name: docker
     enabled: true
     state: started
-  when: ansible_facts['service_mgr'] == 'systemd'
+  when: docker_systemd.stat.exists
 
 - name: Add users to the docker group
   become: true
