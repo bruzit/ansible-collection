@@ -1,4 +1,8 @@
 ---
+provisioner:
+  playbooks:
+    prepare: prepare.yaml
+
 scenario:
   # First check runs on a fresh host, covering github_binary installs in check mode.
   test_sequence:
