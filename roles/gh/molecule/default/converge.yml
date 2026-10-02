@@ -2,5 +2,14 @@
 - name: Converge
   hosts: all
   become: true
+
+  pre_tasks:
+    - name: Create a user to configure
+      ansible.builtin.user:
+        name: molecule
+        create_home: true
+
   roles:
     - role: gh
+      gh_users:
+        - name: molecule

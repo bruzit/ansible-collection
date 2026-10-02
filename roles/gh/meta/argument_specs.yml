@@ -1,0 +1,13 @@
+---
+argument_specs:
+  main:
+    short_description: Install the GitHub CLI and, optionally, use it as git credential helper per user.
+    options:
+      gh_users:
+        type: list
+        elements: dict
+        default: []
+        description:
+          - Users whose git uses C(gh auth git-credential) for C(https://github.com) and C(https://gist.github.com).
+            Key used by this role is C(name) (required).
+          - Other keys are ignored, so the same list can be passed to other roles, such as C(users).
