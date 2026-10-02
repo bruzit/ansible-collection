@@ -1,0 +1,47 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert Docker packages are installed
+      ansible.builtin.assert:
+        that:
+          - "'docker-ce' in ansible_facts.packages"
+          - "'docker-ce-cli' in ansible_facts.packages"
+          - "'docker-compose-plugin' in ansible_facts.packages"
+
+    - name: Check docker is installed
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Assert docker output
+      ansible.builtin.assert:
+        that:
+          - "'Docker version' in docker_version.stdout"
+
+    - name: Read the docker group
+      ansible.builtin.command: getent group docker
+      register: docker_group
+      changed_when: false
+
+    - name: Assert the test user is in the docker group
+      ansible.builtin.assert:
+        that:
+          - "'tester' in docker_group.stdout"
+
+    - name: Check apt source file exists
+      ansible.builtin.command: grep -rl download.docker.com /etc/apt/sources.list.d/
+      register: docker_apt_source
+      changed_when: false
+
+    - name: Assert apt source file exists
+      ansible.builtin.assert:
+        that:
+          - docker_apt_source.stdout | length > 0

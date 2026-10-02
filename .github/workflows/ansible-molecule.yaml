@@ -50,6 +50,7 @@ jobs:
           - claude
           - cosign
           - direnv
+          - docker
           - flatpak
           - gh
           - git
