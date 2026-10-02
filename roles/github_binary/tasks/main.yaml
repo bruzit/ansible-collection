@@ -19,7 +19,7 @@
     github_binary_asset_name: "{{ github_binary_asset | replace('{version}', github_binary_version) }}"
     github_binary_sums_name: "{{ github_binary_sums | replace('{version}', github_binary_version) }}"
     github_binary_dir: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}"
-    github_binary_download: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}-{{ github_binary_asset_name }}"
+    github_binary_download: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}-{{ github_binary_asset | replace('{version}', github_binary_version) }}"
 
 - name: Check the installed version of {{ github_binary_name }}
   ansible.builtin.command: "{{ github_binary_version_command }}"
