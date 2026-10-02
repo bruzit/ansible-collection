@@ -1,0 +1,16 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  vars:
+    docker_users:
+      - tester
+
+  pre_tasks:
+    - name: Create the test user
+      ansible.builtin.user:
+        name: tester
+
+  roles:
+    - role: docker
