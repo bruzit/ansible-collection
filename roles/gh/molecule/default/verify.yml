@@ -13,6 +13,7 @@
       ansible.builtin.assert:
         that:
           - "'gh' in ansible_facts.packages"
+          - "'git' in ansible_facts.packages"
 
     - name: Check gh is installed
       ansible.builtin.command: gh --version
@@ -35,3 +36,24 @@
       ansible.builtin.assert:
         that:
           - gh_apt_source.stdout | length > 0
+
+    - name: Read the per-user git credential helpers
+      become: true
+      become_user: molecule
+      ansible.builtin.command: git config --global --get credential.{{ item }}.helper  # noqa: command-instead-of-module
+      register: gh_credential_helper
+      changed_when: false
+      loop:
+        - https://github.com
+        - https://gist.github.com
+
+    - name: Stat the gh binary
+      ansible.builtin.stat:
+        path: /usr/bin/gh
+      register: gh_binary
+
+    - name: Assert gh is the per-user git credential helper
+      ansible.builtin.assert:
+        that:
+          - gh_binary.stat.exists
+          - gh_credential_helper.results | map(attribute='stdout') | unique == ['!/usr/bin/gh auth git-credential']

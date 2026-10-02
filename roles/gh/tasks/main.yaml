@@ -24,3 +24,20 @@
     name: gh
     state: present
     update_cache: true
+
+- name: Install git
+  become: true
+  ansible.builtin.apt:
+    name: git
+    state: present
+
+- name: Use gh as git credential helper per user
+  become: true
+  become_user: "{{ item.0.name }}"
+  community.general.git_config:
+    name: "credential.{{ item.1 }}.helper"
+    scope: global
+    value: "!/usr/bin/gh auth git-credential"
+  loop: "{{ gh_users | product(['https://github.com', 'https://gist.github.com']) | list }}"
+  loop_control:
+    label: "{{ item.0.name }} {{ item.1 }}"
