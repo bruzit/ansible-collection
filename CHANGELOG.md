@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.25.0](https://github.com/bruzit/ansible-collection/compare/v0.24.0...v0.25.0) (2026-10-02)
+
+### Features
+
+* configure gh as git credential helper per user ([dd55760](https://github.com/bruzit/ansible-collection/commit/dd5576026813217718cf9f1086656990adead2d2))
+
 ## [0.24.0](https://github.com/bruzit/ansible-collection/compare/v0.23.2...v0.24.0) (2026-10-02)
 
 ### Features
