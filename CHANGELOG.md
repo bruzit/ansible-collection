@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.23.2](https://github.com/bruzit/ansible-collection/compare/v0.23.1...v0.23.2) (2026-10-02)
+
+### Bug Fixes
+
+* install ca certificates before the k9s fresh-host check ([06f0ef2](https://github.com/bruzit/ansible-collection/commit/06f0ef2261fa5ae237535d4ace730e69164ab279))
+* resolve the github_binary download path without a sibling fact ([292397e](https://github.com/bruzit/ansible-collection/commit/292397ed9b33ffca34fc90f813ed21589f0accc7))
+* support check mode in the github_binary role ([63c7c0c](https://github.com/bruzit/ansible-collection/commit/63c7c0cc79af6c068665651a5424fd271ad7091c))
+
+### Reverts
+
+* drop shellcheck file selection probe ([26a2070](https://github.com/bruzit/ansible-collection/commit/26a20706fe66150dd9c88917428a763d540a0240))
+
 ## [0.23.1](https://github.com/bruzit/ansible-collection/compare/v0.23.0...v0.23.1) (2026-09-29)
 
 ### Bug Fixes
