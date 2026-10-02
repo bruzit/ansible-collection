@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.24.0](https://github.com/bruzit/ansible-collection/compare/v0.23.2...v0.24.0) (2026-10-02)
+
+### Features
+
+* add docker role installing docker engine from the docker apt repository ([3c8955c](https://github.com/bruzit/ansible-collection/commit/3c8955c3aa32270802365071b537a5ce3f1e6c4c))
+
+### Bug Fixes
+
+* start docker only when systemd is running ([ce3bba3](https://github.com/bruzit/ansible-collection/commit/ce3bba3a123785bd1ec69ab5436bba7e5880e1b5))
+
 ## [0.23.2](https://github.com/bruzit/ansible-collection/compare/v0.23.1...v0.23.2) (2026-10-02)
 
 ### Bug Fixes
