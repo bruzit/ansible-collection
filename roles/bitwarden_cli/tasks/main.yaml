@@ -1,0 +1,17 @@
+---
+- name: Install unzip for the bw archive
+  become: true
+  ansible.builtin.apt:
+    name: unzip
+    state: present
+
+- name: Install bw
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: bw
+    github_binary_repository: bitwarden/clients
+    github_binary_tag_prefix: cli-v
+    github_binary_asset: "bw-linux-{version}.zip"
+    github_binary_member: bw
+    github_binary_version_command: bw --version

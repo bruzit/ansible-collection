@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check bw runs
+      ansible.builtin.command: bw --version
+      register: bitwarden_cli_version
+      changed_when: false
+
+    - name: Assert bw output
+      ansible.builtin.assert:
+        that:
+          - bitwarden_cli_version.stdout is match('^\d+\.\d+\.\d+')
