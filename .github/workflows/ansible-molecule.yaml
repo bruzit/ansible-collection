@@ -46,6 +46,7 @@ jobs:
           - apt
           - argocd_cli
           - az_cli
+          - bitwarden_cli
           - ca_certificates
           - claude
           - cosign
