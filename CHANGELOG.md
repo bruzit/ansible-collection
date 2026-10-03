@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.26.0](https://github.com/bruzit/ansible-collection/compare/v0.25.0...v0.26.0) (2026-10-03)
+
+### Features
+
+* add wsl role for wsl-specific tweaks ([66d7bda](https://github.com/bruzit/ansible-collection/commit/66d7bda3bac0d2e0b73bf50e4b9d2e037779a327))
+
 ## [0.25.0](https://github.com/bruzit/ansible-collection/compare/v0.24.0...v0.25.0) (2026-10-02)
 
 ### Features
