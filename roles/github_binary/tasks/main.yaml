@@ -6,18 +6,37 @@
     status_code: 302
   register: github_binary_latest
   check_mode: false
+  when: github_binary_tag_prefix is undefined and github_binary_sums is defined
+
+- name: Fetch the releases of {{ github_binary_name }}
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/{{ github_binary_repository }}/releases{{ '' if github_binary_tag_prefix is defined else '/latest' }}"
+  register: github_binary_releases
+  check_mode: false
+  when: github_binary_latest is skipped
+
+- name: Select the release of {{ github_binary_name }}
+  ansible.builtin.set_fact:
+    github_binary_release: >-
+      {{ github_binary_releases.json | rejectattr('draft') | rejectattr('prerelease')
+         | selectattr('tag_name', 'match', github_binary_tag_prefix | regex_escape) | first
+         if github_binary_tag_prefix is defined else github_binary_releases.json }}
+  when: github_binary_latest is skipped
 
 - name: Set the version of {{ github_binary_name }}
   ansible.builtin.set_fact:
-    github_binary_tag: "{{ github_binary_latest.location | basename }}"
-    github_binary_version: "{{ github_binary_latest.location | basename | regex_replace('^v', '') }}"
+    github_binary_tag: "{{ github_binary_resolved_tag }}"
+    github_binary_version: >-
+      {{ github_binary_resolved_tag | regex_replace('^' ~ github_binary_tag_prefix | default('') | regex_escape, '') | regex_replace('^v', '') }}
+  vars:
+    github_binary_resolved_tag: >-
+      {{ github_binary_release.tag_name if github_binary_latest is skipped else github_binary_latest.location | basename }}
 
 - name: Set the download location of {{ github_binary_name }}
   ansible.builtin.set_fact:
     github_binary_url: >-
       {{ github_binary_download_url | default('https://github.com/' ~ github_binary_repository ~ '/releases/download/' ~ github_binary_tag) }}
     github_binary_asset_name: "{{ github_binary_asset | replace('{version}', github_binary_version) }}"
-    github_binary_sums_name: "{{ github_binary_sums | replace('{version}', github_binary_version) }}"
     github_binary_dir: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}"
     github_binary_download: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}-{{ github_binary_asset | replace('{version}', github_binary_version) }}"
 
@@ -33,14 +52,29 @@
   block:
     - name: Fetch the checksums of {{ github_binary_name }}
       ansible.builtin.uri:
-        url: "{{ github_binary_url }}/{{ github_binary_sums_name }}"
+        url: "{{ github_binary_url }}/{{ github_binary_sums | replace('{version}', github_binary_version) }}"
         return_content: true
       register: github_binary_sums_file
       check_mode: false
+      when: github_binary_sums is defined
 
     - name: Extract the checksum of {{ github_binary_name }}
       ansible.builtin.set_fact:
         github_binary_checksum: "{{ github_binary_sums_file.content | regex_search(github_binary_sums_regex, '\\1', multiline=True) | first }}"
+      when: github_binary_sums is defined
+
+    - name: Take the release digest checksum of {{ github_binary_name }}
+      ansible.builtin.set_fact:
+        github_binary_checksum: >-
+          {{ github_binary_release.assets | selectattr('name', '==', github_binary_asset_name) | map(attribute='digest')
+             | first | default('', true) | regex_replace('^sha256:', '') }}
+      when: github_binary_sums is undefined
+
+    - name: Assert the checksum of {{ github_binary_name }}
+      ansible.builtin.assert:
+        that: github_binary_checksum is match('^[0-9a-f]{64}$')
+        fail_msg: "No SHA-256 for {{ github_binary_asset_name }} in {{ github_binary_tag }}"
+        quiet: true
 
     - name: Create the download directory of {{ github_binary_name }}
       ansible.builtin.file:
