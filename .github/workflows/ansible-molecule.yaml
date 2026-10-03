@@ -69,6 +69,7 @@ jobs:
           - terraform
           - users
           - widelands
+          - wsl
           - yq
 
     steps:

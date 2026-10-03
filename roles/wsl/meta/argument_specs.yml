@@ -1,0 +1,9 @@
+---
+argument_specs:
+  main:
+    short_description: WSL tweaks; C(/etc/wsl.conf) changes need C(wsl --shutdown) from Windows.
+    options:
+      wsl_default_user:
+        type: str
+        required: true
+        description: Default user of the WSL distribution, C([user] default) in C(/etc/wsl.conf).

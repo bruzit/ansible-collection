@@ -1,0 +1,50 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the managed files
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      register: wsl_files
+      loop:
+        - /etc/wsl.conf
+        - /etc/needrestart/conf.d/wsl.conf
+        - /usr/local/bin/wsl-browser
+        - /etc/profile.d/wsl-browser.sh
+
+    - name: Stat the browser wrapper
+      ansible.builtin.stat:
+        path: /usr/local/bin/wsl-browser
+      register: wsl_browser
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Query the browser alternatives
+      ansible.builtin.command: update-alternatives --query {{ item }}
+      register: wsl_alternatives
+      changed_when: false
+      loop:
+        - x-www-browser
+        - www-browser
+
+    - name: Assert the WSL setup
+      vars:
+        wsl_content: "{{ wsl_files.results | map(attribute='content') | map('b64decode') | list }}"
+      ansible.builtin.assert:
+        that:
+          - >-
+            (wsl_content[0] | community.general.from_ini) == {'user': {'default': 'molecule'}, 'boot': {'systemd': 'false'}}
+          - wsl_content[1] == '$nrconf{kernelhints} = 0;\n'
+          - wsl_content[2] == '#!/bin/sh\nexec rundll32.exe url.dll,FileProtocolHandler "$1"\n'
+          - wsl_content[3] == 'export BROWSER=/usr/local/bin/wsl-browser\n'
+          - wsl_browser.stat.mode == '0755'
+          - "'snapd' not in ansible_facts.packages"
+          - "'xdg-utils' in ansible_facts.packages"
+          - >-
+            wsl_alternatives.results | map(attribute='stdout')
+            | select('search', '^Value: /usr/local/bin/wsl-browser$', multiline=true) | list | length == 2
