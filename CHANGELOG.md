@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.27.0](https://github.com/bruzit/ansible-collection/compare/v0.26.0...v0.27.0) (2026-10-03)
+
+### Features
+
+* add bitwarden_cli role ([4a395e7](https://github.com/bruzit/ansible-collection/commit/4a395e76a8bbff1febb956f5036ae2a480a1ed0a))
+* resolve github_binary releases by tag prefix and verify api digests ([3138236](https://github.com/bruzit/ansible-collection/commit/3138236a22d5ed0b6b097a5c1674b2af934aa3be))
+
 ## [0.26.0](https://github.com/bruzit/ansible-collection/compare/v0.25.0...v0.26.0) (2026-10-03)
 
 ### Features
