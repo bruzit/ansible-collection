@@ -35,6 +35,7 @@ Ansible collection of Molecule-tested roles that provision and maintain Kubuntu 
 | `bruzit.ansible.terraform`       | Terraform from the HashiCorp apt repository; if the Bash autocompletion directory is present, autocompletion is configured.                                                   | Yes      | `bruzit.ansible.ca_certificates` |
 | `bruzit.ansible.users`           | User accounts from `users_accounts`: full name as GECOS, email in AccountsService when installed.                                                                             | Yes      |                                  |
 | `bruzit.ansible.widelands`       | Widelands game setup via Flatpak                                                                                                                                              | Yes      | `bruzit.ansible.flatpak`         |
+| `bruzit.ansible.wsl`             | WSL tweaks: default user, no systemd, snapd purged, browser via rundll32. `wsl_default_user` [string, required]. `/etc/wsl.conf` changes need `wsl --shutdown` from Windows.  | Yes      |                                  |
 | `bruzit.ansible.yq`              | yq YAML processor from checksum-verified GitHub releases.                                                                                                                     | Yes      | `bruzit.ansible.github_binary`   |
 
 ## Installation and Configuration

@@ -1,0 +1,66 @@
+---
+- name: Configure /etc/wsl.conf
+  become: true
+  community.general.ini_file:
+    path: /etc/wsl.conf
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: "0644"
+  loop:
+    - { section: user, option: default, value: "{{ wsl_default_user }}" }
+    - { section: boot, option: systemd, value: "false" }
+
+- name: Create the needrestart drop-in directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/needrestart/conf.d
+    state: directory
+    mode: "0755"
+
+- name: Disable the needrestart kernel check
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/needrestart/conf.d/wsl.conf
+    content: "$nrconf{kernelhints} = 0;\n"
+    mode: "0644"
+
+- name: Purge snapd
+  become: true
+  ansible.builtin.apt:
+    name: snapd
+    state: absent
+    purge: true
+
+- name: Install xdg-utils
+  become: true
+  ansible.builtin.apt:
+    name: xdg-utils
+    state: present
+
+# explorer.exe exits 1, cmd.exe /c start breaks on & in URLs
+- name: Install the Windows browser wrapper
+  become: true
+  ansible.builtin.copy:
+    dest: /usr/local/bin/wsl-browser
+    content: |
+      #!/bin/sh
+      exec rundll32.exe url.dll,FileProtocolHandler "$1"
+    mode: "0755"
+
+- name: Select the Windows browser wrapper as browser alternative
+  become: true
+  community.general.alternatives:
+    name: "{{ item }}"
+    link: /usr/bin/{{ item }}
+    path: /usr/local/bin/wsl-browser
+  loop:
+    - x-www-browser
+    - www-browser
+
+- name: Export BROWSER for login shells
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/profile.d/wsl-browser.sh
+    content: "export BROWSER=/usr/local/bin/wsl-browser\n"
+    mode: "0644"
