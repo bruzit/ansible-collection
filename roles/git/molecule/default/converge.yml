@@ -4,10 +4,13 @@
   become: true
 
   pre_tasks:
-    - name: Create a user to configure
+    - name: Create users to configure
       ansible.builtin.user:
-        name: molecule
+        name: "{{ item }}"
         create_home: true
+      loop:
+        - molecule
+        - molecule-norepos
 
   roles:
     - role: git
@@ -15,3 +18,7 @@
         - name: molecule
           full_name: Molecule Tester
           email: molecule@example.com
+          repositories:
+            - bruzit/.github
+        - name: molecule-norepos
+          repositories: []

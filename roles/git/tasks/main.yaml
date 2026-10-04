@@ -43,3 +43,25 @@
   loop: "{{ git_users | selectattr('email', 'defined') }}"
   loop_control:
     label: "{{ item.name }}"
+
+- name: Create Projects directory per user
+  become: true
+  become_user: "{{ item.name }}"
+  ansible.builtin.file:
+    path: "~{{ item.name }}/Projects"
+    state: directory
+    mode: "0755"
+  loop: "{{ git_users | selectattr('repositories', 'defined') | selectattr('repositories') }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Clone repositories per user
+  become: true
+  become_user: "{{ item.0.name }}"
+  ansible.builtin.git:  # noqa: latest[git]
+    repo: "https://github.com/{{ item.1 }}.git"
+    dest: "~{{ item.0.name }}/Projects/{{ item.1 | split('/') | last }}"
+    update: false
+  loop: "{{ git_users | subelements('repositories', skip_missing=true) }}"
+  loop_control:
+    label: "{{ item.0.name }} {{ item.1 }}"

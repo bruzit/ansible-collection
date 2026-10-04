@@ -8,6 +8,7 @@ argument_specs:
         elements: dict
         default: []
         description:
-          - Users to configure. Keys used by this role are C(name) (required), C(full_name) (C(user.name))
-            and C(email) (C(user.email)).
+          - Users to configure. Keys used by this role are C(name) (required), C(full_name) (C(user.name)),
+            C(email) (C(user.email)) and C(repositories) (list of C(owner/repo) cloned from GitHub over HTTPS into
+            C(~/Projects/repo) if absent, never updated).
           - Other keys are ignored, so the same list can be passed to other roles, such as C(users).
