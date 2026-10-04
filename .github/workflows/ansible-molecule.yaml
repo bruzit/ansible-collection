@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   gate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       run: ${{ steps.check.outputs.run }}
     steps:
