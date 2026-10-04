@@ -26,6 +26,23 @@
         path: /home/molecule/.gitconfig
       register: git_user_gitconfig
 
+    - name: Read the cloned repository remote
+      become: true
+      become_user: molecule
+      ansible.builtin.command: git -C /home/molecule/Projects/.github remote get-url origin  # noqa: command-instead-of-module
+      register: git_user_repository_remote
+      changed_when: false
+
+    - name: Stat the cloned repository
+      ansible.builtin.stat:
+        path: /home/molecule/Projects/.github
+      register: git_user_repository
+
+    - name: Stat the Projects directory of the user without repositories
+      ansible.builtin.stat:
+        path: /home/molecule-norepos/Projects
+      register: git_user_norepos_projects
+
     - name: Assert git output
       ansible.builtin.assert:
         that:
@@ -36,3 +53,6 @@
           - "'push.autosetupremote=true' in git_user_config.stdout_lines"
           - git_user_gitconfig.stat.exists
           - git_user_gitconfig.stat.pw_name == 'molecule'
+          - git_user_repository_remote.stdout == 'https://github.com/bruzit/.github.git'
+          - git_user_repository.stat.pw_name == 'molecule'
+          - not git_user_norepos_projects.stat.exists
