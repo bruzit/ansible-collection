@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.28.0](https://github.com/bruzit/ansible-collection/compare/v0.27.0...v0.28.0) (2026-10-04)
+
+### Features
+
+* clone repositories per git user ([f7b6c2d](https://github.com/bruzit/ansible-collection/commit/f7b6c2dce4a0740eeafcecd520e4a41fc43a4907))
+
 ## [0.27.0](https://github.com/bruzit/ansible-collection/compare/v0.26.0...v0.27.0) (2026-10-03)
 
 ### Features
