@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Query the code package status
+      ansible.builtin.command: dpkg-query -W -f=${Status} code
+      register: vscode_status
+      changed_when: false
+
+    - name: Find apt sources of the Visual Studio Code repository
+      ansible.builtin.command: grep -rl packages.microsoft.com/repos/code /etc/apt/sources.list.d/
+      register: vscode_sources
+      changed_when: false
+
+    - name: Stat the keyring of the code postinst
+      ansible.builtin.stat:
+        path: /usr/share/keyrings/microsoft.gpg
+      register: vscode_postinst_keyring
+
+    - name: Assert the Visual Studio Code setup
+      ansible.builtin.assert:
+        that:
+          - vscode_status.stdout == 'install ok installed'
+          - vscode_sources.stdout_lines == ['/etc/apt/sources.list.d/vscode.sources']
+          - not vscode_postinst_keyring.stat.exists
