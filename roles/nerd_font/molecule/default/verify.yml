@@ -1,0 +1,33 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Fetch the latest Nerd Fonts release
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest
+      register: nerd_font_release
+
+    - name: Read the version marker
+      ansible.builtin.slurp:
+        src: /usr/local/share/fonts/JetBrainsMono/.version
+      register: nerd_font_marker
+
+    - name: Find the font files
+      ansible.builtin.find:
+        paths: /usr/local/share/fonts/JetBrainsMono
+        patterns: "*.ttf"
+      register: nerd_font_files
+
+    - name: List the fonts known to fontconfig
+      ansible.builtin.command: fc-list
+      register: nerd_font_fc_list
+      changed_when: false
+
+    - name: Assert the font is installed
+      ansible.builtin.assert:
+        that:
+          - nerd_font_files.matched > 0
+          - "'JetBrainsMono Nerd Font' in nerd_font_fc_list.stdout"
+          - nerd_font_marker.content | b64decode | trim == nerd_font_release.json.tag_name

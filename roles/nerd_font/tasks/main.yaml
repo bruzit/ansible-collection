@@ -1,0 +1,86 @@
+---
+- name: Install fontconfig and xz-utils
+  become: true
+  ansible.builtin.apt:
+    name:
+      - fontconfig
+      - xz-utils
+    state: present
+
+- name: Fetch the latest Nerd Fonts release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest
+  register: nerd_font_release
+  check_mode: false
+
+- name: Set the release facts of {{ nerd_font_name }}
+  ansible.builtin.set_fact:
+    nerd_font_tag: "{{ nerd_font_release.json.tag_name }}"
+    nerd_font_dir: "/usr/local/share/fonts/{{ nerd_font_name }}"
+    nerd_font_download: "/tmp/{{ nerd_font_name }}-{{ nerd_font_release.json.tag_name }}.tar.xz"
+
+- name: Read the installed version of {{ nerd_font_name }}
+  ansible.builtin.slurp:
+    src: "{{ nerd_font_dir }}/.version"
+  register: nerd_font_marker
+  failed_when: false
+
+- name: Install the Nerd Font {{ nerd_font_name }}
+  when: nerd_font_marker.content | default('') | b64decode | trim != nerd_font_tag
+  block:
+    - name: Take the release digest checksum of {{ nerd_font_name }}
+      ansible.builtin.set_fact:
+        nerd_font_checksum: >-
+          {{ nerd_font_release.json.assets | selectattr('name', '==', nerd_font_name ~ '.tar.xz') | map(attribute='digest')
+             | first | default('', true) | regex_replace('^sha256:', '') }}
+
+    - name: Assert the checksum of {{ nerd_font_name }}
+      ansible.builtin.assert:
+        that: nerd_font_checksum is match('^[0-9a-f]{64}$')
+        fail_msg: "No SHA-256 for {{ nerd_font_name }}.tar.xz in {{ nerd_font_tag }}"
+        quiet: true
+
+    - name: Download and verify the checksum of {{ nerd_font_name }}
+      ansible.builtin.get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_font_tag }}/{{ nerd_font_name }}.tar.xz"
+        dest: "{{ nerd_font_download }}"
+        checksum: "sha256:{{ nerd_font_checksum }}"
+        mode: "0644"
+
+    - name: Remove the previous version of {{ nerd_font_name }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ nerd_font_dir }}"
+        state: absent
+
+    - name: Create the directory of {{ nerd_font_name }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ nerd_font_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Unpack {{ nerd_font_name }}
+      become: true
+      ansible.builtin.unarchive:
+        src: "{{ nerd_font_download }}"
+        dest: "{{ nerd_font_dir }}"
+        remote_src: true
+        owner: root
+        group: root
+      when: not ansible_check_mode
+      notify: Rebuild the font cache
+
+    - name: Write the version marker of {{ nerd_font_name }}
+      become: true
+      ansible.builtin.copy:
+        content: "{{ nerd_font_tag }}\n"
+        dest: "{{ nerd_font_dir }}/.version"
+        mode: "0644"
+      when: not ansible_check_mode
+
+    - name: Remove the download of {{ nerd_font_name }}
+      ansible.builtin.file:
+        path: "{{ nerd_font_download }}"
+        state: absent
+      when: not ansible_check_mode
