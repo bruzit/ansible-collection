@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.31.0](https://github.com/bruzit/ansible-collection/compare/v0.30.0...v0.31.0) (2026-10-06)
+
+### Features
+
+* add vscode role ([9b28e46](https://github.com/bruzit/ansible-collection/commit/9b28e467ed914439578199f7280bc108b680d532))
+
 ## [0.30.0](https://github.com/bruzit/ansible-collection/compare/v0.29.0...v0.30.0) (2026-10-06)
 
 ### Features
