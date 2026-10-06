@@ -1,0 +1,31 @@
+#!/bin/bash
+# Prints a JSON array of roles to test with Molecule for git diff range $1:
+# changed roles plus their transitive dependants (meta dependencies and bruzit.ansible.* references).
+# Unresolvable range or shared config change -> every role.
+set -eu
+
+cd "$(git rev-parse --show-toplevel)"
+all=$(ls roles)
+shared='^(\.github/(workflows/ansible-molecule\.yaml|scripts/|molecule-vm-inventory/)|\.config/molecule/|galaxy\.yml$|meta/|requirements\.ya?ml$)'
+
+if changed=$(git diff --name-only "$1") && ! grep -qE "$shared" <<<"$changed"; then
+  selected=$(sed -n 's|^roles/\([^/]*\)/.*|\1|p' <<<"$changed" | sort -u)
+else
+  selected=$all
+fi
+
+edges=$(for r in $all; do
+  { grep -rhoE 'bruzit\.ansible\.[a-z0-9_]+' "roles/$r"
+    cat "roles/$r"/meta/main.y*ml 2>/dev/null | yq '.dependencies[] | .role // .name // .'
+  } | sed 's/^bruzit\.ansible\.//' | grep -vx "$r" | sort -u | sed "s/$/ $r/"
+done)
+
+while next=$(awk 'NR == FNR { s[$1]; print; next } $1 in s { print $2 }' \
+    <(echo "$selected") <(echo "$edges") | sort -u | grep . || true)
+  [ "$next" != "$selected" ]; do
+  selected=$next
+done
+
+for r in $selected; do
+  [ -d "roles/$r/molecule/default" ] && echo "$r"
+done | jq -Rnc '[inputs]'

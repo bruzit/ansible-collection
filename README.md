@@ -92,6 +92,7 @@ ansible-galaxy collection install --force "${GALAXY_BUILD_OUTPUT##* }"
 ### Testing
 
 Use Ansible Molecule to test each role. All Ubuntu versions with standard support should be tested.
+CI tests only changed roles and their dependants; changes to shared Molecule or CI config test all roles.
 
 ## Copyright and Licensing
 

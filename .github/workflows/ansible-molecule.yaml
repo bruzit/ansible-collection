@@ -16,11 +16,15 @@ concurrency:
 
 jobs:
   gate:
+    name: Gate
     runs-on: ubuntu-slim
     outputs:
       run: ${{ steps.check.outputs.run }}
+      roles: ${{ steps.roles.outputs.roles }}
+      vm_roles: ${{ steps.roles.outputs.vm_roles }}
     steps:
-      - id: check
+      - name: Skip push with open PR
+        id: check
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -32,9 +36,31 @@ jobs:
           fi
           echo "run=$run" >>"$GITHUB_OUTPUT"
 
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select changed roles and dependants
+        id: roles
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+          VM_ROLES: '[{"role": "system", "scenario": "reboot"}]'
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            range="origin/$BASE_REF...HEAD"
+          else
+            range="$BEFORE..$GITHUB_SHA"
+          fi
+          roles=$(.github/scripts/molecule-roles "$range")
+          vm_roles=$(jq -c --argjson r "$roles" 'map(select(.role | IN($r[])))' <<<"$VM_ROLES")
+          printf 'roles=%s\nvm_roles=%s\n' "$roles" "$vm_roles" | tee -a "$GITHUB_OUTPUT"
+
   molecule-docker-driver:
     needs: gate
-    if: needs.gate.outputs.run == 'true'
+    if: needs.gate.outputs.run == 'true' && needs.gate.outputs.roles != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -42,42 +68,7 @@ jobs:
       fail-fast: false
       matrix:
         core: ["2.20", "2.21"]
-        role:
-          - apt
-          - argocd_cli
-          - az_cli
-          - bitwarden_cli
-          - ca_certificates
-          - claude
-          - cosign
-          - direnv
-          - docker
-          - fail2ban
-          - flatpak
-          - gh
-          - git
-          - helm
-          - jq
-          - k9s
-          - kodi
-          - kubectl
-          - kubeseal
-          - nerd_font
-          - obsidian
-          - oras
-          - pwgen
-          - snap
-          - ssh_server
-          - starship
-          - system
-          - talosctl
-          - terraform
-          - unattended_upgrades
-          - users
-          - vscode
-          - widelands
-          - wsl
-          - yq
+        role: ${{ fromJSON(needs.gate.outputs.roles) }}
 
     steps:
       - name: Checkout repository
@@ -105,7 +96,7 @@ jobs:
 
   vm:
     needs: gate
-    if: needs.gate.outputs.run == 'true'
+    if: needs.gate.outputs.run == 'true' && needs.gate.outputs.vm_roles != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -113,11 +104,7 @@ jobs:
       fail-fast: false
       matrix:
         core: ["2.20", "2.21"]
-        role:
-          - system
-        include:
-          - role: system
-            scenario: reboot
+        target: ${{ fromJSON(needs.gate.outputs.vm_roles) }}
 
     steps:
       - name: Checkout repository
@@ -169,8 +156,8 @@ jobs:
         run: .github/scripts/molecule-vm-up
 
       - name: Run Molecule
-        working-directory: roles/${{ matrix.role }}
-        run: molecule test -s ${{ matrix.scenario }}
+        working-directory: roles/${{ matrix.target.role }}
+        run: molecule test -s ${{ matrix.target.scenario }}
 
       - name: Stop VMs
         if: always()
@@ -180,7 +167,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: molecule-${{ matrix.role }}-${{ github.run_id }}
+          name: molecule-${{ matrix.target.role }}-${{ github.run_id }}
           path: |
             ~/.cache/molecule/**/*.log
             /tmp/molecule-vm/*.log
