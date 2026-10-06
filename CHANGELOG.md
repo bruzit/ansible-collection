@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.2](https://github.com/bruzit/ansible-collection/compare/v0.37.1...v0.37.2) (2026-10-06)
+
+### Bug Fixes
+
+* authenticate github api calls via github_token ([947f7ac](https://github.com/bruzit/ansible-collection/commit/947f7ac5ee596030e479d68c0f9c938ec9a2f403))
+
 ## [0.37.1](https://github.com/bruzit/ansible-collection/compare/v0.37.0...v0.37.1) (2026-10-06)
 
 ### Bug Fixes
