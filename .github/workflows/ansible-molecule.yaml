@@ -52,6 +52,7 @@ jobs:
           - cosign
           - direnv
           - docker
+          - fail2ban
           - flatpak
           - gh
           - git

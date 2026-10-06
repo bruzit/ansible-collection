@@ -1,0 +1,20 @@
+---
+- name: Install fail2ban
+  become: true
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+
+# service_mgr reports systemd once /sbin/init links to it, even when systemd is not PID 1 (WSL, containers)
+- name: Detect running systemd
+  ansible.builtin.stat:
+    path: /run/systemd/system
+  register: fail2ban_systemd
+
+- name: Enable and start fail2ban
+  become: true
+  ansible.builtin.systemd_service:
+    name: fail2ban
+    enabled: true
+    state: started
+  when: fail2ban_systemd.stat.exists
