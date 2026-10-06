@@ -59,6 +59,7 @@ jobs:
           - helm
           - jq
           - k9s
+          - kodi
           - kubectl
           - kubeseal
           - nerd_font

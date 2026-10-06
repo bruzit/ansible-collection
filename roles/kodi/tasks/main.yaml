@@ -1,0 +1,64 @@
+---
+- name: Install Kodi
+  become: true
+  ansible.builtin.apt:
+    name: kodi
+    state: present
+
+- name: Create the kodi user
+  become: true
+  ansible.builtin.user:
+    name: kodi
+    system: true
+    home: /var/lib/kodi
+    shell: /usr/sbin/nologin
+    groups: [audio, video, render, input]
+
+- name: Install the Kodi systemd unit
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/kodi.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Kodi
+      After=systemd-user-sessions.service network-online.target sound.target
+      Wants=network-online.target
+      Conflicts=getty@tty1.service
+
+      [Service]
+      User=kodi
+      PAMName=login
+      TTYPath=/dev/tty1
+      StandardInput=tty
+      StandardOutput=journal
+      Environment=KODI_AE_SINK=ALSA
+      ExecStart=/usr/bin/kodi --standalone --windowing=gbm
+      Restart=always
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+  register: kodi_unit
+
+# service_mgr reports systemd once /sbin/init links to it, even when systemd is not PID 1 (WSL, containers)
+- name: Detect running systemd
+  ansible.builtin.stat:
+    path: /run/systemd/system
+  register: kodi_systemd
+
+# Check mode on a fresh host has no unit file to enable or start.
+- name: Enable Kodi
+  become: true
+  ansible.builtin.systemd_service:
+    name: kodi
+    enabled: true
+    daemon_reload: "{{ kodi_systemd.stat.exists }}"
+  when: not (ansible_check_mode and kodi_unit is changed)
+
+- name: Start Kodi
+  become: true
+  ansible.builtin.systemd_service:
+    name: kodi
+    state: "{{ 'restarted' if kodi_unit is changed else 'started' }}"
+  when: kodi_systemd.stat.exists and not (ansible_check_mode and kodi_unit is changed)

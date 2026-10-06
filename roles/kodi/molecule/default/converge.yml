@@ -1,0 +1,14 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  pre_tasks:
+    # Ubuntu Server ships systemd; the container image does not, and it brings the render and input groups.
+    - name: Install systemd
+      ansible.builtin.apt:
+        name: systemd
+        state: present
+
+  roles:
+    - role: kodi

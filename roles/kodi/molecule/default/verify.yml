@@ -1,0 +1,49 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Read the kodi account
+      ansible.builtin.getent:
+        database: passwd
+        key: kodi
+
+    - name: Read the kodi groups
+      ansible.builtin.command:
+        argv: [id, -nG, kodi]
+      register: kodi_groups
+      changed_when: false
+
+    - name: Read the Kodi unit
+      ansible.builtin.slurp:
+        src: /etc/systemd/system/kodi.service
+      register: kodi_unit
+
+    - name: Verify the Kodi unit
+      ansible.builtin.command:
+        argv: [systemd-analyze, verify, /etc/systemd/system/kodi.service]
+      changed_when: false
+
+    - name: Read the Kodi enablement
+      ansible.builtin.command:
+        argv: [systemctl, is-enabled, kodi]
+      register: kodi_enabled
+      changed_when: false
+
+    - name: Assert Kodi setup
+      ansible.builtin.assert:
+        that:
+          - "'kodi' in ansible_facts.packages"
+          - ansible_facts.getent_passwd['kodi'][4] == '/var/lib/kodi'
+          - ansible_facts.getent_passwd['kodi'][5] == '/usr/sbin/nologin'
+          - kodi_groups.stdout.split() | sort == ['audio', 'input', 'kodi', 'render', 'video']
+          - "'ExecStart=/usr/bin/kodi --standalone --windowing=gbm' in (kodi_unit.content | b64decode)"
+          - "'TTYPath=/dev/tty1' in (kodi_unit.content | b64decode)"
+          - "'PAMName=login' in (kodi_unit.content | b64decode)"
+          - kodi_enabled.stdout == 'enabled'
