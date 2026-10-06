@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Dump the apt configuration
+      ansible.builtin.command: apt-config dump
+      register: unattended_upgrades_config
+      changed_when: false
+
+    - name: Assert the unattended upgrades configuration
+      vars:
+        unattended_upgrades_reboot: "{{ inventory_hostname != 'ubuntu-22' }}"
+        unattended_upgrades_lines: "{{ unattended_upgrades_config.stdout_lines }}"
+      ansible.builtin.assert:
+        that:
+          - "'APT::Periodic::Update-Package-Lists \"1\";' in unattended_upgrades_lines"
+          - "'APT::Periodic::Unattended-Upgrade \"1\";' in unattended_upgrades_lines"
+          - >-
+            ('Unattended-Upgrade::Automatic-Reboot "' ~ (unattended_upgrades_reboot | lower) ~ '";')
+            in unattended_upgrades_lines
+          - >-
+            ('Unattended-Upgrade::Automatic-Reboot-WithUsers "true";' in unattended_upgrades_lines)
+            == unattended_upgrades_reboot
+          - >-
+            ('Unattended-Upgrade::Automatic-Reboot-Time "04:00";' in unattended_upgrades_lines)
+            == unattended_upgrades_reboot

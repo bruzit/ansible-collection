@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  roles:
+    - role: unattended_upgrades
+      unattended_upgrades_reboot: "{{ inventory_hostname != 'ubuntu-22' }}"
