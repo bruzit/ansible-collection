@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.3](https://github.com/bruzit/ansible-collection/compare/v0.37.2...v0.37.3) (2026-10-06)
+
+### Bug Fixes
+
+* retry release downloads ([53aeadb](https://github.com/bruzit/ansible-collection/commit/53aeadbfd0ced8113fd46f627361da10bea317d7))
+
 ## [0.37.2](https://github.com/bruzit/ansible-collection/compare/v0.37.1...v0.37.2) (2026-10-06)
 
 ### Bug Fixes
