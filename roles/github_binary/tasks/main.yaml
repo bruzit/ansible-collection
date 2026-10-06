@@ -11,6 +11,7 @@
 - name: Fetch the releases of {{ github_binary_name }}
   ansible.builtin.uri:
     url: "https://api.github.com/repos/{{ github_binary_repository }}/releases{{ '' if github_binary_tag_prefix is defined else '/latest' }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ github_binary_token} if github_binary_token else {} }}"
   register: github_binary_releases
   check_mode: false
   when: github_binary_latest is skipped

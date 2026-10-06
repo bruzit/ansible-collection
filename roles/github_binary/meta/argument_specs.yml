@@ -5,7 +5,7 @@ argument_specs:
     description:
       - C({version}) in C(github_binary_asset) and C(github_binary_sums) is replaced by the release version without
         C(github_binary_tag_prefix) and the leading C(v).
-      - Without C(github_binary_sums), the checksum is the asset's C(digest) from the unauthenticated GitHub releases API.
+      - Without C(github_binary_sums), the checksum is the asset's C(digest) from the GitHub releases API.
       - C(github_binary_sums_regex) overrides the regex whose first group is the asset's SHA-256 in the checksums file;
         the default matches C(<sha256>  <asset>) lines. Not declared below, as it is templated lazily from the resolved asset name.
     options:
@@ -37,3 +37,8 @@ argument_specs:
       github_binary_download_url:
         type: str
         description: Base URL of the asset and checksums when not on GitHub releases.
+      github_binary_token:
+        type: str
+        description: >-
+          GitHub token for the releases API, avoiding its anonymous rate limit;
+          defaults to C(GITHUB_TOKEN) on the controller.

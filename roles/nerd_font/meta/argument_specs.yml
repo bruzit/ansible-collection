@@ -3,9 +3,14 @@ argument_specs:
   main:
     short_description: Install one Nerd Font from the latest ryanoasis/nerd-fonts release into C(/usr/local/share/fonts).
     description:
-      - The archive is verified against the asset's C(digest) from the unauthenticated GitHub releases API.
+      - The archive is verified against the asset's C(digest) from the GitHub releases API.
     options:
       nerd_font_name:
         type: str
         default: JetBrainsMono
         description: Release asset name without C(.tar.xz), e.g. C(FiraCode).
+      nerd_font_github_token:
+        type: str
+        description: >-
+          GitHub token for the releases API, avoiding its anonymous rate limit;
+          defaults to C(GITHUB_TOKEN) on the controller.
