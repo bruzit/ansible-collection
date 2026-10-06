@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.28.1](https://github.com/bruzit/ansible-collection/compare/v0.28.0...v0.28.1) (2026-10-06)
+
+### Bug Fixes
+
+* **wsl:** skip browser alternatives in check mode ([99a35a4](https://github.com/bruzit/ansible-collection/commit/99a35a4c285577a3d3e29b92054610db3b5acfa9))
+
 ## [0.28.0](https://github.com/bruzit/ansible-collection/compare/v0.27.0...v0.28.0) (2026-10-04)
 
 ### Features
