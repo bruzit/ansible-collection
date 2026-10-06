@@ -92,6 +92,8 @@ jobs:
 
       - name: Run Molecule
         working-directory: roles/${{ matrix.role }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: molecule test
 
   vm:

@@ -2,11 +2,14 @@
 - name: Verify
   hosts: all
   gather_facts: false
+  vars:
+    nerd_font_github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
 
   tasks:
     - name: Fetch the latest Nerd Fonts release
       ansible.builtin.uri:
         url: https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest
+        headers: "{{ {'Authorization': 'Bearer ' ~ nerd_font_github_token} if nerd_font_github_token else {} }}"
       register: nerd_font_release
 
     - name: Read the version marker
