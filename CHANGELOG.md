@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.34.0](https://github.com/bruzit/ansible-collection/compare/v0.33.0...v0.34.0) (2026-10-06)
+
+### Features
+
+* **nerd_font:** set the konsole font ([9f09bf0](https://github.com/bruzit/ansible-collection/commit/9f09bf09e7fdbdf305be26eb310d5b99f36cca05))
+
 ## [0.33.0](https://github.com/bruzit/ansible-collection/compare/v0.32.0...v0.33.0) (2026-10-06)
 
 ### Features
