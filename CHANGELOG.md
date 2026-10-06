@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.33.0](https://github.com/bruzit/ansible-collection/compare/v0.32.0...v0.33.0) (2026-10-06)
+
+### Features
+
+* add kodi role ([e34a941](https://github.com/bruzit/ansible-collection/commit/e34a9413c656e4c394bdb7c9db050c36dd4e42d5))
+
 ## [0.32.0](https://github.com/bruzit/ansible-collection/compare/v0.31.0...v0.32.0) (2026-10-06)
 
 ### Features
