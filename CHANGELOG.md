@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.1](https://github.com/bruzit/ansible-collection/compare/v0.37.0...v0.37.1) (2026-10-06)
+
+### Bug Fixes
+
+* **ci:** diff new branches against the default branch ([851e902](https://github.com/bruzit/ansible-collection/commit/851e902dcc3b81e5548f9e056b654e1cb3326fd7))
+
 ## [0.37.0](https://github.com/bruzit/ansible-collection/compare/v0.36.0...v0.37.0) (2026-10-06)
 
 ### Features
