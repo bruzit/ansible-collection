@@ -5,6 +5,9 @@
     follow_redirects: none
     status_code: 302
   register: github_binary_latest
+  until: github_binary_latest is succeeded
+  retries: 3
+  delay: 5
   check_mode: false
   when: github_binary_tag_prefix is undefined and github_binary_sums is defined
 
@@ -13,6 +16,9 @@
     url: "https://api.github.com/repos/{{ github_binary_repository }}/releases{{ '' if github_binary_tag_prefix is defined else '/latest' }}"
     headers: "{{ {'Authorization': 'Bearer ' ~ github_binary_token} if github_binary_token else {} }}"
   register: github_binary_releases
+  until: github_binary_releases is succeeded
+  retries: 3
+  delay: 5
   check_mode: false
   when: github_binary_latest is skipped
 
@@ -56,6 +62,9 @@
         url: "{{ github_binary_url }}/{{ github_binary_sums | replace('{version}', github_binary_version) }}"
         return_content: true
       register: github_binary_sums_file
+      until: github_binary_sums_file is succeeded
+      retries: 3
+      delay: 5
       check_mode: false
       when: github_binary_sums is defined
 
@@ -91,6 +100,10 @@
         dest: "{{ github_binary_download }}"
         checksum: "sha256:{{ github_binary_checksum }}"
         mode: "0644"
+      register: github_binary_downloaded
+      until: github_binary_downloaded is succeeded
+      retries: 3
+      delay: 5
 
     - name: Unpack {{ github_binary_name }}
       ansible.builtin.unarchive:

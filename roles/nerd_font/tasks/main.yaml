@@ -12,6 +12,9 @@
     url: https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest
     headers: "{{ {'Authorization': 'Bearer ' ~ nerd_font_github_token} if nerd_font_github_token else {} }}"
   register: nerd_font_release
+  until: nerd_font_release is succeeded
+  retries: 3
+  delay: 5
   check_mode: false
 
 - name: Set the release facts of {{ nerd_font_name }}
@@ -47,6 +50,10 @@
         dest: "{{ nerd_font_download }}"
         checksum: "sha256:{{ nerd_font_checksum }}"
         mode: "0644"
+      register: nerd_font_downloaded
+      until: nerd_font_downloaded is succeeded
+      retries: 3
+      delay: 5
 
     - name: Remove the previous version of {{ nerd_font_name }}
       become: true
