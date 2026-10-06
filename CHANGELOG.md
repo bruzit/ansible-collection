@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.35.0](https://github.com/bruzit/ansible-collection/compare/v0.34.0...v0.35.0) (2026-10-06)
+
+### Features
+
+* add ssh_server role and github authorized keys ([e63f085](https://github.com/bruzit/ansible-collection/commit/e63f08502d6816ee1da036b87891cdb15fd454fa))
+
 ## [0.34.0](https://github.com/bruzit/ansible-collection/compare/v0.33.0...v0.34.0) (2026-10-06)
 
 ### Features
