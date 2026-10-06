@@ -9,8 +9,3 @@ argument_specs:
         type: str
         default: JetBrainsMono
         description: Release asset name without C(.tar.xz), e.g. C(FiraCode).
-      nerd_font_users:
-        type: list
-        elements: str
-        default: []
-        description: Users whose Konsole default profile uses the C(<nerd_font_name> Nerd Font Mono) family; absent accounts are skipped.
