@@ -57,6 +57,7 @@
   loop:
     - x-www-browser
     - www-browser
+  when: not ansible_check_mode
 
 - name: Export BROWSER for login shells
   become: true
