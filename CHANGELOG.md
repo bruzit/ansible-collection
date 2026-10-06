@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.29.0](https://github.com/bruzit/ansible-collection/compare/v0.28.1...v0.29.0) (2026-10-06)
+
+### Features
+
+* **flatpak:** update apps and remove unused runtimes ([20a704f](https://github.com/bruzit/ansible-collection/commit/20a704f53ccc8597a9ff0ada529f5edc6fc1e87b))
+
 ## [0.28.1](https://github.com/bruzit/ansible-collection/compare/v0.28.0...v0.28.1) (2026-10-06)
 
 ### Bug Fixes
