@@ -66,6 +66,7 @@ jobs:
           - oras
           - pwgen
           - snap
+          - ssh_server
           - starship
           - system
           - talosctl

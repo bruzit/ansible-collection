@@ -13,6 +13,7 @@ repository: https://github.com/bruzit/ansible-collection
 homepage: https://github.com/bruzit/ansible-collection
 dependencies:
   community.general: "*"
+  ansible.posix: "*"
 tags:
   - linux
   - ubuntu

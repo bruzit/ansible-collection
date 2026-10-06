@@ -1,0 +1,30 @@
+---
+# sshd -t needs it; only the running ssh.service creates it
+- name: Ensure the privilege separation directory
+  become: true
+  ansible.builtin.file:
+    path: /run/sshd
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  listen: Reload SSH server
+
+- name: Validate the SSH server configuration
+  become: true
+  ansible.builtin.command: /usr/sbin/sshd -t
+  changed_when: false
+  listen: Reload SSH server
+
+- name: Gather service facts
+  ansible.builtin.service_facts:
+  listen: Reload SSH server
+
+# Inactive under socket activation until the first connection, which then reads the new config
+- name: Reload ssh.service
+  become: true
+  ansible.builtin.systemd_service:
+    name: ssh
+    state: reloaded
+  when: ansible_facts.services['ssh.service'].state | default('') == 'running'
+  listen: Reload SSH server
