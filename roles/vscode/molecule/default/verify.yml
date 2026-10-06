@@ -15,6 +15,16 @@
       register: vscode_sources
       changed_when: false
 
+    - name: Read the apt source
+      ansible.builtin.slurp:
+        src: /etc/apt/sources.list.d/vscode.sources
+      register: vscode_source
+
+    - name: Stat the repository key
+      ansible.builtin.stat:
+        path: /etc/apt/keyrings/vscode.asc
+      register: vscode_key
+
     - name: Stat the keyring of the code postinst
       ansible.builtin.stat:
         path: /usr/share/keyrings/microsoft.gpg
@@ -25,4 +35,6 @@
         that:
           - vscode_status.stdout == 'install ok installed'
           - vscode_sources.stdout_lines == ['/etc/apt/sources.list.d/vscode.sources']
+          - "'Signed-By: /etc/apt/keyrings/vscode.asc' in (vscode_source.content | b64decode)"
+          - vscode_key.stat.mode == '0644'
           - not vscode_postinst_keyring.stat.exists
