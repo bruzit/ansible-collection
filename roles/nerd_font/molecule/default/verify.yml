@@ -1,7 +1,6 @@
 ---
 - name: Verify
   hosts: all
-  become: true
   gather_facts: false
 
   tasks:
@@ -37,33 +36,29 @@
       ansible.builtin.assert:
         that: "'JetBrainsMono Nerd Font Mono' in nerd_font_fc_list.stdout"
 
-    - name: Stat the Konsole files and directories
+    - name: Stat the Konsole files
       ansible.builtin.stat:
-        path: /home/molecule/{{ item }}
+        path: "{{ item }}"
       register: nerd_font_konsole_stat
       loop:
-        - .config
-        - .config/konsolerc
-        - .local
-        - .local/share
-        - .local/share/konsole
-        - .local/share/konsole/Nerd Font.profile
+        - /usr/share/konsole/Nerd Font.profile
+        - /etc/xdg/konsolerc
 
-    - name: Assert the Konsole files and directories belong to the user
+    - name: Assert the Konsole files belong to root
       ansible.builtin.assert:
         that:
-          - nerd_font_konsole_stat.results | map(attribute='stat.pw_name') | unique == ['molecule']
-          - nerd_font_konsole_stat.results | map(attribute='stat.gr_name') | unique == ['molecule']
-          - nerd_font_konsole_stat.results | selectattr('stat.isreg') | map(attribute='stat.mode') | unique == ['0644']
+          - nerd_font_konsole_stat.results | map(attribute='stat.pw_name') | unique == ['root']
+          - nerd_font_konsole_stat.results | map(attribute='stat.gr_name') | unique == ['root']
+          - nerd_font_konsole_stat.results | map(attribute='stat.mode') | unique == ['0644']
 
     - name: Read the Konsole profile
       ansible.builtin.slurp:
-        src: /home/molecule/.local/share/konsole/Nerd Font.profile
+        src: /usr/share/konsole/Nerd Font.profile
       register: nerd_font_profile
 
     - name: Read the Konsole config
       ansible.builtin.slurp:
-        src: /home/molecule/.config/konsolerc
+        src: /etc/xdg/konsolerc
       register: nerd_font_konsolerc
 
     - name: Assert the Konsole default profile uses the Nerd Font
