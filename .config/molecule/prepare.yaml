@@ -5,5 +5,11 @@
 
   tasks:
     - name: Install sudo, python3 and python3-apt
-      ansible.builtin.raw: apt-get update && apt-get install -y sudo python3 python3-apt
+      ansible.builtin.raw: >-
+        timeout 300 sh -c 'apt-get -o Acquire::Retries=3 update
+        && apt-get -o Acquire::Retries=3 install -y sudo python3 python3-apt'
+      register: prepare_packages
+      until: prepare_packages is succeeded
+      retries: 2
+      delay: 10
       changed_when: true
