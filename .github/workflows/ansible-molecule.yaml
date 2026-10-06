@@ -72,6 +72,7 @@ jobs:
           - system
           - talosctl
           - terraform
+          - unattended_upgrades
           - users
           - vscode
           - widelands

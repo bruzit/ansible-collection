@@ -1,0 +1,13 @@
+---
+argument_specs:
+  main:
+    short_description: Unattended security upgrades with an optional automatic reboot window.
+    options:
+      unattended_upgrades_reboot:
+        type: bool
+        default: false
+        description: Reboot automatically when required, even with users logged in.
+      unattended_upgrades_reboot_time:
+        type: str
+        default: "04:00"
+        description: Reboot time passed to C(shutdown -r) when O(unattended_upgrades_reboot) is true.

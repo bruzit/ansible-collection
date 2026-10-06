@@ -1,0 +1,28 @@
+---
+- name: Install unattended-upgrades
+  become: true
+  ansible.builtin.apt:
+    name: unattended-upgrades
+    state: present
+
+- name: Enable periodic unattended upgrades
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    mode: "0644"
+
+# Overrides 50unattended-upgrades; WithUsers because Kodi's tty1 logind session counts as a user.
+- name: Configure automatic reboot
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/52bruzit-unattended-upgrades
+    content: |
+      Unattended-Upgrade::Automatic-Reboot "{{ unattended_upgrades_reboot | lower }}";
+      {% if unattended_upgrades_reboot %}
+      Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+      Unattended-Upgrade::Automatic-Reboot-Time "{{ unattended_upgrades_reboot_time }}";
+      {% endif %}
+    mode: "0644"
