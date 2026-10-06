@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.30.0](https://github.com/bruzit/ansible-collection/compare/v0.29.0...v0.30.0) (2026-10-06)
+
+### Features
+
+* add nerd_font role ([6f7dc3b](https://github.com/bruzit/ansible-collection/commit/6f7dc3bfd53bea8c4aff58dce77199aaad522eb8))
+
 ## [0.29.0](https://github.com/bruzit/ansible-collection/compare/v0.28.1...v0.29.0) (2026-10-06)
 
 ### Features
