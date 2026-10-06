@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.32.0](https://github.com/bruzit/ansible-collection/compare/v0.31.0...v0.32.0) (2026-10-06)
+
+### Features
+
+* add fail2ban role ([0e9ef5d](https://github.com/bruzit/ansible-collection/commit/0e9ef5d48da17e9b7ff91025e36b101d848c5d26))
+
 ## [0.31.0](https://github.com/bruzit/ansible-collection/compare/v0.30.0...v0.31.0) (2026-10-06)
 
 ### Features
