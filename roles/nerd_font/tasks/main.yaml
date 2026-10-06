@@ -84,3 +84,50 @@
         path: "{{ nerd_font_download }}"
         state: absent
       when: not ansible_check_mode
+
+- name: Set the Konsole font to {{ nerd_font_name }}
+  when: nerd_font_users | length > 0
+  become: true
+  vars:
+    nerd_font_konsole_users: "{{ nerd_font_users | select('in', ansible_facts.getent_passwd) }}"
+  block:
+    - name: Look up the users
+      ansible.builtin.getent:
+        database: passwd
+
+    - name: Create the Konsole config directories
+      ansible.builtin.file:
+        path: "{{ ansible_facts.getent_passwd[item.0][4] }}/{{ item.1 }}"
+        state: directory
+        owner: "{{ item.0 }}"
+        group: "{{ ansible_facts.getent_passwd[item.0][2] }}"
+        mode: u+rwx
+      loop: "{{ nerd_font_konsole_users | product(['.config', '.local', '.local/share', '.local/share/konsole']) }}"
+
+    - name: Configure the Konsole profile
+      community.general.ini_file:
+        path: "{{ ansible_facts.getent_passwd[item.0][4] }}/{{ item.1.path }}"
+        section: "{{ item.1.section }}"
+        option: "{{ item.1.option }}"
+        value: "{{ item.1.value }}"
+        no_extra_spaces: true
+        owner: "{{ item.0 }}"
+        group: "{{ ansible_facts.getent_passwd[item.0][2] }}"
+        mode: "0644"
+      loop: "{{ nerd_font_konsole_users | product(nerd_font_konsole_settings) }}"
+      loop_control:
+        label: "{{ item.0 }} {{ item.1.path }} {{ item.1.option }}"
+      vars:
+        nerd_font_konsole_settings:
+          - path: .local/share/konsole/Nerd Font.profile
+            section: General
+            option: Name
+            value: Nerd Font
+          - path: .local/share/konsole/Nerd Font.profile
+            section: Appearance
+            option: Font
+            value: "{{ nerd_font_name }} Nerd Font Mono,11,-1,5,50,0,0,0,0,0"
+          - path: .config/konsolerc
+            section: Desktop Entry
+            option: DefaultProfile
+            value: Nerd Font.profile

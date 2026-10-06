@@ -1,6 +1,7 @@
 ---
 - name: Verify
   hosts: all
+  become: true
   gather_facts: false
 
   tasks:
@@ -31,3 +32,47 @@
           - nerd_font_files.matched > 0
           - "'JetBrainsMono Nerd Font' in nerd_font_fc_list.stdout"
           - nerd_font_marker.content | b64decode | trim == nerd_font_release.json.tag_name
+
+    - name: Assert the Nerd Font Mono family is known to fontconfig
+      ansible.builtin.assert:
+        that: "'JetBrainsMono Nerd Font Mono' in nerd_font_fc_list.stdout"
+
+    - name: Stat the Konsole files and directories
+      ansible.builtin.stat:
+        path: /home/molecule/{{ item }}
+      register: nerd_font_konsole_stat
+      loop:
+        - .config
+        - .config/konsolerc
+        - .local
+        - .local/share
+        - .local/share/konsole
+        - .local/share/konsole/Nerd Font.profile
+
+    - name: Assert the Konsole files and directories belong to the user
+      ansible.builtin.assert:
+        that:
+          - nerd_font_konsole_stat.results | map(attribute='stat.pw_name') | unique == ['molecule']
+          - nerd_font_konsole_stat.results | map(attribute='stat.gr_name') | unique == ['molecule']
+          - nerd_font_konsole_stat.results | selectattr('stat.isreg') | map(attribute='stat.mode') | unique == ['0644']
+
+    - name: Read the Konsole profile
+      ansible.builtin.slurp:
+        src: /home/molecule/.local/share/konsole/Nerd Font.profile
+      register: nerd_font_profile
+
+    - name: Read the Konsole config
+      ansible.builtin.slurp:
+        src: /home/molecule/.config/konsolerc
+      register: nerd_font_konsolerc
+
+    - name: Assert the Konsole default profile uses the Nerd Font
+      ansible.builtin.assert:
+        that:
+          - nerd_font_profile.content | b64decode is search('^\[General\]\nName=Nerd Font$', multiline=true)
+          - >-
+            nerd_font_profile.content | b64decode
+            is search('^\[Appearance\]\nFont=JetBrainsMono Nerd Font Mono,11,-1,5,50,0,0,0,0,0$', multiline=true)
+          - >-
+            nerd_font_konsolerc.content | b64decode
+            is search('^\[Desktop Entry\]\nDefaultProfile=Nerd Font.profile$', multiline=true)
