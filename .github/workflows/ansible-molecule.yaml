@@ -60,6 +60,7 @@ jobs:
           - k9s
           - kubectl
           - kubeseal
+          - nerd_font
           - obsidian
           - oras
           - pwgen
