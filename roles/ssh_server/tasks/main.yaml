@@ -1,0 +1,51 @@
+---
+- name: Refuse to lock out the connecting user
+  when: "'ssh' in ansible_connection"
+  block:
+    # ansible_user_id reports root when facts were gathered with become
+    - name: Read the connecting user
+      become: false
+      ansible.builtin.command: id -un
+      register: ssh_server_remote_user
+      changed_when: false
+      check_mode: false
+
+    - name: Assert the connecting user is not root
+      ansible.builtin.assert:
+        that: ssh_server_remote_user.stdout != 'root'
+        fail_msg: >-
+          Connecting as root; PermitRootLogin no would lock it out.
+          Connect as an admin user with authorized keys.
+
+    - name: Stat the connecting user's authorized keys
+      become: false
+      ansible.builtin.stat:
+        path: ~/.ssh/authorized_keys
+      register: ssh_server_authorized_keys
+
+    - name: Assert the connecting user has authorized keys
+      ansible.builtin.assert:
+        that: ssh_server_authorized_keys.stat.size | default(0) > 0
+        fail_msg: >-
+          ~/.ssh/authorized_keys of the connecting user is missing or empty;
+          disabling password login would lock it out.
+
+- name: Install OpenSSH server
+  become: true
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+
+# 10- sorts before cloud-init's 50-cloud-init.conf and sshd keeps the first value
+- name: Harden the SSH server
+  become: true
+  ansible.builtin.copy:
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+    dest: /etc/ssh/sshd_config.d/10-bruzit.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload SSH server

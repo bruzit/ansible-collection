@@ -5,6 +5,8 @@
     name: "{{ item.name }}"
     comment: "{{ item.full_name | default(omit) }}"
     shell: "{{ item.shell | default('/bin/bash') }}"
+    groups: "{{ 'sudo' if item.admin | default(false) else omit }}"
+    append: "{{ item.admin | default(false) }}"
     create_home: true
   loop: "{{ users_accounts }}"
   loop_control:
@@ -30,3 +32,18 @@
     label: "{{ item.name }}"
   when: "'accountsservice' in ansible_facts.packages"
   notify: Restart accounts-daemon
+
+# Accounts are absent on a fresh host in check mode
+- name: Read the account entries
+  ansible.builtin.getent:
+    database: passwd
+
+- name: Authorize the GitHub SSH keys
+  become: true
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "https://github.com/{{ item.github }}.keys"
+  loop: "{{ users_accounts | selectattr('github', 'defined') }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name in ansible_facts.getent_passwd

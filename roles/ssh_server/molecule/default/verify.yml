@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the drop-in
+      ansible.builtin.slurp:
+        src: /etc/ssh/sshd_config.d/10-bruzit.conf
+      register: ssh_server_dropin
+
+    - name: Validate the SSH server configuration
+      ansible.builtin.command: /usr/sbin/sshd -t
+      changed_when: false
+
+    - name: Read the effective SSH server configuration
+      ansible.builtin.command: /usr/sbin/sshd -T
+      register: ssh_server_effective
+      changed_when: false
+
+    - name: Assert the drop-in and the effective configuration
+      ansible.builtin.assert:
+        that:
+          - (ssh_server_dropin.content | b64decode) ==
+            "PermitRootLogin no\nPasswordAuthentication no\nKbdInteractiveAuthentication no\n"
+          - "'permitrootlogin no' in ssh_server_effective.stdout_lines"
+          - "'passwordauthentication no' in ssh_server_effective.stdout_lines"
+          - "'kbdinteractiveauthentication no' in ssh_server_effective.stdout_lines"
