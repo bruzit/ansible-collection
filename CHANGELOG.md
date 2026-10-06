@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.37.0](https://github.com/bruzit/ansible-collection/compare/v0.36.0...v0.37.0) (2026-10-06)
+
+### Features
+
+* add mc role ([7cc4d00](https://github.com/bruzit/ansible-collection/commit/7cc4d00f56cf47cc1836b01915521c3b98e5b9c2))
+
 ## [0.36.0](https://github.com/bruzit/ansible-collection/compare/v0.35.0...v0.36.0) (2026-10-06)
 
 ### Features
