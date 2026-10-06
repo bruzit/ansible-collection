@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.36.0](https://github.com/bruzit/ansible-collection/compare/v0.35.0...v0.36.0) (2026-10-06)
+
+### Features
+
+* add unattended_upgrades role ([a97ea4e](https://github.com/bruzit/ansible-collection/commit/a97ea4ec4e72a478ebdad47f0ced2b2986b183a2))
+
 ## [0.35.0](https://github.com/bruzit/ansible-collection/compare/v0.34.0...v0.35.0) (2026-10-06)
 
 ### Features
