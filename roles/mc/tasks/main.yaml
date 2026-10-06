@@ -1,0 +1,6 @@
+---
+- name: Install mc
+  become: true
+  ansible.builtin.apt:
+    name: mc
+    state: present
