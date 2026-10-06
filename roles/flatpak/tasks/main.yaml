@@ -11,3 +11,17 @@
     name: flathub
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     state: present
+
+- name: Update Flatpak apps
+  become: true
+  ansible.builtin.command:
+    argv: [flatpak, update, --system, -y, --noninteractive]
+  register: flatpak_update
+  changed_when: flatpak_update.stdout is not search('Nothing to (do|update)')
+
+- name: Remove unused Flatpak runtimes
+  become: true
+  ansible.builtin.command:
+    argv: [flatpak, uninstall, --system, --unused, -y, --noninteractive]
+  register: flatpak_uninstall_unused
+  changed_when: "'Nothing unused to uninstall' not in flatpak_uninstall_unused.stdout"
