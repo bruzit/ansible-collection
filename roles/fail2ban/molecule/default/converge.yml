@@ -1,0 +1,17 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  pre_tasks:
+    # 22.04 sshd jail reads auth.log, written by rsyslog absent from the image
+    - name: Create auth.log
+      ansible.builtin.file:
+        path: /var/log/auth.log
+        state: touch
+        mode: "0640"
+        modification_time: preserve
+        access_time: preserve
+
+  roles:
+    - role: fail2ban

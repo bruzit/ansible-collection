@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert fail2ban is installed
+      ansible.builtin.assert:
+        that:
+          - "'fail2ban' in ansible_facts.packages"
+
+    - name: Test fail2ban configuration
+      ansible.builtin.command: fail2ban-client -t
+      changed_when: false
+
+    - name: Dump fail2ban configuration
+      ansible.builtin.command: fail2ban-client -d
+      register: fail2ban_dump
+      changed_when: false
+
+    - name: Assert the sshd jail is enabled
+      ansible.builtin.assert:
+        that:
+          - "\"['add', 'sshd'\" in fail2ban_dump.stdout"
