@@ -24,12 +24,12 @@
         that:
           - "'azure-cli' in az_cli_version.stdout"
 
-    - name: Check apt source file exists
+    - name: Find apt sources of the Azure CLI repository
       ansible.builtin.command: grep -rl packages.microsoft.com/repos/azure-cli /etc/apt/sources.list.d/
-      register: az_cli_apt_source
+      register: az_cli_apt_sources
       changed_when: false
 
-    - name: Assert apt source file exists
+    - name: Assert the Azure CLI repository is a single deb822 source
       ansible.builtin.assert:
         that:
-          - az_cli_apt_source.stdout | length > 0
+          - az_cli_apt_sources.stdout_lines == ['/etc/apt/sources.list.d/azure-cli.sources']

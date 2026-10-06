@@ -1,24 +1,26 @@
 ---
-- name: Install GnuPG required by apt_repository
+- name: Install python3-debian required by deb822_repository
   become: true
   ansible.builtin.apt:
-    name: gnupg
+    name: python3-debian
     state: present
 
-- name: Install Microsoft signing key
+- name: Remove the legacy Azure CLI apt source
   become: true
-  ansible.builtin.get_url:
-    url: https://packages.microsoft.com/keys/microsoft.asc
-    dest: /usr/share/keyrings/microsoft.asc
-    mode: "0644"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/azure-cli.list
+    state: absent
 
 - name: Add Azure CLI apt repository
   become: true
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.asc]
-      https://packages.microsoft.com/repos/azure-cli/ {{ ansible_facts['distribution_release'] }} main
-    filename: azure-cli
+  ansible.builtin.deb822_repository:
+    name: azure-cli
+    uris: https://packages.microsoft.com/repos/azure-cli/
+    suites: "{{ ansible_facts['distribution_release'] }}"
+    components: main
+    architectures: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+  when: not ansible_check_mode
 
 - name: Install Azure CLI
   become: true
@@ -26,3 +28,4 @@
     name: azure-cli
     state: present
     update_cache: true
+  when: not ansible_check_mode
