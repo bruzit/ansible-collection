@@ -1,0 +1,24 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert unzip is installed
+      ansible.builtin.assert:
+        that:
+          - "'unzip' in ansible_facts.packages"
+
+    - name: Check kubectl-oidc_login runs
+      ansible.builtin.command: kubectl-oidc_login --version
+      register: github_binary_kubelogin_version
+      changed_when: false
+
+    - name: Assert kubectl-oidc_login output
+      ansible.builtin.assert:
+        that:
+          - "'kubelogin version v' in github_binary_kubelogin_version.stdout"

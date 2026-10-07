@@ -105,6 +105,15 @@
       retries: 3
       delay: 5
 
+    - name: Install unzip for {{ github_binary_name }}
+      become: true
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+      when:
+        - github_binary_member is defined
+        - github_binary_asset_name.endswith('.zip')
+
     - name: Unpack {{ github_binary_name }}
       ansible.builtin.unarchive:
         src: "{{ github_binary_download }}"
