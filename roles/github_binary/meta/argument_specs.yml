@@ -30,7 +30,9 @@ argument_specs:
         description: Command whose output contains the installed version; the install is skipped when it does.
       github_binary_member:
         type: str
-        description: Path of the binary inside the asset archive; unset when the asset is the binary itself.
+        description: >-
+          Path of the binary inside the asset archive; unset when the asset is the binary itself.
+          A C(.zip) asset gets C(unzip) installed with apt.
       github_binary_tag_prefix:
         type: str
         description: Install the newest non-prerelease among the 30 most recent releases whose tag starts with this prefix.

@@ -1,0 +1,17 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install kubelogin from a zip asset
+      ansible.builtin.include_role:
+        name: bruzit.ansible.github_binary
+      vars:
+        github_binary_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+        github_binary_name: kubectl-oidc_login
+        github_binary_repository: int128/kubelogin
+        github_binary_asset: "kubelogin_linux_{{ github_binary_arch }}.zip"
+        github_binary_sums: "kubelogin_linux_{{ github_binary_arch }}.zip.sha256"
+        github_binary_member: kubelogin
+        github_binary_version_command: kubectl-oidc_login --version
