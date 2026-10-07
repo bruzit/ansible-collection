@@ -8,7 +8,32 @@
       register: claude_version
       changed_when: false
 
-    - name: Assert Claude Code output
+    - name: Read Claude Code user settings
+      ansible.builtin.slurp:
+        src: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
+      register: claude_user_settings
+
+    - name: Read Claude Code project local settings
+      ansible.builtin.slurp:
+        src: "{{ ansible_facts['env']['HOME'] }}/Projects/demo/.claude/settings.local.json"
+      register: claude_project_local_settings
+
+    - name: Stat Claude Code project local settings
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['env']['HOME'] }}/Projects/demo/.claude/settings.local.json"
+      register: claude_project_local_settings_stat
+
+    - name: Assert Claude Code output and settings
+      vars:
+        user_settings: "{{ claude_user_settings.content | b64decode | from_json }}"
+        local_settings: "{{ claude_project_local_settings.content | b64decode | from_json }}"
       ansible.builtin.assert:
         that:
           - "'Claude Code' in claude_version.stdout"
+          - user_settings.env.FOO == 'bar'
+          - user_settings.permissions.allow == ['Bash(git:*)']
+          - user_settings.permissions.deny == ['Bash(rm:*)']
+          - user_settings.enabledPlugins['demo@demo-marketplace']
+          - user_settings.extraKnownMarketplaces['demo-marketplace'].source.source == 'directory'
+          - "local_settings == {'enabledPlugins': {'local@demo-marketplace': true}}"
+          - claude_project_local_settings_stat.stat.mode == '0600'

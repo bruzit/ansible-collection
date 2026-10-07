@@ -43,3 +43,19 @@
       ansible.builtin.file:
         path: "/tmp/claude-{{ claude_version }}-{{ claude_platform }}"
         state: absent
+
+- name: Merge Claude Code user settings
+  ansible.builtin.include_tasks: settings.yaml
+  vars:
+    claude_settings_path: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
+    claude_settings_merge: "{{ claude_settings }}"
+  when: claude_settings | length > 0
+
+- name: Merge Claude Code project local settings
+  ansible.builtin.include_tasks: settings.yaml
+  vars:
+    claude_settings_path: "{{ item.path }}/.claude/settings.local.json"
+    claude_settings_merge: "{{ item.settings }}"
+  loop: "{{ claude_local_settings }}"
+  loop_control:
+    label: "{{ item.path }}"
