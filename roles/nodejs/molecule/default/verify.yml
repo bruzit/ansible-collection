@@ -1,0 +1,41 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Check node version
+      ansible.builtin.command: node --version
+      register: nodejs_node_version
+      changed_when: false
+
+    - name: Check npx version
+      ansible.builtin.command: npx --version
+      register: nodejs_npx_version
+      changed_when: false
+
+    - name: Assert npx output
+      ansible.builtin.assert:
+        that:
+          - nodejs_npx_version.stdout is regex('^[0-9]+\.')
+
+    - name: Assert Ubuntu archive packages
+      ansible.builtin.assert:
+        that:
+          - "'nodejs' in ansible_facts.packages"
+          - "'npm' in ansible_facts.packages"
+          - nodejs_node_version.stdout is regex('^v[0-9]+\.')
+      when: nodejs_major is undefined
+
+    - name: Assert NodeSource major without separate npm
+      ansible.builtin.assert:
+        that:
+          - nodejs_node_version.stdout.startswith('v' ~ nodejs_major ~ '.')
+          - "'npm' not in ansible_facts.packages"
+          - "'nodesource' in ansible_facts.packages.nodejs[0].version"
+      when: nodejs_major is defined
