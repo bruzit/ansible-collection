@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.38.0](https://github.com/bruzit/ansible-collection/compare/v0.37.3...v0.38.0) (2026-10-07)
+
+### Features
+
+* add nodejs role ([6092d02](https://github.com/bruzit/ansible-collection/commit/6092d027e68ddfc300d072c07f9557a0c5ae5f31))
+* **claude:** merge settings into claude code settings files ([a90a956](https://github.com/bruzit/ansible-collection/commit/a90a956655ed62569830212ebf1a89ced9aa8555))
+* **github_binary:** support zip assets ([2eeb869](https://github.com/bruzit/ansible-collection/commit/2eeb8697aae92081f8b8f6528f71429d7a93d4f2))
+
 ## [0.37.3](https://github.com/bruzit/ansible-collection/compare/v0.37.2...v0.37.3) (2026-10-06)
 
 ### Bug Fixes
