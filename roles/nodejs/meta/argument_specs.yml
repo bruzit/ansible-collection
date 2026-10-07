@@ -1,0 +1,11 @@
+---
+argument_specs:
+  main:
+    short_description: Install Node.js and npm from the Ubuntu archive or the NodeSource apt repository.
+    options:
+      nodejs_major:
+        type: str
+        default: ""
+        description:
+          - Node.js major from the NodeSource apt repository, e.g. C("24"); its C(nodejs) package bundles npm.
+          - Empty installs C(nodejs) and C(npm) from the Ubuntu archive.

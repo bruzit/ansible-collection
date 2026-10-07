@@ -1,0 +1,24 @@
+---
+provisioner:
+  inventory:
+    host_vars:
+      ubuntu-22:
+        nodejs_major: "24"
+
+scenario:
+  # First check runs on a fresh host, covering the NodeSource repository in check mode.
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - check
+    - converge
+    - idempotence
+    - check
+    - side_effect
+    - verify
+    - cleanup
+    - destroy
