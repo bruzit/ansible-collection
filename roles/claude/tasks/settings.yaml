@@ -1,0 +1,28 @@
+---
+- name: Read Claude Code settings {{ claude_settings_path }}
+  ansible.builtin.slurp:
+    src: "{{ claude_settings_path }}"
+  register: claude_settings_current
+  failed_when: claude_settings_current is failed and 'not found' not in claude_settings_current.msg
+
+- name: Merge Claude Code settings {{ claude_settings_path }}
+  ansible.builtin.set_fact:
+    claude_settings_present: "{{ claude_settings_current.content | default('e30=') | b64decode | from_json }}"
+    claude_settings_merged: >-
+      {{ claude_settings_current.content | default('e30=') | b64decode | from_json
+         | combine(claude_settings_merge, recursive=true, list_merge='replace') }}
+
+- name: Write Claude Code settings {{ claude_settings_path }}
+  when: claude_settings_merged != claude_settings_present
+  block:
+    - name: Create Claude Code settings directory {{ claude_settings_path | dirname }}
+      ansible.builtin.file:
+        path: "{{ claude_settings_path | dirname }}"
+        state: directory
+        mode: "0700"
+
+    - name: Write Claude Code settings {{ claude_settings_path }}
+      ansible.builtin.copy:
+        content: "{{ claude_settings_merged | to_nice_json(indent=2, sort_keys=false) }}\n"
+        dest: "{{ claude_settings_path }}"
+        mode: "0600"

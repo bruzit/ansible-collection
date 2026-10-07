@@ -2,5 +2,48 @@
 - name: Converge
   hosts: all
 
+  pre_tasks:
+    - name: Create Claude Code settings directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.claude"
+        state: directory
+        mode: "0700"
+
+    - name: Seed Claude Code settings with unmanaged keys
+      ansible.builtin.copy:
+        content: |
+          {
+            "env": {"FOO": "bar"},
+            "permissions": {
+              "allow": ["Bash(ls:*)", "Bash(cat:*)"],
+              "deny": ["Bash(rm:*)"]
+            }
+          }
+        dest: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
+        mode: "0600"
+        force: false
+
+    - name: Create project directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/Projects/demo"
+        state: directory
+        mode: "0755"
+
   roles:
     - role: claude
+      claude_settings:
+        permissions:
+          allow:
+            - Bash(git:*)
+        enabledPlugins:
+          demo@demo-marketplace: true
+        extraKnownMarketplaces:
+          demo-marketplace:
+            source:
+              source: directory
+              path: "{{ ansible_facts['env']['HOME'] }}/Projects/demo"
+      claude_local_settings:
+        - path: "{{ ansible_facts['env']['HOME'] }}/Projects/demo"
+          settings:
+            enabledPlugins:
+              local@demo-marketplace: true
