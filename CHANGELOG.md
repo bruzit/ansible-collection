@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.39.0](https://github.com/bruzit/ansible-collection/compare/v0.38.0...v0.39.0) (2026-10-08)
+
+### Features
+
+* **users:** generate ed25519 ssh keys ([398af7b](https://github.com/bruzit/ansible-collection/commit/398af7bcd4648c888f91068d198de0bf0a069dc3))
+
 ## [0.38.0](https://github.com/bruzit/ansible-collection/compare/v0.37.3...v0.38.0) (2026-10-07)
 
 ### Features
