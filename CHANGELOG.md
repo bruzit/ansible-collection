@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.41.0](https://github.com/bruzit/ansible-collection/compare/v0.40.1...v0.41.0) (2026-10-08)
+
+### Features
+
+* pin apt repository signing keys ([c02f3ca](https://github.com/bruzit/ansible-collection/commit/c02f3ca13ff647d58d35d3efef1e6d38d06cffde))
+
 ## [0.40.1](https://github.com/bruzit/ansible-collection/compare/v0.40.0...v0.40.1) (2026-10-08)
 
 ### Bug Fixes
