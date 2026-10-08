@@ -43,6 +43,32 @@
         path: /home/molecule-norepos/Projects
       register: git_user_norepos_projects
 
+    - name: Stat the signing key
+      ansible.builtin.stat:
+        path: /home/molecule/.ssh/id_ed25519_signing
+      register: git_signing_key
+
+    - name: Stat the allowed signers
+      ansible.builtin.stat:
+        path: /home/molecule/.config/git/allowed_signers
+      register: git_allowed_signers
+
+    - name: Create a scratch repository
+      become: true
+      become_user: molecule
+      ansible.builtin.tempfile:
+        state: directory
+      register: git_scratch
+
+    - name: Commit to the scratch repository and verify its signature
+      become: true
+      become_user: molecule
+      ansible.builtin.shell: git init -q && git commit -q --allow-empty -m signed && git verify-commit HEAD  # noqa: command-instead-of-module
+      args:
+        chdir: "{{ git_scratch.path }}"
+      register: git_verify_commit
+      changed_when: false
+
     - name: Assert git output
       ansible.builtin.assert:
         that:
@@ -56,3 +82,8 @@
           - git_user_repository_remote.stdout == 'https://github.com/bruzit/.github.git'
           - git_user_repository.stat.pw_name == 'molecule'
           - not git_user_norepos_projects.stat.exists
+          - "'gpg.format=ssh' in git_user_config.stdout_lines"
+          - git_signing_key.stat.exists
+          - git_signing_key.stat.pw_name == 'molecule'
+          - git_allowed_signers.stat.exists
+          - "'Good \"git\" signature for molecule@example.com' in git_verify_commit.stderr"

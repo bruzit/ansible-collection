@@ -44,6 +44,13 @@
   loop_control:
     label: "{{ item.name }}"
 
+- name: Configure SSH commit signing per user
+  ansible.builtin.include_tasks: signing.yaml
+  loop: "{{ git_users | selectattr('signing_key', 'defined') }}"
+  loop_control:
+    loop_var: git_user
+    label: "{{ git_user.name }}"
+
 - name: Create Projects directory per user
   become: true
   become_user: "{{ item.name }}"

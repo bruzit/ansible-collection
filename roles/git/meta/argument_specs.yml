@@ -9,6 +9,7 @@ argument_specs:
         default: []
         description:
           - Users to configure. Keys used by this role are C(name) (required), C(full_name) (C(user.name)),
-            C(email) (C(user.email)) and C(repositories) (list of C(owner/repo) cloned from GitHub over HTTPS into
-            C(~/Projects/repo) if absent, never updated).
+            C(email) (C(user.email)), C(repositories) (list of C(owner/repo) cloned from GitHub over HTTPS into
+            C(~/Projects/repo) if absent, never updated) and C(signing_key) (path to the SSH commit and tag signing
+            private key, e.g. C(~/.ssh/id_ed25519_signing), generated if absent, never overwritten; requires C(email)).
           - Other keys are ignored, so the same list can be passed to other roles, such as C(users).
