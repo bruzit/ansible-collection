@@ -7,7 +7,7 @@ on:
 jobs:
   megalinter:
     name: MegaLinter
-    uses: bruzit/github-actions-and-workflows/.github/workflows/megalinter.yaml@v0
+    uses: bruzit/github-actions-and-workflows/.github/workflows/megalinter.yaml@feature/gitleaks-pr-scope
     permissions:
       contents: write
       pull-requests: write
