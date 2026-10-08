@@ -1,0 +1,48 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Query the google-chrome-stable package status
+      ansible.builtin.command: dpkg-query -W -f=${Status} google-chrome-stable
+      register: google_chrome_status
+      changed_when: false
+
+    - name: Run google-chrome-stable
+      ansible.builtin.command: google-chrome-stable --version
+      register: google_chrome_version
+      changed_when: false
+
+    - name: Run the daily cron job of google-chrome-stable
+      ansible.builtin.command: /etc/cron.daily/google-chrome
+      changed_when: false
+
+    - name: Find apt sources of the Google Chrome repository
+      ansible.builtin.command: grep -rl dl.google.com /etc/apt/sources.list.d/
+      register: google_chrome_sources
+      changed_when: false
+
+    - name: Read the apt source
+      ansible.builtin.slurp:
+        src: /etc/apt/sources.list.d/chrome.sources
+      register: google_chrome_source
+
+    - name: Stat the repository key
+      ansible.builtin.stat:
+        path: /etc/apt/keyrings/chrome.asc
+      register: google_chrome_key
+
+    - name: Update the apt cache, failing on any warning
+      ansible.builtin.command: apt-get update --error-on=any  # noqa: command-instead-of-module
+      changed_when: false
+
+    - name: Assert the Google Chrome setup
+      ansible.builtin.assert:
+        that:
+          - google_chrome_status.stdout == 'install ok installed'
+          - google_chrome_version.stdout is match('Google Chrome \d+\.')
+          - google_chrome_sources.stdout_lines == ['/etc/apt/sources.list.d/chrome.sources']
+          - "'Signed-By: /etc/apt/keyrings/chrome.asc' in (google_chrome_source.content | b64decode)"
+          - google_chrome_key.stat.mode == '0644'
