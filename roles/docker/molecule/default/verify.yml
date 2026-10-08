@@ -41,7 +41,16 @@
       register: docker_apt_source
       changed_when: false
 
-    - name: Assert apt source file exists
+    - name: Stat the legacy Docker apt source and key
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: docker_legacy
+      loop:
+        - /etc/apt/sources.list.d/docker.list
+        - /usr/share/keyrings/docker.asc
+
+    - name: Assert the Docker repository is a single deb822 source
       ansible.builtin.assert:
         that:
-          - docker_apt_source.stdout | length > 0
+          - docker_apt_source.stdout_lines == ['/etc/apt/sources.list.d/docker.sources']
+          - docker_legacy.results | map(attribute='stat.exists') is not any

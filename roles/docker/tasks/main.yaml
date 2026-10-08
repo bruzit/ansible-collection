@@ -1,24 +1,16 @@
 ---
-- name: Install GnuPG required by apt_repository
-  become: true
-  ansible.builtin.apt:
-    name: gnupg
-    state: present
-
-- name: Install Docker signing key
-  become: true
-  ansible.builtin.get_url:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /usr/share/keyrings/docker.asc
-    mode: "0644"
-
 - name: Add Docker apt repository
-  become: true
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [arch=amd64 signed-by=/usr/share/keyrings/docker.asc]
-      https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable
-    filename: docker
+  ansible.builtin.include_role:
+    name: bruzit.ansible.apt_source
+  vars:
+    apt_source_name: docker
+    apt_source_uris: https://download.docker.com/linux/ubuntu
+    apt_source_suites: "{{ ansible_facts['distribution_release'] }}"
+    apt_source_components: stable
+    apt_source_key_url: https://download.docker.com/linux/ubuntu/gpg
+    apt_source_fingerprint: "9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88"
+    apt_source_legacy_keys:
+      - /usr/share/keyrings/docker.asc
 
 - name: Install Docker
   become: true
