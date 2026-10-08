@@ -11,6 +11,7 @@
 
   roles:
     - role: users
+      users_ssh_key: true
       users_accounts:
         - name: molecule
           full_name: Molecule Tester

@@ -29,6 +29,18 @@
         path: /home/molecule/.ssh/authorized_keys
       register: users_authorized_keys
 
+    - name: Stat the generated SSH keys
+      ansible.builtin.stat:
+        path: "/home/{{ item.0 }}/.ssh/{{ item.1 }}"
+      loop: "{{ ['molecule', 'plain'] | product(['id_ed25519', 'id_ed25519.pub']) }}"
+      register: users_ssh_keys
+
+    - name: Read the generated public SSH keys
+      ansible.builtin.slurp:
+        src: "/home/{{ item }}/.ssh/id_ed25519.pub"
+      loop: [molecule, plain]
+      register: users_ssh_public_keys
+
     - name: Assert accounts and metadata
       ansible.builtin.assert:
         that:
@@ -42,3 +54,11 @@
           - users_authorized_keys.stat.size | default(0) > 0
           - "'molecule' in ansible_facts.getent_group['sudo'][2].split(',')"
           - "'plain' not in ansible_facts.getent_group['sudo'][2].split(',')"
+
+    - name: Assert the generated SSH keys
+      ansible.builtin.assert:
+        that:
+          - users_ssh_keys.results | map(attribute='stat.pw_name') | list == ['molecule', 'molecule', 'plain', 'plain']
+          - users_ssh_keys.results | map(attribute='stat.mode') | list == ['0600', '0644', '0600', '0644']
+          - users_ssh_public_keys.results | map(attribute='content') | map('b64decode') | map('split') | map('first') | unique == ['ssh-ed25519']
+          - (users_ssh_public_keys.results[0].content | b64decode).split() | last == 'molecule@example.com'
