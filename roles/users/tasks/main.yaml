@@ -1,4 +1,11 @@
 ---
+- name: Install the OpenSSH client
+  become: true
+  ansible.builtin.apt:
+    name: openssh-client
+    state: present
+  when: users_ssh_key
+
 - name: Ensure user accounts exist
   become: true
   ansible.builtin.user:
@@ -8,6 +15,10 @@
     groups: "{{ 'sudo' if item.admin | default(false) else omit }}"
     append: "{{ item.admin | default(false) }}"
     create_home: true
+    generate_ssh_key: "{{ users_ssh_key }}"
+    ssh_key_type: ed25519
+    ssh_key_file: .ssh/id_ed25519
+    ssh_key_comment: "{{ item.email | default(omit) }}"
   loop: "{{ users_accounts }}"
   loop_control:
     label: "{{ item.name }}"

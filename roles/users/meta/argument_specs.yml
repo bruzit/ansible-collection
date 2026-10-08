@@ -1,7 +1,7 @@
 ---
 argument_specs:
   main:
-    short_description: Ensure user accounts exist, with full name, email, GitHub SSH keys and sudo membership.
+    short_description: Ensure user accounts exist, with full name, email, GitHub SSH keys, an optional ed25519 key pair and sudo membership.
     options:
       users_accounts:
         type: list
@@ -13,3 +13,9 @@ argument_specs:
             public SSH keys are added to C(authorized_keys), other keys kept) and C(admin) (C(true) adds the account to
             C(sudo)).
           - Other keys are ignored, so the same list can be passed to other roles, such as C(git).
+      users_ssh_key:
+        type: bool
+        default: false
+        description:
+          - Generate C(~/.ssh/id_ed25519) for every account, commented with C(email) when set.
+          - An existing key is never overwritten.
