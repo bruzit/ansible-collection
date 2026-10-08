@@ -1,0 +1,41 @@
+---
+# Read by the postinst and /etc/cron.daily/google-chrome; otherwise both add google-chrome.sources.
+- name: Keep the google-chrome-stable package from managing its apt repository
+  become: true
+  ansible.builtin.copy:
+    content: |
+      repo_add_once="false"
+      repo_reenable_on_distupgrade="false"
+    dest: /etc/default/google-chrome
+    mode: "0644"
+
+# The postinst rewrites google-chrome.sources whenever it exists, hence the pinned source is named chrome.
+- name: Remove the apt sources of the google-chrome-stable package
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/google-chrome.{{ item }}
+    state: absent
+  loop:
+    - list
+    - sources
+
+- name: Add Google Chrome apt repository
+  ansible.builtin.include_role:
+    name: bruzit.ansible.apt_source
+  vars:
+    apt_source_name: chrome
+    apt_source_uris: https://dl.google.com/linux/chrome/deb/
+    apt_source_suites: stable
+    apt_source_components: main
+    apt_source_key_url: https://dl.google.com/linux/linux_signing_key.pub
+    apt_source_fingerprint: "EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796"
+    apt_source_legacy_keys:
+      - /etc/apt/trusted.gpg.d/google-chrome.gpg
+
+- name: Install Google Chrome
+  become: true
+  ansible.builtin.apt:
+    name: google-chrome-stable
+    state: present
+    update_cache: true
+  when: not ansible_check_mode

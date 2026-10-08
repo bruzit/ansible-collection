@@ -1,0 +1,8 @@
+---
+argument_specs:
+  main:
+    short_description: Install Google Chrome from the Google apt repository.
+    description:
+      - The package's own apt source C(google-chrome.sources) is disabled and removed; its unused
+        C(/usr/share/keyrings/google-chrome.gpg) is rewritten by every upgrade and daily cron run.
+      - The repository and the install are skipped in check mode.
