@@ -1,0 +1,111 @@
+---
+- name: Install gpg and python3-debian for {{ apt_source_name }}
+  become: true
+  ansible.builtin.apt:
+    name:
+      - gpg
+      - python3-debian
+    state: present
+
+- name: Add the verified apt source {{ apt_source_name }}
+  when: not ansible_check_mode
+  become: true
+  vars:
+    apt_source_pinned: "{{ apt_source_fingerprint | upper | replace(' ', '') }}"
+  block:
+    - name: Create the download directory of {{ apt_source_name }}
+      ansible.builtin.tempfile:
+        state: directory
+      register: apt_source_tmp
+      changed_when: false
+
+    - name: Download the signing key of {{ apt_source_name }}
+      ansible.builtin.get_url:
+        url: "{{ apt_source_key_url }}"
+        dest: "{{ apt_source_tmp.path }}/key"
+        mode: "0644"
+      register: apt_source_download
+      until: apt_source_download is succeeded
+      retries: 3
+      delay: 5
+      changed_when: false
+
+    - name: Read the signing key of {{ apt_source_name }}
+      ansible.builtin.command: gpg --homedir {{ apt_source_tmp.path }} --no-autostart --show-keys --with-colons {{ apt_source_tmp.path }}/key
+      register: apt_source_gpg
+      changed_when: false
+
+    - name: Import the signing key of {{ apt_source_name }}
+      ansible.builtin.command: gpg --homedir {{ apt_source_tmp.path }} --no-autostart --batch --import {{ apt_source_tmp.path }}/key
+      changed_when: false
+
+    - name: Export the pinned primary key of {{ apt_source_name }}
+      ansible.builtin.command:
+        argv:
+          - gpg
+          - --homedir
+          - "{{ apt_source_tmp.path }}"
+          - --no-autostart
+          - --batch
+          - --export
+          - --armor
+          - --output
+          - "{{ apt_source_tmp.path }}/keyring.asc"
+          - "{{ apt_source_pinned }}"
+      changed_when: false
+
+    - name: Stat the pinned primary key of {{ apt_source_name }}
+      ansible.builtin.stat:
+        path: "{{ apt_source_tmp.path }}/keyring.asc"
+      register: apt_source_export
+
+    - name: Assert the pinned fingerprint of {{ apt_source_name }}
+      ansible.builtin.assert:
+        that:
+          - apt_source_pinned in apt_source_found
+          - apt_source_export.stat.size > 0
+        fail_msg: >-
+          {{ apt_source_key_url }} has primary keys {{ apt_source_found | join(', ') }},
+          not the pinned {{ apt_source_pinned }}
+        quiet: true
+      vars:
+        apt_source_found: "{{ apt_source_gpg.stdout | regex_findall('^pub:.*\\nfpr:+([0-9A-F]{40}):', multiline=True) }}"
+
+    - name: Assert the validity of the pinned key of {{ apt_source_name }}
+      ansible.builtin.assert:
+        that: apt_source_gpg.stdout is not search('^pub:[er]:.*\\nfpr:+' ~ apt_source_pinned ~ ':', multiline=True)
+        fail_msg: >-
+          pinned key {{ apt_source_pinned }} for {{ apt_source_name }} is expired/revoked;
+          vendor rotated or extended it: update the pin
+        quiet: true
+
+    - name: Install the pinned primary key of {{ apt_source_name }}
+      ansible.builtin.copy:
+        src: "{{ apt_source_tmp.path }}/keyring.asc"
+        dest: /etc/apt/keyrings/{{ apt_source_name }}.asc
+        remote_src: true
+        mode: "0644"
+      register: apt_source_keyring
+
+    - name: Remove the legacy apt source and keys of {{ apt_source_name }}
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ ['/etc/apt/sources.list.d/' ~ apt_source_name ~ '.list'] + apt_source_legacy_keys | default([]) }}"
+
+    - name: Add the apt repository {{ apt_source_name }}
+      ansible.builtin.deb822_repository:
+        name: "{{ apt_source_name }}"
+        uris: "{{ apt_source_uris }}"
+        suites: "{{ apt_source_suites }}"
+        components: "{{ apt_source_components | default(omit) }}"
+        architectures: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+        signed_by: "{{ apt_source_keyring.dest }}"
+
+  always:
+    - name: Remove the download directory of {{ apt_source_name }}
+      ansible.builtin.file:
+        path: "{{ apt_source_tmp.path }}"
+        state: absent
+      changed_when: false
+      when: apt_source_tmp.path is defined

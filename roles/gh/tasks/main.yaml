@@ -1,26 +1,17 @@
 ---
-- name: Install GnuPG required by apt_repository
-  become: true
-  ansible.builtin.apt:
-    name: gnupg
-    state: present
-
-- name: Install GitHub CLI signing key
-  become: true
-  ansible.builtin.get_url:
-    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    dest: /usr/share/keyrings/githubcli-archive-keyring.gpg
-    mode: "0644"
-  register: gh_keyring
-  until: gh_keyring is succeeded
-  retries: 3
-  delay: 5
-
 - name: Add GitHub CLI apt repository
-  become: true
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-    filename: github-cli
+  ansible.builtin.include_role:
+    name: bruzit.ansible.apt_source
+  vars:
+    apt_source_name: github-cli
+    apt_source_uris: https://cli.github.com/packages
+    apt_source_suites: stable
+    apt_source_components: main
+    apt_source_key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    apt_source_fingerprint: "7F38 BBB5 9D06 4DBC B3D8 4D72 5612 B364 6231 3325"
+    apt_source_legacy_keys:
+      - /usr/share/keyrings/githubcli-archive-keyring.gpg
+      - /etc/apt/keyrings/github-cli.gpg
 
 - name: Install GitHub CLI
   become: true

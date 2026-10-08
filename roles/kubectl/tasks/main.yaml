@@ -1,10 +1,4 @@
 ---
-- name: Install GnuPG required by apt_repository
-  become: true
-  ansible.builtin.apt:
-    name: gnupg
-    state: present
-
 - name: Resolve the latest stable Kubernetes release
   ansible.builtin.uri:
     url: https://dl.k8s.io/release/stable.txt
@@ -18,20 +12,17 @@
     kubectl_minor: "{{ kubectl_stable.content | trim | regex_replace('^v([0-9]+\\.[0-9]+).*$', '\\1') }}"
   when: kubectl_minor | length == 0
 
-- name: Install Kubernetes signing key
-  become: true
-  ansible.builtin.get_url:
-    url: "https://pkgs.k8s.io/core:/stable:/v{{ kubectl_minor }}/deb/Release.key"
-    dest: /usr/share/keyrings/kubernetes-apt-keyring.asc
-    mode: "0644"
-
 - name: Add Kubernetes apt repository
-  become: true
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes-apt-keyring.asc]
-      https://pkgs.k8s.io/core:/stable:/v{{ kubectl_minor }}/deb/ /
-    filename: kubernetes
+  ansible.builtin.include_role:
+    name: bruzit.ansible.apt_source
+  vars:
+    apt_source_name: kubernetes
+    apt_source_uris: "https://pkgs.k8s.io/core:/stable:/v{{ kubectl_minor }}/deb/"
+    apt_source_suites: /
+    apt_source_key_url: "https://pkgs.k8s.io/core:/stable:/v{{ kubectl_minor }}/deb/Release.key"
+    apt_source_fingerprint: "DE15 B144 86CD 377B 9E87 6E1A 2346 54DA 9A29 6436"
+    apt_source_legacy_keys:
+      - /usr/share/keyrings/kubernetes-apt-keyring.asc
 
 - name: Install kubectl
   become: true

@@ -1,0 +1,51 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Update the apt cache, failing on any repository error
+      ansible.builtin.command: apt-get update --error-on=any  # noqa: command-instead-of-module
+      changed_when: false
+
+    - name: Read the gh package policy
+      ansible.builtin.command: apt-cache policy gh
+      register: apt_source_policy
+      changed_when: false
+
+    - name: Read the apt source
+      ansible.builtin.slurp:
+        src: /etc/apt/sources.list.d/github-cli.sources
+      register: apt_source_sources
+
+    - name: Stat the signing key
+      ansible.builtin.stat:
+        path: /etc/apt/keyrings/github-cli.asc
+      register: apt_source_key
+
+    - name: Read the signing key
+      ansible.builtin.command: gpg --show-keys --with-colons /etc/apt/keyrings/github-cli.asc
+      register: apt_source_gpg
+      changed_when: false
+
+    - name: Find files of the rejected apt source
+      ansible.builtin.find:
+        paths:
+          - /etc/apt/sources.list.d
+          - /etc/apt/keyrings
+        patterns:
+          - mismatch.*
+          - expired.*
+      register: apt_source_rejected
+
+    - name: Assert the apt source
+      ansible.builtin.assert:
+        that:
+          - "'cli.github.com/packages' in apt_source_policy.stdout"
+          - "'Signed-By: /etc/apt/keyrings/github-cli.asc' in (apt_source_sources.content | b64decode)"
+          - apt_source_key.stat.mode == '0644'
+          - apt_source_primaries == ['7F38BBB59D064DBCB3D84D725612B36462313325']
+          - apt_source_rejected.matched == 0
+      vars:
+        apt_source_primaries: "{{ apt_source_gpg.stdout | regex_findall('^pub:.*\\nfpr:+([0-9A-F]{40}):', multiline=True) }}"

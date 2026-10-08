@@ -1,24 +1,16 @@
 ---
-- name: Install GnuPG required by apt_repository
-  become: true
-  ansible.builtin.apt:
-    name: gnupg
-    state: present
-
-- name: Install HashiCorp signing key
-  become: true
-  ansible.builtin.get_url:
-    url: https://apt.releases.hashicorp.com/gpg
-    dest: /usr/share/keyrings/hashicorp-archive-keyring.asc
-    mode: "0644"
-
 - name: Add HashiCorp apt repository
-  become: true
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.asc]
-      https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main
-    filename: hashicorp
+  ansible.builtin.include_role:
+    name: bruzit.ansible.apt_source
+  vars:
+    apt_source_name: hashicorp
+    apt_source_uris: https://apt.releases.hashicorp.com
+    apt_source_suites: "{{ ansible_facts['distribution_release'] }}"
+    apt_source_components: main
+    apt_source_key_url: https://apt.releases.hashicorp.com/gpg
+    apt_source_fingerprint: "D55C 0D1A C78A 8D81 26CB 631C FC9C A96A CA02 6560"
+    apt_source_legacy_keys:
+      - /usr/share/keyrings/hashicorp-archive-keyring.asc
 
 - name: Install Terraform
   become: true

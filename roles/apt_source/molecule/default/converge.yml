@@ -1,0 +1,62 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Add the GitHub CLI apt repository from a binary key with an extra expired primary key
+      ansible.builtin.include_role:
+        name: bruzit.ansible.apt_source
+      vars:
+        apt_source_name: github-cli
+        apt_source_uris: https://cli.github.com/packages
+        apt_source_suites: stable
+        apt_source_components: main
+        apt_source_key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+        apt_source_fingerprint: 7f38 bbb5 9d06 4dbc b3d8  4d72 5612 b364 6231 3325
+
+    - name: Reject a key without the pinned fingerprint
+      when: not ansible_check_mode
+      block:
+        - name: Add an apt repository with a wrong pinned fingerprint
+          ansible.builtin.include_role:
+            name: bruzit.ansible.apt_source
+          vars:
+            apt_source_name: mismatch
+            apt_source_uris: https://cli.github.com/packages
+            apt_source_suites: stable
+            apt_source_components: main
+            apt_source_key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+            apt_source_fingerprint: "9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88"
+
+        - name: Fail as the wrong fingerprint was accepted
+          ansible.builtin.fail:
+            msg: apt_source accepted a key without the pinned fingerprint
+
+      rescue:
+        - name: Assert the fingerprint check failed
+          ansible.builtin.assert:
+            that: ansible_failed_result.msg is search('not the pinned 9DC858229FC7DD38854AE2D88D81803C0EBFCD88')
+
+    - name: Reject an expired pinned key
+      when: not ansible_check_mode
+      block:
+        - name: Add an apt repository pinning an expired primary key
+          ansible.builtin.include_role:
+            name: bruzit.ansible.apt_source
+          vars:
+            apt_source_name: expired
+            apt_source_uris: https://cli.github.com/packages
+            apt_source_suites: stable
+            apt_source_components: main
+            apt_source_key_url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+            apt_source_fingerprint: "2C61 0620 1985 B60E 6C7A C873 23F3 D4EA 7571 6059"
+
+        - name: Fail as the expired key was accepted
+          ansible.builtin.fail:
+            msg: apt_source accepted an expired pinned key
+
+      rescue:
+        - name: Assert the validity check failed
+          ansible.builtin.assert:
+            that: ansible_failed_result.msg is search('pinned key 2C6106201985B60E6C7AC87323F3D4EA75716059 for expired is expired/revoked')
