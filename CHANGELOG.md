@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.40.0](https://github.com/bruzit/ansible-collection/compare/v0.39.0...v0.40.0) (2026-10-08)
+
+### Features
+
+* **git:** sign commits with ssh keys ([a23a357](https://github.com/bruzit/ansible-collection/commit/a23a35787795f1fbb42fc81ba9fda7f5ba0e56cf))
+
 ## [0.39.0](https://github.com/bruzit/ansible-collection/compare/v0.38.0...v0.39.0) (2026-10-08)
 
 ### Features
