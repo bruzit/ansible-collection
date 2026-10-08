@@ -20,5 +20,6 @@
           email: molecule@example.com
           repositories:
             - bruzit/.github
+          signing_key: ~/.ssh/id_ed25519_signing
         - name: molecule-norepos
           repositories: []

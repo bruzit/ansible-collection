@@ -1,0 +1,66 @@
+---
+- name: Install ssh-keygen for {{ git_user.name }}
+  become: true
+  ansible.builtin.package:
+    name: openssh-client
+    state: present
+
+- name: Read the account entry of {{ git_user.name }}
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ git_user.name }}"
+
+- name: Configure SSH commit signing for {{ git_user.name }}
+  become: true
+  become_user: "{{ git_user.name }}"
+  vars:
+    git_home: "{{ ansible_facts.getent_passwd[git_user.name][4] }}"
+    git_signing_key: "{{ git_user.signing_key | regex_replace('^~/', git_home ~ '/') }}"
+  block:
+    - name: Create the signing key directory for {{ git_user.name }}
+      ansible.builtin.file:
+        path: "{{ git_signing_key | dirname }}"
+        state: directory
+        mode: "0700"
+
+    - name: Generate the signing key for {{ git_user.name }}
+      ansible.builtin.command:
+        argv: [ssh-keygen, -t, ed25519, -N, "", -C, "{{ git_user.email }} git signing", -f, "{{ git_signing_key }}"]
+        creates: "{{ git_signing_key }}"
+      register: git_signing_key_generated
+
+    - name: Trust the signing key and sign commits for {{ git_user.name }}
+      when: not ansible_check_mode or git_signing_key_generated is not changed
+      block:
+        - name: Read the signing public key of {{ git_user.name }}
+          ansible.builtin.slurp:
+            src: "{{ git_signing_key }}.pub"
+          register: git_signing_public_key
+
+        - name: Create the git config directory of {{ git_user.name }}
+          ansible.builtin.file:
+            path: "{{ git_home }}/.config/git"
+            state: directory
+            mode: "0755"
+
+        - name: Write the allowed signers of {{ git_user.name }}
+          ansible.builtin.copy:
+            content: "{{ git_user.email }} namespaces=\"git\" {{ git_signing_public_key.content | b64decode }}"
+            dest: "{{ git_home }}/.config/git/allowed_signers"
+            mode: "0644"
+
+        - name: Set git signing config for {{ git_user.name }}
+          community.general.git_config:
+            name: "{{ item.key }}"
+            scope: global
+            value: "{{ item.value }}"
+          loop: "{{ git_signing_config | dict2items }}"
+          loop_control:
+            label: "{{ item.key }}"
+          vars:
+            git_signing_config:
+              gpg.format: ssh
+              user.signingkey: "{{ git_user.signing_key }}.pub"
+              commit.gpgsign: "true"
+              tag.gpgsign: "true"
+              gpg.ssh.allowedSignersFile: ~/.config/git/allowed_signers
