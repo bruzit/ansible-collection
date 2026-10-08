@@ -1,0 +1,6 @@
+---
+argument_specs:
+  main:
+    short_description: Install VSCodium from the VSCodium apt repository.
+    description:
+      - The repository and the install are skipped in check mode.

@@ -1,0 +1,21 @@
+---
+- name: Add VSCodium apt repository
+  ansible.builtin.include_role:
+    name: bruzit.ansible.apt_source
+  vars:
+    apt_source_name: vscodium
+    apt_source_uris: https://download.vscodium.com/debs
+    apt_source_suites: vscodium
+    apt_source_components: main
+    apt_source_key_url: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+    apt_source_fingerprint: "1302 DE60 2318 89FE 1EBA CADC 5467 8CF7 5A27 8D9C"
+    apt_source_legacy_keys:
+      - /usr/share/keyrings/vscodium-archive-keyring.gpg
+
+- name: Install VSCodium
+  become: true
+  ansible.builtin.apt:
+    name: codium
+    state: present
+    update_cache: true
+  when: not ansible_check_mode
