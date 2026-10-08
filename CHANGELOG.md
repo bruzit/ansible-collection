@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.42.0](https://github.com/bruzit/ansible-collection/compare/v0.41.0...v0.42.0) (2026-10-08)
+
+### Features
+
+* add google_chrome role ([e82062d](https://github.com/bruzit/ansible-collection/commit/e82062d15387886c3910e63859c66d7c3a1de780))
+* add vscodium role ([f382859](https://github.com/bruzit/ansible-collection/commit/f382859d32b0e5a0414e7c1365c1a06e1e36b876))
+
 ## [0.41.0](https://github.com/bruzit/ansible-collection/compare/v0.40.1...v0.41.0) (2026-10-08)
 
 ### Features
