@@ -1,0 +1,18 @@
+---
+scenario:
+  # First check runs on a fresh host, covering the repository and install skipped in check mode.
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - check
+    - converge
+    - idempotence
+    - check
+    - side_effect
+    - verify
+    - cleanup
+    - destroy

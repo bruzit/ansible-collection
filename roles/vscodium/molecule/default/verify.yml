@@ -1,0 +1,41 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Query the codium package status
+      ansible.builtin.command: dpkg-query -W -f=${Status} codium
+      register: vscodium_status
+      changed_when: false
+
+    # The codium launcher refuses root without --user-data-dir.
+    - name: Run codium
+      ansible.builtin.command: codium --version --user-data-dir /tmp/codium
+      register: vscodium_version
+      changed_when: false
+
+    - name: Find apt sources of the VSCodium repository
+      ansible.builtin.command: grep -rl download.vscodium.com /etc/apt/sources.list.d/
+      register: vscodium_sources
+      changed_when: false
+
+    - name: Read the apt source
+      ansible.builtin.slurp:
+        src: /etc/apt/sources.list.d/vscodium.sources
+      register: vscodium_source
+
+    - name: Stat the repository key
+      ansible.builtin.stat:
+        path: /etc/apt/keyrings/vscodium.asc
+      register: vscodium_key
+
+    - name: Assert the VSCodium setup
+      ansible.builtin.assert:
+        that:
+          - vscodium_status.stdout == 'install ok installed'
+          - vscodium_version.stdout_lines[0] is match('^\d+\.\d+\.\d+$')
+          - vscodium_sources.stdout_lines == ['/etc/apt/sources.list.d/vscodium.sources']
+          - "'Signed-By: /etc/apt/keyrings/vscodium.asc' in (vscodium_source.content | b64decode)"
+          - vscodium_key.stat.mode == '0644'
