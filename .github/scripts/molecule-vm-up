@@ -4,6 +4,8 @@
 set -euo pipefail
 
 WORK=/tmp/molecule-vm
+# UEC Image Automatic Signing Key, per https://ubuntu.com/docs/public-images/public-images-how-to/verify-image-checksum/
+SIGNER_FPR=D2EB44626FDDC30B513D5BB71A5D6C4C7DB87C81
 mkdir -p "$WORK"; cd "$WORK"
 
 [ -f key ] || ssh-keygen -t ed25519 -N '' -f key
@@ -19,6 +21,18 @@ EOF
 # SSH port = release without the dot; must match host_vars ansible_port
 declare -A IMAGES=( [ubuntu-22]=22.04 [ubuntu-24]=24.04 [ubuntu-26]=26.04 )
 
+keyring() {
+  [ -n "${GNUPGHOME_OWN:-}" ] && return
+  GNUPGHOME_OWN=$(mktemp -d); export GNUPGHOME=$GNUPGHOME_OWN
+  trap 'rm -rf "$GNUPGHOME_OWN"' EXIT
+  curl -fsSL --retry 3 -o "$GNUPGHOME/key.asc" \
+    "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x$SIGNER_FPR"
+  fprs=$(gpg --batch --show-keys --with-colons "$GNUPGHOME/key.asc" |
+    awk -F: '$1 == "pub" { p = 1; next } p && $1 == "fpr" { print $10; p = 0 }')
+  [ "$fprs" = "$SIGNER_FPR" ] || { echo "ERROR: keyserver key is not exactly $SIGNER_FPR: $fprs" >&2; exit 1; }
+  gpg --batch --dearmor -o "$GNUPGHOME/keyring.gpg" "$GNUPGHOME/key.asc"
+}
+
 for vm in "${!IMAGES[@]}"; do
   ver=${IMAGES[$vm]}; port=${ver//./}
 
@@ -28,6 +42,12 @@ for vm in "${!IMAGES[@]}"; do
       "https://cloud-images.ubuntu.com/releases/$ver/release/ubuntu-$ver-server-cloudimg-amd64.img"
     curl -fL --retry 3 -o "$vm.sums" \
       "https://cloud-images.ubuntu.com/releases/$ver/release/SHA256SUMS"
+    curl -fL --retry 3 -o "$vm.sums.gpg" \
+      "https://cloud-images.ubuntu.com/releases/$ver/release/SHA256SUMS.gpg"
+    keyring
+    status=$(gpgv --status-fd 1 --keyring "$GNUPGHOME/keyring.gpg" "$vm.sums.gpg" "$vm.sums")
+    grep -E "^\[GNUPG:\] VALIDSIG .* $SIGNER_FPR\$" <<<"$status" ||
+      { echo "ERROR: SHA256SUMS for $vm not signed by $SIGNER_FPR" >&2; exit 1; }
     sha=$(awk -v f="ubuntu-$ver-server-cloudimg-amd64.img" '$2 == f || $2 == "*" f {print $1}' "$vm.sums")
     [ -n "$sha" ] || { echo "ERROR: no checksum for $vm.img in SHA256SUMS" >&2; exit 1; }
     echo "$sha  $vm.img" | sha256sum -c -
