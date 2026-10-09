@@ -1,0 +1,60 @@
+---
+- name: Install OpenTTD and its free base sets
+  become: true
+  ansible.builtin.apt:
+    name:
+      - openttd
+      - openttd-opengfx
+      - openttd-openmsx
+      - openttd-opensfx
+    state: present
+
+- name: Install JGR's Patchpack
+  when: ansible_facts['architecture'] == 'x86_64'
+  block:
+    - name: Install the latest JGR's Patchpack release
+      ansible.builtin.include_role:
+        name: bruzit.ansible.github_binary
+        apply:
+          become: true
+      vars:
+        github_binary_name: openttd-jgrpp
+        github_binary_repository: JGRennison/OpenTTD-patches
+        github_binary_tag_prefix: jgrpp-
+        github_binary_asset: "openttd-jgrpp-{version}-linux-generic-amd64.tar.xz"
+        github_binary_install_dir: /opt/openttd-jgrpp
+        github_binary_member: openttd
+        # Not openttd -h, which creates the personal directories in the home of root.
+        github_binary_version_command: grep -m1 '^### v' /opt/openttd-jgrpp/jgrpp-changelog.md
+
+    # The generic build searches /usr/local/share/games/openttd, not the Ubuntu /usr/share/games/openttd.
+    - name: Share the base sets with JGR's Patchpack
+      become: true
+      ansible.builtin.file:
+        src: /usr/share/games/openttd/baseset/{{ item }}
+        dest: /opt/openttd-jgrpp/baseset/{{ item }}
+        state: link
+        force: true  # Check mode on a fresh host lacks the base sets.
+      loop: [opengfx, openmsx, opensfx]
+
+    - name: Create the applications directory
+      become: true
+      ansible.builtin.file:
+        path: /usr/local/share/applications
+        state: directory
+        mode: "0755"
+
+    - name: Add the JGR's Patchpack desktop entry
+      become: true
+      ansible.builtin.copy:
+        dest: /usr/local/share/applications/openttd-jgrpp.desktop
+        mode: "0644"
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Name=OpenTTD JGRPP
+          Comment=OpenTTD with JGR's Patchpack
+          Exec=openttd-jgrpp
+          Icon=/opt/openttd-jgrpp/share/icons/hicolor/256x256/apps/openttd.png
+          Terminal=false
+          Categories=Game;Simulation;

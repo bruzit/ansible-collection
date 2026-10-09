@@ -1,0 +1,7 @@
+---
+argument_specs:
+  main:
+    short_description: Install OpenTTD from the Ubuntu archive and JGR's Patchpack side by side.
+    description:
+      - JGR's Patchpack, amd64 only, is the latest generic Linux build in C(/opt/openttd-jgrpp), run as C(openttd-jgrpp).
+      - Both share the free base sets and C(~/.config/openttd), C(~/.local/share/openttd); vanilla cannot load JGRPP saves.

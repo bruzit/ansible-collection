@@ -32,7 +32,12 @@ argument_specs:
         type: str
         description: >-
           Path of the binary inside the asset archive; unset when the asset is the binary itself.
-          A C(.zip) asset gets C(unzip) installed with apt.
+          A C(.zip) asset gets C(unzip), a C(.tar.xz) one C(xz-utils) installed with apt.
+      github_binary_install_dir:
+        type: str
+        description: >-
+          Directory replaced by the whole tar asset, stripped of its top-level directory; C(/usr/local/bin/{name})
+          is then a launcher of C(github_binary_member) in it, not a copy.
       github_binary_tag_prefix:
         type: str
         description: Install the newest non-prerelease among the 30 most recent releases whose tag starts with this prefix.
