@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.43.0](https://github.com/bruzit/ansible-collection/compare/v0.42.0...v0.43.0) (2026-10-09)
+
+### Features
+
+* add openttd role ([6829349](https://github.com/bruzit/ansible-collection/commit/6829349fea23a1b198e265b8cac591a0f7ca1265))
+
 ## [0.42.0](https://github.com/bruzit/ansible-collection/compare/v0.41.0...v0.42.0) (2026-10-08)
 
 ### Features
