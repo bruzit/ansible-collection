@@ -1,0 +1,67 @@
+---
+argument_specs:
+  main:
+    short_description: nftables firewall in its own inet bruzit table, default drop in and out.
+    description:
+      - Manages only C(table inet bruzit); other tables, e.g. Docker's, are kept. Never flushes the ruleset,
+        and the C(nftables.service) C(ExecStop) is overridden to delete only this table.
+      - Baseline every host needs. In - loopback, established/related, ICMP and ICMPv6 essentials (ND, RA, MLD
+        query, packet-too-big, time-exceeded, parameter-problem), DHCPv4 and DHCPv6 client replies. Out - loopback,
+        established/related, ICMP, ICMPv6, DNS (53, DNS over TLS 853), NTP (123, NTS key exchange 4460), DHCP.
+        Forward - Docker bridges C(docker0) and C(br-*) in and out. Everything else is opened by the rules of the
+        roles that need it, see the C(rules) entry point.
+      - Unmatched packets are logged, rate-limited, to the kernel log with the prefix C(bruzit-drop-in),
+        C(bruzit-drop-out) (with the socket UID) or C(bruzit-drop-fwd), then accepted in audit mode or dropped in
+        enforce mode.
+      - C(/etc/nftables.conf) declares the table and its chains, flushes the chains, refills them and includes
+        C(/etc/nftables.d/*.nft), all in one atomic C(nft -f). The table is never recreated, so sets and their
+        elements, e.g. added by dnsmasq C(nftset=), survive reloads. C(nftables.service) stop deletes the table.
+      - Changes are validated with C(nft -c -f) first. Over SSH with systemd, a C(bruzit-nftables-rollback) timer
+        restores the previous table after 120 s unless a new connection succeeds first; the files keep the new
+        ruleset, loaded at boot. The base ruleset is applied by the C(Reload nftables) handler, or earlier by a
+        C(rules) call.
+      - Fails on WSL unless O(nftables_enabled) is false.
+    options:
+      nftables_enabled:
+        type: bool
+        default: true
+        description: Manage the firewall. When false, this role and every C(rules) call do nothing.
+      nftables_mode:
+        type: str
+        choices: [audit, enforce]
+        default: audit
+        description: C(audit) logs would-be drops and accepts them; C(enforce) logs and drops them.
+  rules:
+    short_description: Install or remove the nftables rules of the calling role.
+    description:
+      - Entry point for roles that need traffic beyond the baseline. The calling role depends on
+        C(bruzit.ansible.nftables) in C(meta/main.yaml) and calls this entry point with C(include_role) and
+        C(tasks_from) C(rules).
+      - Renders C(templates/nftables.nft.j2) of the calling role and validates the whole ruleset with it in place
+        of C(/etc/nftables.d/<nftables_rules_name>.nft), or without it for O(nftables_rules_state=absent), before
+        touching that file. A ruleset that fails C(nft -c) fails the task and leaves the file unchanged.
+      - When the file changes, applies the whole ruleset right away, with the rollback over SSH, so the calling
+        role's rules are live for its later tasks. In enforce mode over SSH, apply C(ssh_server) before roles whose
+        rules change, or the first apply locks the connection out and is rolled back.
+      - The template holds only C(table inet bruzit { ... }) blocks. It adds C(accept) rules to C(chain allow_in) or
+        C(chain allow_out), jumped after the baseline and before the drop log, so drop-ins are independent of each
+        other; these chains are flushed on every reload, so a removed file removes its rules.
+      - It may declare sets named C(<nftables_rules_name>_v4) and C(<nftables_rules_name>_v6), or with another
+        C(<nftables_rules_name>_) prefix, e.g. for dnsmasq
+        C(nftset=/<domain>/4#inet#bruzit#<name>_v4,6#inet#bruzit#<name>_v6). Sets keep their elements across
+        reloads; a removed file's sets stay, unreferenced, until reboot or C(nft delete set).
+      - It never declares chains of its own, flushes, deletes or touches other tables.
+    options:
+      nftables_enabled:
+        type: bool
+        default: true
+        description: When false, does nothing.
+      nftables_rules_name:
+        type: str
+        required: true
+        description: Drop-in file name without C(.nft), the calling role's name.
+      nftables_rules_state:
+        type: str
+        choices: [present, absent]
+        default: present
+        description: Install or remove the drop-in.

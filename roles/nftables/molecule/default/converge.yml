@@ -3,8 +3,5 @@
   hosts: all
   become: true
 
-  vars:
-    nftables_enabled: false
-
   roles:
-    - role: apt
+    - role: nftables

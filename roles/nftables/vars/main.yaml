@@ -1,0 +1,3 @@
+---
+nftables_rollback: "{{ 'ssh' in ansible_connection and nftables_apply_systemd.stat.exists }}"
+nftables_rollback_seconds: 120

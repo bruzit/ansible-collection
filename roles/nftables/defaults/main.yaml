@@ -1,0 +1,4 @@
+---
+nftables_enabled: true
+nftables_mode: audit
+nftables_rules_state: present

@@ -1,0 +1,11 @@
+table inet bruzit {
+	set molecule_set_v4 {
+		type ipv4_addr
+		flags interval
+		auto-merge
+	}
+
+	chain allow_out {
+		ip daddr @molecule_set_v4 tcp dport 9 accept
+	}
+}

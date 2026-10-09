@@ -1,0 +1,5 @@
+---
+- name: Apply the nftables ruleset
+  ansible.builtin.include_tasks: apply.yaml
+  when: not ansible_check_mode
+  listen: Reload nftables

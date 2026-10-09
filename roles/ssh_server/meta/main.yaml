@@ -1,4 +1,3 @@
 ---
 dependencies:
   - role: bruzit.ansible.nftables
-  - role: bruzit.ansible.system

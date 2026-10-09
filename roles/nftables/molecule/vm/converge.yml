@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  roles:
+    - role: bruzit.ansible.ssh_server
+    - role: bruzit.ansible.apt
+    - role: bruzit.ansible.git

@@ -1,0 +1,280 @@
+---
+- name: Verify audit mode
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Add a foreign canary table
+      ansible.builtin.command: nft add table ip molecule_canary
+      changed_when: true
+
+    - name: Read the nft version
+      ansible.builtin.command: nft --version
+      register: nftables_version
+      changed_when: false
+
+    - name: Show the nft version
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts['distribution_version'] }} {{ ansible_facts['kernel'] }} {{ nftables_version.stdout }}"
+
+    - name: Read the live table
+      ansible.builtin.command: nft list table inet bruzit
+      register: nftables_table
+      changed_when: false
+
+    - name: Read the nftables.service state
+      ansible.builtin.systemd_service:
+        name: nftables
+      register: nftables_service
+
+    - name: Assert the audit ruleset with the drop-ins of ssh_server, apt and git
+      ansible.builtin.assert:
+        that:
+          - nftables_table.stdout is search('hook input priority filter; policy accept;')
+          - nftables_table.stdout is search('hook output priority filter; policy accept;')
+          - nftables_table.stdout is search('hook forward priority filter; policy accept;')
+          - nftables_table.stdout is search('chain allow_in {\s+tcp dport (\{ )?22( \})? accept\s+}')
+          - nftables_table.stdout is search('chain allow_out {\s+tcp dport \{ 80, 443 \} accept\s+tcp dport 22 accept\s+}')
+          - nftables_service.status.UnitFileState == 'enabled'
+          - nftables_service.status.ActiveState == 'active'
+          - nftables_service.status.ExecStop is search('nft delete table inet bruzit')
+
+    - name: Install rules with a set
+      ansible.builtin.include_role:
+        name: molecule_set
+
+    - name: Add a set element
+      ansible.builtin.command: nft add element inet bruzit molecule_set_v4 { 192.0.2.1 }
+      changed_when: true
+
+    - name: Reload nftables.service
+      ansible.builtin.systemd_service:
+        name: nftables
+        state: reloaded
+
+    - name: Read the set after the reload
+      ansible.builtin.command: nft list set inet bruzit molecule_set_v4
+      register: nftables_set
+      changed_when: false
+
+    - name: Remove the rules with the set
+      ansible.builtin.include_role:
+        name: bruzit.ansible.nftables
+        tasks_from: rules
+      vars:
+        nftables_rules_name: molecule_set
+        nftables_rules_state: absent
+
+    - name: Read allow_out without the rules with the set
+      ansible.builtin.command: nft list chain inet bruzit allow_out
+      register: nftables_allow_out
+      changed_when: false
+
+    - name: Assert the set element survived the reload and the removed rules are gone
+      ansible.builtin.assert:
+        that:
+          - nftables_set.stdout is search('elements = \{ 192.0.2.1 \}')
+          - nftables_allow_out.stdout is not search('molecule_set_v4')
+
+    - name: Reject invalid rules before writing them
+      block:
+        - name: Install invalid rules
+          ansible.builtin.include_role:
+            name: molecule_bad
+
+        - name: Fail as the invalid rules were accepted
+          ansible.builtin.fail:
+            msg: invalid nftables rules were accepted
+
+      rescue:
+        - name: Stat the invalid rules
+          ansible.builtin.stat:
+            path: /etc/nftables.d/molecule_bad.nft
+          register: nftables_bad
+
+        - name: Assert the invalid rules failed validation and were not written
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.stderr is search('Could not resolve service')
+              - not nftables_bad.stat.exists
+
+    - name: Remove the drop-in of apt
+      ansible.builtin.include_role:
+        name: bruzit.ansible.nftables
+        tasks_from: rules
+      vars:
+        nftables_rules_name: apt
+        nftables_rules_state: absent
+
+    - name: Read allow_out without apt
+      ansible.builtin.command: nft list chain inet bruzit allow_out
+      register: nftables_allow_out
+      changed_when: false
+
+    - name: Resolve a name
+      ansible.builtin.command: getent ahosts github.com
+      changed_when: false
+
+    - name: Fetch over HTTPS, not allowed but audited
+      ansible.builtin.uri:
+        url: https://github.com
+        method: HEAD
+
+    - name: Find the audited HTTPS connection in the kernel log
+      ansible.builtin.command: journalctl -k -q --no-pager -g 'bruzit-drop-out.* DPT=443 '
+      register: nftables_audit_log
+      changed_when: false
+      until: nftables_audit_log.rc == 0
+      retries: 6
+      delay: 10
+
+    - name: Read the canary table
+      ansible.builtin.command: nft list table ip molecule_canary
+      changed_when: false
+
+    - name: Assert the apt drop-in is gone
+      ansible.builtin.assert:
+        that: nftables_allow_out.stdout is not search('443')
+
+    - name: Restore the drop-in of apt
+      ansible.builtin.include_role:
+        name: bruzit.ansible.apt
+
+- name: Verify enforce mode
+  hosts: all
+  become: true
+
+  vars:
+    nftables_mode: enforce
+
+  tasks:
+    - name: Enforce
+      ansible.builtin.include_role:
+        name: bruzit.ansible.nftables
+
+    - name: Apply the enforcing ruleset
+      ansible.builtin.meta: flush_handlers
+
+    - name: Read the enforcing table
+      ansible.builtin.command: nft list table inet bruzit
+      register: nftables_table
+      changed_when: false
+
+    - name: Resolve a name
+      ansible.builtin.command: getent ahosts example.org
+      changed_when: false
+
+    - name: Reconnect over SSH
+      ansible.builtin.meta: reset_connection
+
+    - name: Ping over a new SSH connection
+      ansible.builtin.ping:
+
+    - name: Fetch over HTTPS
+      ansible.builtin.uri:
+        url: https://github.com
+        method: HEAD
+
+    - name: Connect to GitHub SSH
+      ansible.builtin.command: timeout 5 bash -c '</dev/tcp/github.com/22'
+      changed_when: false
+
+    - name: Assert the enforcing ruleset
+      ansible.builtin.assert:
+        that:
+          - nftables_table.stdout is search('hook input priority filter; policy drop;')
+          - nftables_table.stdout is search('hook output priority filter; policy drop;')
+          - nftables_table.stdout is search('hook forward priority filter; policy drop;')
+
+    - name: Remove the drop-in of git
+      ansible.builtin.include_role:
+        name: bruzit.ansible.nftables
+        tasks_from: rules
+      vars:
+        nftables_rules_name: git
+        nftables_rules_state: absent
+
+    - name: Connect to GitHub SSH without the git drop-in
+      ansible.builtin.command: timeout 5 bash -c '</dev/tcp/github.com/22'
+      register: nftables_blocked
+      changed_when: false
+      failed_when: nftables_blocked.rc == 0
+
+    - name: Find the dropped connection in the kernel log
+      ansible.builtin.command: journalctl -k -q --no-pager -g 'bruzit-drop-out.* DPT=22 '
+      changed_when: false
+
+    - name: Restore the drop-in of git
+      ansible.builtin.include_role:
+        name: bruzit.ansible.git
+
+    - name: Connect to GitHub SSH with the git drop-in
+      ansible.builtin.command: timeout 5 bash -c '</dev/tcp/github.com/22'
+      changed_when: false
+
+    - name: Restart nftables.service
+      ansible.builtin.systemd_service:
+        name: nftables
+        state: restarted
+
+    - name: Read the canary table after the restart
+      ansible.builtin.command: nft list table ip molecule_canary
+      changed_when: false
+
+    - name: Lock out SSH and expect the rollback
+      block:
+        - name: Remove the drop-in of ssh_server
+          ansible.builtin.include_role:
+            name: bruzit.ansible.nftables
+            tasks_from: rules
+          vars:
+            nftables_rules_name: ssh_server
+            nftables_rules_state: absent
+
+        - name: Fail as SSH survived without its drop-in
+          ansible.builtin.fail:
+            msg: a new SSH connection succeeded without the ssh_server drop-in
+
+      rescue:
+        - name: Wait for the rollback
+          ansible.builtin.pause:
+            seconds: 70
+
+        - name: Reconnect after the rollback
+          ansible.builtin.wait_for_connection:
+            timeout: 120
+
+        - name: Read allow_in after the rollback
+          ansible.builtin.command: nft list chain inet bruzit allow_in
+          register: nftables_allow_in
+          changed_when: false
+
+        - name: Read the rollback journal
+          ansible.builtin.command: journalctl -q --no-pager -u bruzit-nftables-rollback.service
+          register: nftables_rollback_journal
+          changed_when: false
+
+        - name: Assert the rollback ran and restored SSH in
+          ansible.builtin.assert:
+            that:
+              - nftables_rollback_journal.stdout_lines | length > 0
+              - nftables_allow_in.stdout is search('tcp dport (\{ )?22( \})? accept')
+
+    - name: Restore the drop-in of ssh_server
+      ansible.builtin.include_role:
+        name: bruzit.ansible.ssh_server
+
+    - name: Reboot
+      ansible.builtin.reboot:
+
+    - name: Read the table after the reboot
+      ansible.builtin.command: nft list table inet bruzit
+      register: nftables_table
+      changed_when: false
+
+    - name: Assert the enforcing ruleset with all drop-ins after the reboot
+      ansible.builtin.assert:
+        that:
+          - nftables_table.stdout is search('hook output priority filter; policy drop;')
+          - nftables_table.stdout is search('chain allow_in {\s+tcp dport (\{ )?22( \})? accept\s+}')
+          - nftables_table.stdout is search('tcp dport \{ 80, 443 \} accept')
