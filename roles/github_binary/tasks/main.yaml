@@ -44,7 +44,7 @@
     github_binary_url: >-
       {{ github_binary_download_url | default('https://github.com/' ~ github_binary_repository ~ '/releases/download/' ~ github_binary_tag) }}
     github_binary_asset_name: "{{ github_binary_asset | replace('{version}', github_binary_version) }}"
-    github_binary_dir: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}"
+    github_binary_dir: "{{ github_binary_install_dir | default('/tmp/' ~ github_binary_name ~ '-' ~ github_binary_tag) }}"
     github_binary_download: "/tmp/{{ github_binary_name }}-{{ github_binary_tag }}-{{ github_binary_asset | replace('{version}', github_binary_version) }}"
 
 - name: Check the installed version of {{ github_binary_name }}
@@ -86,6 +86,12 @@
         fail_msg: "No SHA-256 for {{ github_binary_asset_name }} in {{ github_binary_tag }}"
         quiet: true
 
+    - name: Remove the previous version of {{ github_binary_name }}
+      ansible.builtin.file:
+        path: "{{ github_binary_install_dir }}"
+        state: absent
+      when: github_binary_install_dir is defined
+
     - name: Create the download directory of {{ github_binary_name }}
       ansible.builtin.file:
         path: "{{ github_binary_dir }}"
@@ -105,20 +111,21 @@
       retries: 3
       delay: 5
 
-    - name: Install unzip for {{ github_binary_name }}
+    - name: Install the unpacker for {{ github_binary_name }}
       become: true
       ansible.builtin.apt:
-        name: unzip
+        name: "{{ 'unzip' if github_binary_asset_name.endswith('.zip') else 'xz-utils' }}"
         state: present
       when:
         - github_binary_member is defined
-        - github_binary_asset_name.endswith('.zip')
+        - github_binary_asset_name.endswith(('.zip', '.tar.xz'))
 
     - name: Unpack {{ github_binary_name }}
       ansible.builtin.unarchive:
         src: "{{ github_binary_download }}"
         dest: "{{ github_binary_dir }}"
         remote_src: true
+        extra_opts: "{{ ['--strip-components=1'] if github_binary_install_dir is defined else omit }}"
       when:
         - github_binary_member is defined
         - not ansible_check_mode
@@ -130,13 +137,24 @@
         dest: "/usr/local/bin/{{ github_binary_name }}"
         remote_src: true
         mode: "0755"
-      when: not ansible_check_mode
+      when:
+        - github_binary_install_dir is undefined
+        - not ansible_check_mode
+
+    # A symlink would break binaries that locate their data relative to argv[0].
+    - name: Install the launcher of {{ github_binary_name }}
+      become: true
+      ansible.builtin.copy:
+        content: |
+          #!/bin/sh
+          exec {{ github_binary_dir }}/{{ github_binary_member }} "$@"
+        dest: "/usr/local/bin/{{ github_binary_name }}"
+        mode: "0755"
+      when: github_binary_install_dir is defined
 
     - name: Remove the downloads of {{ github_binary_name }}
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
-      loop:
-        - "{{ github_binary_dir }}"
-        - "{{ github_binary_download }}"
+      loop: "{{ [github_binary_download] + ([] if github_binary_install_dir is defined else [github_binary_dir]) }}"
       when: not ansible_check_mode

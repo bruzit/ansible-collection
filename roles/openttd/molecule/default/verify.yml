@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Stat the JGR's Patchpack files
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: openttd_files
+      loop:
+        - /opt/openttd-jgrpp/openttd
+        - /usr/local/share/applications/openttd-jgrpp.desktop
+
+    - name: Run openttd-jgrpp
+      ansible.builtin.command: openttd-jgrpp -h
+      register: openttd_jgrpp_help
+      changed_when: false
+
+    - name: Assert the OpenTTD setup
+      ansible.builtin.assert:
+        that:
+          - "['openttd', 'openttd-opengfx', 'openttd-openmsx', 'openttd-opensfx'] is subset(ansible_facts.packages)"
+          - openttd_files.results[0].stat.executable
+          - openttd_files.results[1].stat.exists
+          - openttd_jgrpp_help.stdout_lines[0] is match('OpenTTD jgrpp-\d+\.\d+\.\d+$')
+          - >-
+            openttd_jgrpp_help.stdout is search('^\s+OpenGFX: .*\[OpenGFX [\d.]+\]$', multiline=true)
