@@ -1,4 +1,13 @@
 ---
+platforms:
+  - name: ubuntu-24
+    image: docker.io/library/ubuntu:24.04
+    pre_build_image: true
+
+  - name: ubuntu-26
+    image: docker.io/library/ubuntu:26.04
+    pre_build_image: true
+
 scenario:
   # First check runs on a fresh host, covering the repository and install skipped in check mode.
   test_sequence:
