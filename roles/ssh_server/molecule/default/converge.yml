@@ -3,5 +3,8 @@
   hosts: all
   become: true
 
+  vars:
+    nftables_enabled: false
+
   roles:
     - role: ssh_server

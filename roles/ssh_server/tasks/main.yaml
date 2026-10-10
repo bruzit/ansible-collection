@@ -49,3 +49,31 @@
     group: root
     mode: "0644"
   notify: Reload SSH server
+
+- name: Read the SSH server ports
+  when: nftables_enabled
+  block:
+    # sshd -T needs it; only the running ssh.service creates it
+    - name: Ensure the privilege separation directory
+      become: true
+      ansible.builtin.file:
+        path: /run/sshd
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Read the effective SSH server configuration
+      become: true
+      ansible.builtin.command: /usr/sbin/sshd -T
+      register: ssh_server_effective
+      changed_when: false
+      failed_when: ssh_server_effective.rc != 0 and not ansible_check_mode
+      check_mode: false
+
+- name: Install the nftables rules of ssh_server
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: ssh_server

@@ -1,0 +1,7 @@
+---
+- name: Install the nftables rules of molecule_set
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: molecule_set

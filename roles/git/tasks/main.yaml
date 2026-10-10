@@ -1,4 +1,11 @@
 ---
+- name: Install the nftables rules of git
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: git
+
 - name: Install git
   become: true
   ansible.builtin.package:

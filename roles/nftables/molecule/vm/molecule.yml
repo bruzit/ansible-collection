@@ -1,0 +1,28 @@
+---
+driver:
+  name: default
+  options:
+    managed: false          # molecule connects only; QEMU is booted by CI script
+
+platforms:
+  - name: ubuntu-22
+  - name: ubuntu-24
+  - name: ubuntu-26
+
+provisioner:
+  playbooks:
+    prepare: ../../../../.config/molecule/prepare-vm.yaml
+  options:
+    diff: true
+  inventory:
+    links:
+      host_vars: ../../../../.github/molecule-vm-inventory/host_vars
+      group_vars: ../../../../.github/molecule-vm-inventory/group_vars
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+    ssh_connection:
+      pipelining: true
+
+verifier:
+  name: ansible

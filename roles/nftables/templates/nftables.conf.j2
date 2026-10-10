@@ -1,0 +1,62 @@
+#!/usr/sbin/nft -f
+{% set policy = (nftables_mode == 'enforce') | ternary('drop', 'accept') %}
+
+# The table is never recreated, so sets and their elements survive reloads; only the chains are refilled.
+table inet bruzit {
+	chain allow_in {
+	}
+
+	chain allow_out {
+	}
+
+	chain input {
+		type filter hook input priority filter; policy {{ policy }};
+	}
+
+	chain output {
+		type filter hook output priority filter; policy {{ policy }};
+	}
+
+	chain forward {
+		type filter hook forward priority filter; policy {{ policy }};
+	}
+}
+
+{% for chain in ['allow_in', 'allow_out', 'input', 'output', 'forward'] %}
+flush chain inet bruzit {{ chain }}
+{% endfor %}
+
+table inet bruzit {
+	chain input {
+		iif "lo" accept
+		ct state established,related accept
+		icmp type { echo-request, destination-unreachable, time-exceeded, parameter-problem } accept
+		icmpv6 type { echo-request, destination-unreachable, packet-too-big, time-exceeded, parameter-problem, nd-router-solicit, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, mld-listener-query } accept
+		udp sport 67 udp dport 68 accept
+		udp sport 547 udp dport 546 accept
+		jump allow_in
+		limit rate 10/minute burst 20 packets log prefix "bruzit-drop-in: "
+	}
+
+	chain output {
+		oif "lo" accept
+		ct state established,related accept
+		meta l4proto { icmp, ipv6-icmp } accept
+		# 853 DNS over TLS, 4460 NTS key exchange of chrony
+		udp dport { 53, 67, 123, 547 } accept
+		tcp dport { 53, 853, 4460 } accept
+		jump allow_out
+		limit rate 10/minute burst 20 packets log prefix "bruzit-drop-out: " flags skuid
+	}
+
+	chain forward {
+		ct state established,related accept
+		iifname "docker0" accept
+		iifname "br-*" accept
+		oifname "docker0" accept
+		oifname "br-*" accept
+		limit rate 10/minute burst 20 packets log prefix "bruzit-drop-fwd: "
+	}
+}
+
+include "/etc/nftables.d/*.nft"

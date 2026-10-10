@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the live table
+      ansible.builtin.command: nft list table inet bruzit
+      register: nftables_table
+      changed_when: false
+
+    - name: Read the ruleset file
+      ansible.builtin.slurp:
+        src: /etc/nftables.conf
+      register: nftables_conf
+
+    - name: Read the nftables.service drop-in
+      ansible.builtin.slurp:
+        src: /etc/systemd/system/nftables.service.d/bruzit.conf
+      register: nftables_unit
+
+    - name: Assert the audit ruleset
+      ansible.builtin.assert:
+        that:
+          - nftables_table.stdout is search('hook input priority filter; policy accept;')
+          - nftables_table.stdout is search('hook output priority filter; policy accept;')
+          - nftables_table.stdout is search('hook forward priority filter; policy accept;')
+          - nftables_table.stdout is search('log prefix "bruzit-drop-out')
+          - "'flush ruleset' not in (nftables_conf.content | b64decode)"
+          - (nftables_conf.content | b64decode) is search('flush chain inet bruzit input')
+          - "'ExecStop=-/usr/sbin/nft delete table inet bruzit' in (nftables_unit.content | b64decode)"

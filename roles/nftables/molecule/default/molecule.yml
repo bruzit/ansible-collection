@@ -1,0 +1,20 @@
+---
+# NET_ADMIN lets nft manage the container's own network namespace
+platforms:
+  - name: ubuntu-22
+    image: docker.io/library/ubuntu:22.04
+    pre_build_image: true
+    capabilities:
+      - NET_ADMIN
+
+  - name: ubuntu-24
+    image: docker.io/library/ubuntu:24.04
+    pre_build_image: true
+    capabilities:
+      - NET_ADMIN
+
+  - name: ubuntu-26
+    image: docker.io/library/ubuntu:26.04
+    pre_build_image: true
+    capabilities:
+      - NET_ADMIN
