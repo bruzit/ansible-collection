@@ -11,9 +11,33 @@
     github_binary_member: starship
     github_binary_version_command: starship --version
 
+- name: Install the plain-text symbols preset of starship
+  when: not ansible_check_mode
+  block:
+    - name: Render the plain-text symbols preset of starship
+      ansible.builtin.command: starship preset plain-text-symbols
+      register: starship_plain_text_symbols
+      changed_when: false
+
+    - name: Create the starship configuration directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/starship
+        state: directory
+        mode: "0755"
+
+    - name: Write the plain-text symbols preset of starship
+      become: true
+      ansible.builtin.copy:
+        content: "{{ starship_plain_text_symbols.stdout }}\n"
+        dest: /etc/starship/plain-text-symbols.toml
+        mode: "0644"
+
 - name: Hook starship into interactive bash shells
   become: true
   ansible.builtin.blockinfile:
     path: /etc/bash.bashrc
     marker: "# {mark} ANSIBLE MANAGED BLOCK starship"
-    block: eval "$(starship init bash)"
+    block: |
+      [ "$TERM" = linux ] && export STARSHIP_CONFIG="${STARSHIP_CONFIG:-/etc/starship/plain-text-symbols.toml}"
+      eval "$(starship init bash)"
