@@ -4,6 +4,9 @@
   become: true
   gather_facts: false
 
+  vars:
+    starship_pua: '[-\U000F0000-\U0010FFFF]'
+
   tasks:
     - name: Check starship runs
       ansible.builtin.command: starship --version
@@ -15,8 +18,41 @@
       register: starship_hook
       changed_when: false
 
+    - name: Read the plain-text symbols preset
+      ansible.builtin.slurp:
+        src: /etc/starship/plain-text-symbols.toml
+      register: starship_preset
+
+    - name: Check the preset parses as TOML
+      delegate_to: localhost
+      become: false
+      ansible.builtin.command:
+        argv: [python3, -c, "import sys, tomllib; tomllib.load(sys.stdin.buffer)"]
+        stdin: "{{ starship_preset.content | b64decode }}"
+      changed_when: false
+
+    - name: Check the starship config on the Linux console
+      ansible.builtin.command: bash -ic 'echo "$STARSHIP_CONFIG"; starship print-config'
+      environment:
+        TERM: linux
+      register: starship_console
+      changed_when: false
+
+    - name: Check the starship config elsewhere
+      ansible.builtin.command: bash -ic 'echo "$STARSHIP_CONFIG"; starship print-config'
+      environment:
+        TERM: xterm-256color
+      register: starship_terminal
+      changed_when: false
+
     - name: Assert starship output
       ansible.builtin.assert:
         that:
           - starship_version.stdout is regex('^starship \d+\.\d+\.\d+')
           - "'starship_precmd' in starship_hook.stdout"
+          - starship_preset.content | b64decode is not search(starship_pua)
+          - "'[git_branch]' in starship_preset.content | b64decode"
+          - starship_console.stdout_lines | first == '/etc/starship/plain-text-symbols.toml'
+          - starship_console.stdout is not search(starship_pua)
+          - starship_terminal.stdout_lines | first == ''
+          - starship_terminal.stdout is search(starship_pua)
