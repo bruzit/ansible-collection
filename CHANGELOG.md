@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.44.0](https://github.com/bruzit/ansible-collection/compare/v0.43.0...v0.44.0) (2026-10-11)
+
+### Features
+
+* plain-text starship symbols on the linux console ([3f094d0](https://github.com/bruzit/ansible-collection/commit/3f094d0633243ccfc257be5b55f42717e8911b8b))
+
 ## [0.43.0](https://github.com/bruzit/ansible-collection/compare/v0.42.0...v0.43.0) (2026-10-09)
 
 ### Features
