@@ -3,6 +3,9 @@
   hosts: all
   become: true
 
+  vars:
+    nftables_enabled: false
+
   pre_tasks:
     - name: Create users to configure
       ansible.builtin.user:

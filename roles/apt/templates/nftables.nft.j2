@@ -1,0 +1,5 @@
+table inet bruzit {
+	chain allow_out {
+		tcp dport { 80, 443 } accept
+	}
+}

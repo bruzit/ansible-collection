@@ -1,4 +1,11 @@
 ---
+- name: Install the nftables rules of apt
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: apt
+
 - name: Update cache and upgrade all deb packages
   become: true
   ansible.builtin.apt:
