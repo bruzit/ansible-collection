@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.45.0](https://github.com/bruzit/ansible-collection/compare/v0.44.0...v0.45.0) (2026-10-12)
+
+### Features
+
+* add nftables role ([a61d1a5](https://github.com/bruzit/ansible-collection/commit/a61d1a5071c0620d898a3864aa71572611a21bc0))
+
 ## [0.44.0](https://github.com/bruzit/ansible-collection/compare/v0.43.0...v0.44.0) (2026-10-11)
 
 ### Features
