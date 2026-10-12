@@ -1,0 +1,80 @@
+---
+- name: Report the nftables rules of {{ nftables_rules_name }}
+  when: nftables_enabled and ansible_check_mode
+  become: true
+  block:
+    - name: Report installing the nftables rules of {{ nftables_rules_name }}
+      ansible.builtin.template:
+        src: "{{ ansible_parent_role_paths | first }}/templates/nftables.nft.j2"
+        dest: /etc/nftables.d/{{ nftables_rules_name }}.nft
+        owner: root
+        group: root
+        mode: "0644"
+      when: nftables_rules_state == 'present'
+
+    - name: Report removing the nftables rules of {{ nftables_rules_name }}
+      ansible.builtin.file:
+        path: /etc/nftables.d/{{ nftables_rules_name }}.nft
+        state: absent
+      when: nftables_rules_state == 'absent'
+
+- name: Validate and install the nftables rules of {{ nftables_rules_name }}
+  when: nftables_enabled and not ansible_check_mode
+  become: true
+  block:
+    - name: Create the validation directory of {{ nftables_rules_name }}
+      ansible.builtin.tempfile:
+        state: directory
+      register: nftables_rules_tmp
+      changed_when: false
+
+    - name: Stage the ruleset without the rules of {{ nftables_rules_name }}
+      ansible.builtin.shell: >-
+        mkdir {{ nftables_rules_tmp.path }}/d
+        && find /etc/nftables.d -maxdepth 1 -name '*.nft' ! -name '{{ nftables_rules_name }}.nft'
+        -exec cp -t {{ nftables_rules_tmp.path }}/d {} +
+        && sed 's#"/etc/nftables.d/\*.nft"#"{{ nftables_rules_tmp.path }}/d/*.nft"#'
+        /etc/nftables.conf >{{ nftables_rules_tmp.path }}/nftables.conf
+      changed_when: false
+
+    - name: Render the candidate rules of {{ nftables_rules_name }}
+      ansible.builtin.template:
+        src: "{{ ansible_parent_role_paths | first }}/templates/nftables.nft.j2"
+        dest: "{{ nftables_rules_tmp.path }}/d/{{ nftables_rules_name }}.nft"
+        mode: "0644"
+      changed_when: false
+      when: nftables_rules_state == 'present'
+
+    - name: Validate the ruleset with the candidate rules of {{ nftables_rules_name }}
+      ansible.builtin.command: nft -c -f {{ nftables_rules_tmp.path }}/nftables.conf
+      changed_when: false
+
+    - name: Install the nftables rules of {{ nftables_rules_name }}
+      ansible.builtin.copy:
+        src: "{{ nftables_rules_tmp.path }}/d/{{ nftables_rules_name }}.nft"
+        dest: /etc/nftables.d/{{ nftables_rules_name }}.nft
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
+      register: nftables_rules_installed
+      when: nftables_rules_state == 'present'
+
+    - name: Remove the nftables rules of {{ nftables_rules_name }}
+      ansible.builtin.file:
+        path: /etc/nftables.d/{{ nftables_rules_name }}.nft
+        state: absent
+      register: nftables_rules_removed
+      when: nftables_rules_state == 'absent'
+
+  always:
+    - name: Remove the validation directory of {{ nftables_rules_name }}
+      ansible.builtin.file:
+        path: "{{ nftables_rules_tmp.path }}"
+        state: absent
+      changed_when: false
+      when: nftables_rules_tmp.path is defined
+
+- name: Apply the nftables rules of {{ nftables_rules_name }}
+  ansible.builtin.include_tasks: apply.yaml
+  when: nftables_enabled and (nftables_rules_installed is changed or nftables_rules_removed is changed)

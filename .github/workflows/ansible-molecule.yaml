@@ -47,7 +47,7 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
           BEFORE: ${{ github.event.before }}
-          VM_ROLES: '[{"role": "system", "scenario": "reboot"}]'
+          VM_ROLES: '[{"role": "nftables", "scenario": "vm"}, {"role": "system", "scenario": "reboot"}]'
         run: |
           if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
             range="origin/$BASE_REF...HEAD"

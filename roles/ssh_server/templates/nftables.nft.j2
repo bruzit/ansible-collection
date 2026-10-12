@@ -1,0 +1,5 @@
+table inet bruzit {
+	chain allow_in {
+		tcp dport { {{ ssh_server_effective.stdout | default('') | regex_findall('^port ([0-9]+)$', multiline=True) | default(['22'], true) | join(', ') }} } accept
+	}
+}
