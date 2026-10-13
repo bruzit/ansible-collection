@@ -11,7 +11,7 @@ platforms:
 
 provisioner:
   playbooks:
-    prepare: ../../../../.config/molecule/prepare-vm.yaml
+    prepare: prepare.yaml
   options:
     diff: true
   inventory:
