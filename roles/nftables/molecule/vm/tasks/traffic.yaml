@@ -1,0 +1,116 @@
+---
+- name: Read the traffic matrix
+  ansible.builtin.include_vars: "{{ playbook_dir }}/vars/traffic.yaml"
+
+- name: Install the traffic helper
+  ansible.builtin.copy:
+    src: traffic.py
+    dest: /usr/local/sbin/molecule-traffic
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Detect Docker
+  ansible.builtin.stat:
+    path: /usr/bin/dockerd
+  register: nftables_traffic_dockerd
+
+- name: Report the docker0 path as skipped
+  ansible.builtin.debug:
+    msg: Docker is installed and owns docker0, so the docker0 probes are skipped
+  when: nftables_traffic_dockerd.stat.exists
+
+- name: Select the traffic targets
+  ansible.builtin.set_fact:
+    nftables_traffic_net: >-
+      {{ nftables_traffic_targets | dict2items
+      | rejectattr('key', 'in', ['docker0'] if nftables_traffic_dockerd.stat.exists else [])
+      | items2dict }}
+
+- name: Write the traffic matrix
+  ansible.builtin.copy:
+    content: "{{ {'targets': nftables_traffic_net, 'probes': nftables_traffic_probes} | to_json }}"
+    dest: /etc/molecule-traffic.json
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Build the traffic test network
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      set -euo pipefail
+      has() {  # netns or empty, device, address
+        ip ${1:+-n "$1"} -br addr show dev "$2" 2>/dev/null | grep -qF " $3/"
+      }
+      built() {
+      {% for name, t in nftables_traffic_net.items() %}
+        systemctl -q is-active molecule-traffic-{{ name }} || return
+      {% if t.netns is defined %}
+        has '' {{ t.link }} {{ t.gateway }} && has {{ t.netns }} eth0 {{ t.ipv4 }} || return
+      {% endif %}
+      {% endfor %}
+        has '' nft-peer {{ nftables_traffic_net.host.ipv6 }} && has peer eth0 {{ nftables_traffic_net.peer.ipv6 }}
+      }
+      built && exit
+
+      systemctl stop 'molecule-traffic-*' && systemctl reset-failed 'molecule-traffic-*' || true
+      link() {  # netns, host interface, host address, namespace address
+        ip netns del "$1" 2>/dev/null || true
+        ip link del "$2" 2>/dev/null || true
+        ip netns add "$1"
+        ip link add "$2" type veth peer name eth0 netns "$1"
+        ip addr add "$3/24" dev "$2"
+        ip link set "$2" up
+        ip -n "$1" addr add "$4/24" dev eth0
+        ip -n "$1" link set lo up
+        ip -n "$1" link set eth0 up
+        ip -n "$1" route add default via "$3"
+      }
+      {% for name, t in nftables_traffic_net.items() if t.netns is defined %}
+      link {{ t.netns }} {{ t.link }} {{ t.gateway }} {{ t.ipv4 }}
+      {% endfor %}
+      ip addr add {{ nftables_traffic_net.host.ipv6 }}/64 dev nft-peer nodad
+      ip -n peer addr add {{ nftables_traffic_net.peer.ipv6 }}/64 dev eth0 nodad
+      sysctl -qw net.ipv4.ip_forward=1
+      {% for name, t in nftables_traffic_net.items() %}
+      systemd-run -q -p Type=notify --unit molecule-traffic-{{ name }} \
+        {{ 'ip netns exec ' ~ t.netns if t.netns is defined else '' }} molecule-traffic serve {{ name }}
+      {% endfor %}
+      echo built
+  register: nftables_traffic_build
+  changed_when: nftables_traffic_build.stdout == 'built'
+
+- name: Remove the drop-in under test
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: "{{ nftables_traffic_without }}"
+    nftables_rules_state: absent
+  when: nftables_traffic_without is defined
+
+- name: Probe the traffic matrix in mode {{ nftables_mode | default('audit') }}
+  ansible.builtin.command:
+    argv: >-
+      {{ ['molecule-traffic', 'probe', '--mode', nftables_mode | default('audit')]
+      + (['--without', nftables_traffic_without] if nftables_traffic_without is defined else []) }}
+  register: nftables_traffic
+  changed_when: false
+
+- name: Assert the traffic matrix in mode {{ nftables_mode | default('audit') }}
+  ansible.builtin.assert:
+    that:
+      - item.result == item.expect
+      - item.logged == item.log
+    quiet: true
+  loop: "{{ nftables_traffic.stdout | from_json }}"
+  loop_control:
+    label: >-
+      {{ item.label }}: expect {{ item.expect }}{{ ' logged' if item.log else '' }},
+      got {{ item.result }}{{ ' logged' if item.logged else '' }}
+
+- name: Restore the drop-in under test
+  ansible.builtin.include_role:
+    name: bruzit.ansible.{{ nftables_traffic_without }}
+  when: nftables_traffic_without is defined

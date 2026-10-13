@@ -1,0 +1,13 @@
+---
+- name: Prepare the VM
+  ansible.builtin.import_playbook: ../../../../.config/molecule/prepare-vm.yaml
+
+- name: Prepare the traffic matrix
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install conntrack
+      ansible.builtin.apt:
+        name: conntrack
+        update_cache: true

@@ -1,3 +1,4 @@
 .ansible/
 *.tar.gz
 megalinter-reports/
+__pycache__/
