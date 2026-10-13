@@ -1,0 +1,37 @@
+---
+- name: Prepare
+  ansible.builtin.import_playbook: ../../../../.config/molecule/prepare.yaml
+
+- name: Emulate the WSL network setup
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Install iproute2 for the default route fact
+      ansible.builtin.apt:
+        name: iproute2
+        state: present
+
+    - name: Create /mnt/wsl
+      ansible.builtin.file:
+        path: /mnt/wsl
+        state: directory
+        mode: "0755"
+
+    - name: Copy the Docker resolv.conf to /mnt/wsl
+      ansible.builtin.copy:
+        src: /etc/resolv.conf
+        dest: /mnt/wsl/resolv.conf
+        remote_src: true
+        mode: "0644"
+
+    - name: Unmount the Docker resolv.conf
+      ansible.builtin.command: umount /etc/resolv.conf
+      changed_when: true
+
+    - name: Link /etc/resolv.conf to /mnt/wsl/resolv.conf
+      ansible.builtin.file:
+        src: /mnt/wsl/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true

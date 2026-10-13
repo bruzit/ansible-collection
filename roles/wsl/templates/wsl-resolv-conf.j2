@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+gw=$(ip -4 route show default | awk '{print $3; exit}')
+[ -n "$gw" ] || exit 0
+tmp=$(mktemp /etc/resolv.conf.XXXXXX)
+printf 'nameserver %s\n' "$gw" > "$tmp"
+{% if wsl_dns_search %}
+printf 'search %s\n' {{ wsl_dns_search | join(' ') | quote }} >> "$tmp"
+{% endif %}
+chmod 0644 "$tmp"
+mv -f "$tmp" /etc/resolv.conf

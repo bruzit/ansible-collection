@@ -1,6 +1,32 @@
 ---
+# SYS_ADMIN lets prepare unmount Docker's /etc/resolv.conf bind mount
+platforms:
+  - name: ubuntu-22
+    image: docker.io/library/ubuntu:22.04
+    pre_build_image: true
+    capabilities:
+      - SYS_ADMIN
+
+  - name: ubuntu-24
+    image: docker.io/library/ubuntu:24.04
+    pre_build_image: true
+    capabilities:
+      - SYS_ADMIN
+
+  - name: ubuntu-26
+    image: docker.io/library/ubuntu:26.04
+    pre_build_image: true
+    capabilities:
+      - SYS_ADMIN
+
+provisioner:
+  playbooks:
+    prepare: prepare.yaml
+    side_effect: side_effect.yaml
+
 scenario:
-  # First check runs on a fresh host, covering the browser alternatives in check mode.
+  # First check runs on a fresh host, covering the browser alternatives and the DNS script in check mode.
+  # side_effect checks the enabled DNS, then converges with wsl_dns_gateway false.
   test_sequence:
     - dependency
     - cleanup
