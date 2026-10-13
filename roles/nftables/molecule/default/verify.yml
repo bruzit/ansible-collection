@@ -10,6 +10,12 @@
       register: nftables_table
       changed_when: false
 
+    - name: Read the inet filter table
+      ansible.builtin.command: nft list table inet filter
+      register: nftables_filter
+      changed_when: false
+      failed_when: false
+
     - name: Read the ruleset file
       ansible.builtin.slurp:
         src: /etc/nftables.conf
@@ -30,6 +36,12 @@
           - "'flush ruleset' not in (nftables_conf.content | b64decode)"
           - (nftables_conf.content | b64decode) is search('flush chain inet bruzit input')
           - "'ExecStop=-/usr/sbin/nft delete table inet bruzit' in (nftables_unit.content | b64decode)"
+
+    - name: Assert the stock inet filter table is deleted and the modified one kept
+      ansible.builtin.assert:
+        that: >-
+          nftables_filter.stdout is search('tcp dport 22 accept') if inventory_hostname == 'ubuntu-24'
+          else nftables_filter.rc != 0
 
     - name: Assert the quiet ruleset drops without logging
       vars:
