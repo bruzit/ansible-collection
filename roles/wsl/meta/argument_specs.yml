@@ -7,3 +7,18 @@ argument_specs:
         type: str
         required: true
         description: Default user of the WSL distribution, C([user] default) in C(/etc/wsl.conf).
+      wsl_dns_gateway:
+        type: bool
+        default: false
+        description:
+          - Point C(/etc/resolv.conf) at the WSL NAT gateway now and at every distro start, via
+            C(/usr/local/sbin/wsl-resolv-conf) as C([boot] command) and C([network] generateResolvConf=false).
+            Works around DNS tunneling timeouts. No default route, no change.
+          - Fails if C([boot] command) is already set to anything else.
+          - V(false) removes both keys, only with these values, and the script; C(/etc/resolv.conf) is left for
+            WSL to regenerate after C(wsl --shutdown).
+      wsl_dns_search:
+        type: list
+        elements: str
+        default: []
+        description: Search domains written to C(/etc/resolv.conf) when O(wsl_dns_gateway) is true.

@@ -1,0 +1,94 @@
+---
+- name: Verify the gateway DNS
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Read the DNS files
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      register: wsl_dns_files
+      loop:
+        - /usr/local/sbin/wsl-resolv-conf
+        - /etc/wsl.conf
+        - /etc/resolv.conf
+
+    - name: Stat the DNS files
+      ansible.builtin.stat:
+        path: "{{ item }}"
+        follow: false
+      register: wsl_dns_stat
+      loop:
+        - /usr/local/sbin/wsl-resolv-conf
+        - /etc/resolv.conf
+
+    - name: Assert the gateway DNS
+      vars:
+        wsl_dns_content: "{{ wsl_dns_files.results | map(attribute='content') | map('b64decode') | list }}"
+        wsl_dns_script: |
+          #!/bin/sh
+          set -eu
+          gw=$(ip -4 route show default | awk '{print $3; exit}')
+          [ -n "$gw" ] || exit 0
+          tmp=$(mktemp /etc/resolv.conf.XXXXXX)
+          printf 'nameserver %s\n' "$gw" > "$tmp"
+          printf 'search %s\n' 'example.com example.org' >> "$tmp"
+          chmod 0644 "$tmp"
+          mv -f "$tmp" /etc/resolv.conf
+      ansible.builtin.assert:
+        that:
+          - wsl_dns_content[0] == wsl_dns_script
+          - wsl_dns_stat.results[0].stat.mode == '0755'
+          - >-
+            (wsl_dns_content[1] | community.general.from_ini) == {
+              'user': {'default': 'molecule'},
+              'boot': {'systemd': 'false', 'command': '/usr/local/sbin/wsl-resolv-conf'},
+              'network': {'generateResolvConf': 'false'}}
+          - wsl_dns_content[2] == 'nameserver ' ~ ansible_facts.default_ipv4.gateway ~ '\nsearch example.com example.org\n'
+          - wsl_dns_stat.results[1].stat.isreg
+
+- name: Disable the gateway DNS
+  hosts: all
+  become: true
+
+  roles:
+    - role: wsl
+      wsl_default_user: molecule
+
+- name: Disable the gateway DNS again
+  hosts: all
+  become: true
+
+  pre_tasks:
+    - name: Stat the DNS files before
+      ansible.builtin.stat:
+        path: "{{ item }}"
+        follow: false
+      register: wsl_dns_before
+      loop:
+        - /etc/wsl.conf
+        - /etc/resolv.conf
+        - /usr/local/sbin/wsl-resolv-conf
+
+  roles:
+    - role: wsl
+      wsl_default_user: molecule
+
+  post_tasks:
+    - name: Stat the DNS files after
+      ansible.builtin.stat:
+        path: "{{ item }}"
+        follow: false
+      register: wsl_dns_after
+      loop:
+        - /etc/wsl.conf
+        - /etc/resolv.conf
+        - /usr/local/sbin/wsl-resolv-conf
+
+    - name: Assert false from the clean state is a no-op
+      ansible.builtin.assert:
+        that:
+          - >-
+            wsl_dns_before.results | map(attribute='stat.mtime', default=0) | list
+            == wsl_dns_after.results | map(attribute='stat.mtime', default=0) | list
+          - not wsl_dns_after.results[2].stat.exists
