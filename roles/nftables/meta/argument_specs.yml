@@ -4,7 +4,9 @@ argument_specs:
     short_description: nftables firewall in its own inet bruzit table, default drop in and out.
     description:
       - Manages only C(table inet bruzit); other tables, e.g. Docker's, are kept. Never flushes the ruleset,
-        and the C(nftables.service) C(ExecStop) is overridden to delete only this table.
+        and the C(nftables.service) C(ExecStop) is overridden to delete only this table. A leftover
+        C(table inet filter) of the packaged C(/etc/nftables.conf) is deleted after each apply only while unchanged,
+        three empty accept chains; otherwise it is kept with a warning.
       - Baseline every host needs. In - loopback, established/related, ICMP and ICMPv6 essentials (ND, RA, MLD
         query, packet-too-big, time-exceeded, parameter-problem), DHCPv4 and DHCPv6 client replies. Out - loopback,
         established/related, ICMP, ICMPv6, DNS (53, DNS over TLS 853), NTP (123, NTS key exchange 4460), DHCP.

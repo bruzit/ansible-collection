@@ -9,6 +9,40 @@
   ansible.builtin.command: nft -f /etc/nftables.conf
   changed_when: true
 
+- name: Read the inet filter table
+  become: true
+  ansible.builtin.command: nft -j list table inet filter
+  register: nftables_apply_filter
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+# Shape of the packaged /etc/nftables.conf, same on 22.04 (priority 0) and later (priority filter)
+- name: Remove the stock inet filter table
+  when: nftables_apply_filter.rc == 0
+  vars:
+    nftables_apply_filter_stock:
+      - table: {family: inet, name: filter}
+      - chain: {family: inet, table: filter, name: input, type: filter, hook: input, prio: 0, policy: accept}
+      - chain: {family: inet, table: filter, name: forward, type: filter, hook: forward, prio: 0, policy: accept}
+      - chain: {family: inet, table: filter, name: output, type: filter, hook: output, prio: 0, policy: accept}
+    nftables_apply_filter_is_stock: >-
+      {{ (nftables_apply_filter.stdout | regex_replace(', "handle": [0-9]+', '') | from_json).nftables
+      | rejectattr('metainfo', 'defined') | list == nftables_apply_filter_stock }}
+  block:
+    - name: Delete the stock inet filter table
+      become: true
+      ansible.builtin.command: nft delete table inet filter
+      changed_when: true
+      when: nftables_apply_filter_is_stock
+
+    - name: Keep the modified inet filter table
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: table inet filter differs from the stock one of the nftables package, kept; delete it by hand
+          if nothing owns it.
+      when: not nftables_apply_filter_is_stock
+
 - name: Detect running systemd
   ansible.builtin.stat:
     path: /run/systemd/system
