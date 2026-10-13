@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.46.0](https://github.com/bruzit/ansible-collection/compare/v0.45.0...v0.46.0) (2026-10-13)
+
+### Features
+
+* **wsl:** optional dns via the nat gateway ([0efff74](https://github.com/bruzit/ansible-collection/commit/0efff74406fcd01a0a012011d396be57bd04e1af))
+
 ## [0.45.0](https://github.com/bruzit/ansible-collection/compare/v0.44.0...v0.45.0) (2026-10-12)
 
 ### Features
