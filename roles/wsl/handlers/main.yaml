@@ -1,0 +1,4 @@
+---
+- name: Remind to restart WSL
+  ansible.builtin.debug:
+    msg: /etc/wsl.conf changed; run wsl --shutdown from Windows to apply it.

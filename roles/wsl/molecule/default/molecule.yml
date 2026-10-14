@@ -26,7 +26,7 @@ provisioner:
 
 scenario:
   # First check runs on a fresh host, covering the browser alternatives and the DNS script in check mode.
-  # side_effect checks the enabled DNS, then converges with wsl_dns_gateway false.
+  # After converge, resolv.conf points at the Docker gateway, which does not answer DNS: later steps must not need it.
   test_sequence:
     - dependency
     - cleanup
