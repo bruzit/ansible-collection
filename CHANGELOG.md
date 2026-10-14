@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.47.1](https://github.com/bruzit/ansible-collection/compare/v0.47.0...v0.47.1) (2026-10-14)
+
+### Bug Fixes
+
+* **wsl:** switch dns last and test disable from a clean state ([11d1221](https://github.com/bruzit/ansible-collection/commit/11d122144dab63f911257eacb15a9a9b37e90992))
+
 ## [0.47.0](https://github.com/bruzit/ansible-collection/compare/v0.46.0...v0.47.0) (2026-10-14)
 
 ### Features
