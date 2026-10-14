@@ -2,6 +2,7 @@
 - name: Verify
   hosts: all
   become: true
+  gather_facts: false
 
   tasks:
     - name: Read the managed files
@@ -13,17 +14,11 @@
         - /etc/needrestart/conf.d/wsl.conf
         - /usr/local/bin/wsl-browser
         - /etc/profile.d/wsl-browser.sh
-        - /etc/resolv.conf
 
     - name: Stat the browser wrapper
       ansible.builtin.stat:
         path: /usr/local/bin/wsl-browser
       register: wsl_browser
-
-    - name: Stat the DNS script
-      ansible.builtin.stat:
-        path: /usr/local/sbin/wsl-resolv-conf
-      register: wsl_dns_script
 
     - name: Gather package facts
       ansible.builtin.package_facts:
@@ -43,13 +38,11 @@
       ansible.builtin.assert:
         that:
           - >-
-            (wsl_content[0] | community.general.from_ini) == {'user': {'default': 'molecule'}, 'boot': {'systemd': 'false'}, 'network': {}}
+            (wsl_content[0] | community.general.from_ini) == {'user': {'default': 'molecule'}, 'boot': {'systemd': 'false'}}
           - wsl_content[1] == '$nrconf{kernelhints} = 0;\n'
           - wsl_content[2] == '#!/bin/sh\nexec rundll32.exe url.dll,FileProtocolHandler "$1"\n'
           - wsl_content[3] == 'export BROWSER=/usr/local/bin/wsl-browser\n'
           - wsl_browser.stat.mode == '0755'
-          - wsl_content[4] == 'nameserver ' ~ ansible_facts.default_ipv4.gateway ~ '\nsearch example.com example.org\n'
-          - not wsl_dns_script.stat.exists
           - "'snapd' not in ansible_facts.packages"
           - "'xdg-utils' in ansible_facts.packages"
           - >-

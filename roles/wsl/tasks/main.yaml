@@ -16,18 +16,6 @@
     quiet: true
   when: wsl_dns_gateway
 
-- name: Configure /etc/wsl.conf
-  become: true
-  community.general.ini_file:
-    path: /etc/wsl.conf
-    section: "{{ item.section }}"
-    option: "{{ item.option }}"
-    value: "{{ item.value }}"
-    mode: "0644"
-  loop:
-    - { section: user, option: default, value: "{{ wsl_default_user }}" }
-    - { section: boot, option: systemd, value: "false" }
-
 - name: Install the resolv.conf writer
   become: true
   ansible.builtin.template:
@@ -37,42 +25,22 @@
   register: wsl_dns_script
   when: wsl_dns_gateway
 
-- name: Configure DNS via the NAT gateway in /etc/wsl.conf
+- name: Configure /etc/wsl.conf
   become: true
   community.general.ini_file:
     path: /etc/wsl.conf
     section: "{{ item.section }}"
     option: "{{ item.option }}"
     value: "{{ item.value }}"
-    exclusive: "{{ wsl_dns_gateway }}"
-    state: "{{ wsl_dns_gateway | ternary('present', 'absent') }}"
+    exclusive: "{{ item.present | default(true) }}"
+    state: "{{ item.present | default(true) | ternary('present', 'absent') }}"
     mode: "0644"
+  notify: Remind to restart WSL
   loop:
-    - { section: network, option: generateResolvConf, value: "false" }
-    - { section: boot, option: command, value: /usr/local/sbin/wsl-resolv-conf }
-
-- name: Point /etc/resolv.conf at the NAT gateway
-  become: true
-  ansible.builtin.copy:
-    dest: /etc/resolv.conf
-    content: |
-      nameserver {{ ansible_facts.default_ipv4.gateway }}
-      {% if wsl_dns_search %}
-      search {{ wsl_dns_search | join(' ') }}
-      {% endif %}
-    follow: false
-    mode: "0644"
-  when:
-    - wsl_dns_gateway
-    - ansible_facts.default_ipv4.gateway is defined
-    - not (ansible_check_mode and wsl_dns_script is changed)
-
-- name: Remove the resolv.conf writer
-  become: true
-  ansible.builtin.file:
-    path: /usr/local/sbin/wsl-resolv-conf
-    state: absent
-  when: not wsl_dns_gateway
+    - { section: user, option: default, value: "{{ wsl_default_user }}" }
+    - { section: boot, option: systemd, value: "false" }
+    - { section: network, option: generateResolvConf, value: "false", present: "{{ wsl_dns_gateway }}" }
+    - { section: boot, option: command, value: /usr/local/sbin/wsl-resolv-conf, present: "{{ wsl_dns_gateway }}" }
 
 - name: Create the needrestart drop-in directory
   become: true
@@ -128,3 +96,26 @@
     dest: /etc/profile.d/wsl-browser.sh
     content: "export BROWSER=/usr/local/bin/wsl-browser\n"
     mode: "0644"
+
+- name: Point /etc/resolv.conf at the NAT gateway
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/resolv.conf
+    content: |
+      nameserver {{ ansible_facts.default_ipv4.gateway }}
+      {% if wsl_dns_search %}
+      search {{ wsl_dns_search | join(' ') }}
+      {% endif %}
+    follow: false
+    mode: "0644"
+  when:
+    - wsl_dns_gateway
+    - ansible_facts.default_ipv4.gateway is defined
+    - not (ansible_check_mode and wsl_dns_script is changed)
+
+- name: Remove the resolv.conf writer
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/sbin/wsl-resolv-conf
+    state: absent
+  when: not wsl_dns_gateway

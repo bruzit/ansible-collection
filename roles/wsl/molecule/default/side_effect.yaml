@@ -28,9 +28,10 @@
         wsl_dns_script: |
           #!/bin/sh
           set -eu
-          gw=$(ip -4 route show default | awk '{print $3; exit}')
+          gw=$(ip -4 route show default | awk '{for (i = 1; i < NF; i++) if ($i == "via") {print $(i + 1); exit}}')
           [ -n "$gw" ] || exit 0
           tmp=$(mktemp /etc/resolv.conf.XXXXXX)
+          trap 'rm -f "$tmp"' EXIT
           printf 'nameserver %s\n' "$gw" > "$tmp"
           printf 'search %s\n' 'example.com example.org' >> "$tmp"
           chmod 0644 "$tmp"
@@ -55,11 +56,44 @@
     - role: wsl
       wsl_default_user: molecule
 
-- name: Disable the gateway DNS again
+  post_tasks:
+    - name: Read the DNS files after disabling
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      register: wsl_dns_disabled
+      loop:
+        - /etc/wsl.conf
+        - /etc/resolv.conf
+
+    - name: Assert the gateway DNS is disabled and resolv.conf left
+      vars:
+        wsl_dns_content: "{{ wsl_dns_disabled.results | map(attribute='content') | map('b64decode') | list }}"
+      ansible.builtin.assert:
+        that:
+          - >-
+            (wsl_dns_content[0] | community.general.from_ini) == {
+              'user': {'default': 'molecule'}, 'boot': {'systemd': 'false'}, 'network': {}}
+          - wsl_dns_content[1] == 'nameserver ' ~ ansible_facts.default_ipv4.gateway ~ '\nsearch example.com example.org\n'
+
+- name: Disable the gateway DNS from a clean state
   hosts: all
   become: true
 
   pre_tasks:
+    - name: Remove the empty network section
+      community.general.ini_file:
+        path: /etc/wsl.conf
+        section: network
+        state: absent
+        mode: "0644"
+
+    - name: Restore the /etc/resolv.conf link
+      ansible.builtin.file:
+        src: /mnt/wsl/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+
     - name: Stat the DNS files before
       ansible.builtin.stat:
         path: "{{ item }}"

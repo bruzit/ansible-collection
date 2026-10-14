@@ -13,7 +13,8 @@ argument_specs:
         description:
           - Point C(/etc/resolv.conf) at the WSL NAT gateway now and at every distro start, via
             C(/usr/local/sbin/wsl-resolv-conf) as C([boot] command) and C([network] generateResolvConf=false).
-            Works around DNS tunneling timeouts. No default route, no change.
+            Works around DNS tunneling timeouts. Without an IPv4 default route, the keys and the script still apply;
+            only the immediate C(/etc/resolv.conf) write is skipped, and the script does nothing at boot.
           - Fails if C([boot] command) is already set to anything else.
           - V(false) removes both keys, only with these values, and the script; C(/etc/resolv.conf) is left for
             WSL to regenerate after C(wsl --shutdown).
