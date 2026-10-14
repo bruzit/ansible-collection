@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.47.0](https://github.com/bruzit/ansible-collection/compare/v0.46.0...v0.47.0) (2026-10-14)
+
+### Features
+
+* **nftables:** remove the stock inet filter table ([f23bda0](https://github.com/bruzit/ansible-collection/commit/f23bda0febc25977fac875dcbb0aa15593bc92d3))
+
 ## [0.46.0](https://github.com/bruzit/ansible-collection/compare/v0.45.0...v0.46.0) (2026-10-13)
 
 ### Features
