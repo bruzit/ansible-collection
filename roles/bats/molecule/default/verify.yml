@@ -1,0 +1,44 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert bats is installed
+      ansible.builtin.assert:
+        that:
+          - "'bats' in ansible_facts['packages']"
+
+    - name: Check bats runs
+      ansible.builtin.command: bats --version
+      register: bats_version
+      changed_when: false
+
+    - name: Create a test file
+      ansible.builtin.tempfile:
+        suffix: .bats
+      register: bats_test_file
+
+    - name: Write a passing test
+      ansible.builtin.copy:
+        content: |
+          @test "ok" { true; }
+        dest: "{{ bats_test_file.path }}"
+        mode: "0644"
+
+    - name: Run the test
+      ansible.builtin.command:
+        argv: [bats, --tap, "{{ bats_test_file.path }}"]
+      register: bats_run
+      changed_when: false
+
+    - name: Assert bats output
+      ansible.builtin.assert:
+        that:
+          - "'Bats' in bats_version.stdout"
+          - "'ok 1 ok' in bats_run.stdout_lines"

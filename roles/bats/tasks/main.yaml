@@ -1,0 +1,7 @@
+---
+- name: Install bats
+  become: true
+  ansible.builtin.apt:
+    name: bats
+    state: present
+    install_recommends: false
