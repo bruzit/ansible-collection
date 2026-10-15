@@ -1,0 +1,8 @@
+---
+argument_specs:
+  main:
+    short_description: Install the latest stable Go from go.dev into C(/usr/local/go).
+    description:
+      - Not apt, as the Ubuntu archive lags upstream (1.18, 1.22, 1.26 on 22.04, 24.04, 26.04).
+      - The archive is SHA-256 verified against the go.dev release list; C(/usr/local/go) is replaced when the version changes.
+      - C(/etc/profile.d/go.sh) adds C(/usr/local/go/bin) to the PATH of login shells.
