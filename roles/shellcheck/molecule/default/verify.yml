@@ -1,0 +1,35 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert shellcheck is installed
+      ansible.builtin.assert:
+        that:
+          - "'shellcheck' in ansible_facts['packages']"
+
+    - name: Check shellcheck runs
+      ansible.builtin.command: shellcheck --version
+      register: shellcheck_version
+      changed_when: false
+
+    - name: Lint a script with an unquoted variable
+      ansible.builtin.command:
+        argv: [shellcheck, --shell=sh, "-"]
+        stdin: echo $1
+      register: shellcheck_lint
+      changed_when: false
+      failed_when: false
+
+    - name: Assert shellcheck output
+      ansible.builtin.assert:
+        that:
+          - "'ShellCheck' in shellcheck_version.stdout"
+          - shellcheck_lint.rc != 0
+          - "'SC2086' in shellcheck_lint.stdout"

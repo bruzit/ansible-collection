@@ -1,0 +1,6 @@
+---
+- name: Install shellcheck
+  become: true
+  ansible.builtin.apt:
+    name: shellcheck
+    state: present
