@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.48.0](https://github.com/bruzit/ansible-collection/compare/v0.47.1...v0.48.0) (2026-10-15)
+
+### Features
+
+* add kind role ([8799911](https://github.com/bruzit/ansible-collection/commit/8799911abf257c1772afc5496db9f084450d0eac))
+
 ## [0.47.1](https://github.com/bruzit/ansible-collection/compare/v0.47.0...v0.47.1) (2026-10-14)
 
 ### Bug Fixes
