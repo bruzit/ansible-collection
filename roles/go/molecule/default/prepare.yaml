@@ -1,0 +1,13 @@
+---
+- name: Prepare
+  ansible.builtin.import_playbook: ../../../../.config/molecule/prepare.yaml
+
+- name: Install CA certificates for the check-mode probes
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Install ca-certificates
+      ansible.builtin.apt:
+        name: ca-certificates
+        state: present

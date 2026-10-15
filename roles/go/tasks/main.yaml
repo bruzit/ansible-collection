@@ -1,0 +1,80 @@
+---
+- name: Assert Go supports the architecture
+  ansible.builtin.assert:
+    that: ansible_facts['architecture'] in ['x86_64', 'aarch64']
+    fail_msg: "No Go build for {{ ansible_facts['architecture'] }}; supported: x86_64, aarch64"
+    quiet: true
+
+- name: Fetch the Go releases
+  ansible.builtin.uri:
+    url: https://go.dev/dl/?mode=json
+  register: go_releases
+  until: go_releases is succeeded
+  retries: 3
+  delay: 5
+  check_mode: false
+
+- name: Set the Go architecture
+  ansible.builtin.set_fact:
+    go_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+
+- name: Select the latest stable Go archive
+  ansible.builtin.set_fact:
+    go_archive: >-
+      {{ go_releases.json | selectattr('stable') | map(attribute='files') | first | default([])
+         | selectattr('os', '==', 'linux') | selectattr('kind', '==', 'archive') | selectattr('arch', '==', go_arch)
+         | first | default({}) }}
+
+- name: Assert the checksum of the latest Go
+  ansible.builtin.assert:
+    that: go_archive.sha256 | default('') is match('^[0-9a-f]{64}$')
+    fail_msg: "No SHA-256 for a linux {{ go_arch }} archive of the latest stable Go"
+    quiet: true
+
+- name: Read the installed Go version
+  ansible.builtin.slurp:
+    src: /usr/local/go/VERSION
+  register: go_installed
+  failed_when: false
+
+- name: Install Go {{ go_archive.version }}
+  when: go_installed.content | default('') | b64decode | split('\n') | first != go_archive.version
+  block:
+    - name: Download and verify the checksum of Go
+      ansible.builtin.get_url:
+        url: "https://go.dev/dl/{{ go_archive.filename }}"
+        dest: "/tmp/{{ go_archive.filename }}"
+        checksum: "sha256:{{ go_archive.sha256 }}"
+        mode: "0644"
+      register: go_downloaded
+      until: go_downloaded is succeeded
+      retries: 3
+      delay: 5
+
+    # Go must not be untarred over an existing install.
+    - name: Remove the previous Go
+      become: true
+      ansible.builtin.file:
+        path: /usr/local/go
+        state: absent
+
+    - name: Unpack Go
+      become: true
+      ansible.builtin.unarchive:
+        src: "/tmp/{{ go_archive.filename }}"
+        dest: /usr/local
+        remote_src: true
+      when: not ansible_check_mode
+
+    - name: Remove the download of Go
+      ansible.builtin.file:
+        path: "/tmp/{{ go_archive.filename }}"
+        state: absent
+      when: not ansible_check_mode
+
+- name: Add Go to the PATH of login shells
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/profile.d/go.sh
+    content: "export PATH=$PATH:/usr/local/go/bin\n"
+    mode: "0644"

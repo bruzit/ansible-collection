@@ -1,0 +1,47 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Fetch the Go releases
+      ansible.builtin.uri:
+        url: https://go.dev/dl/?mode=json
+      register: go_releases
+
+    - name: Check go version
+      ansible.builtin.command: /usr/local/go/bin/go version
+      register: go_version
+      changed_when: false
+
+    - name: Check a login shell finds go
+      ansible.builtin.command: bash -lc 'go version'
+      register: go_login_version
+      changed_when: false
+
+    - name: Write a hello world program
+      ansible.builtin.copy:
+        dest: /tmp/hello.go
+        content: |
+          package main
+
+          import "fmt"
+
+          func main() {
+              fmt.Println("Hello, Go")
+          }
+        mode: "0644"
+
+    - name: Run the hello world program
+      ansible.builtin.command: /usr/local/go/bin/go run /tmp/hello.go
+      register: go_hello
+      changed_when: false
+
+    - name: Assert Go output
+      vars:
+        go_latest: "{{ (go_releases.json | selectattr('stable') | first).version }}"
+      ansible.builtin.assert:
+        that:
+          - go_version.stdout.startswith('go version ' ~ go_latest ~ ' ')
+          - go_login_version.stdout == go_version.stdout
+          - go_hello.stdout == 'Hello, Go'
