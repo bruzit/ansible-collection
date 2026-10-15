@@ -1,0 +1,10 @@
+---
+- name: Install kind
+  ansible.builtin.include_role:
+    name: bruzit.ansible.github_binary
+  vars:
+    github_binary_name: kind
+    github_binary_repository: kubernetes-sigs/kind
+    github_binary_asset: "kind-linux-{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+    github_binary_sums: "{{ github_binary_asset }}.sha256sum"
+    github_binary_version_command: kind version

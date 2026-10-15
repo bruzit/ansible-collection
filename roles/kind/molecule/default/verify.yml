@@ -1,0 +1,21 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Resolve the latest kind release
+      ansible.builtin.uri:
+        url: https://github.com/kubernetes-sigs/kind/releases/latest
+        follow_redirects: none
+        status_code: 302
+      register: kind_latest
+
+    - name: Check kind runs
+      ansible.builtin.command: kind version
+      register: kind_version
+      changed_when: false
+
+    - name: Assert kind reports the latest release
+      ansible.builtin.assert:
+        that: kind_version.stdout.startswith('kind ' ~ kind_latest.location | basename ~ ' ')

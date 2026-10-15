@@ -1,0 +1,7 @@
+---
+argument_specs:
+  main:
+    short_description: Install kind from checksum-verified GitHub releases.
+    description:
+      - Upstream release, not apt; the Ubuntu archive has kind only from 26.04, behind upstream.
+      - kind needs Docker at runtime, which this role does not install.
