@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.49.0](https://github.com/bruzit/ansible-collection/compare/v0.48.0...v0.49.0) (2026-10-15)
+
+### Features
+
+* add bats and shellcheck roles ([66eb59f](https://github.com/bruzit/ansible-collection/commit/66eb59f4cd8c19cd08d6d629700419dbf5d174d9))
+
 ## [0.48.0](https://github.com/bruzit/ansible-collection/compare/v0.47.1...v0.48.0) (2026-10-15)
 
 ### Features
