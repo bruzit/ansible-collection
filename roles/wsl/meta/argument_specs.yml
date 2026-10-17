@@ -23,3 +23,10 @@ argument_specs:
         elements: str
         default: []
         description: Search domains written to C(/etc/resolv.conf) when O(wsl_dns_gateway) is true.
+      wsl_systemd:
+        type: bool
+        default: false
+        description:
+          - Boot the distribution with systemd, C([boot] systemd) in C(/etc/wsl.conf).
+          - WSL protects its interop binfmt entry from C(systemd-binfmt) itself (C([boot] protectBinfmt), default true).
+          - O(wsl_dns_gateway) keeps working; C(systemd-resolved) does not replace the regular C(/etc/resolv.conf).
