@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.53.0](https://github.com/bruzit/ansible-collection/compare/v0.52.0...v0.53.0) (2026-10-17)
+
+### Features
+
+* disable nftables by default on wsl ([d27d74b](https://github.com/bruzit/ansible-collection/commit/d27d74b3b51546af92cf6faa7f7dd47c2b6c0d37))
+
 ## [0.52.0](https://github.com/bruzit/ansible-collection/compare/v0.51.1...v0.52.0) (2026-10-17)
 
 ### Features
