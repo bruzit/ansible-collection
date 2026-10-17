@@ -4,6 +4,7 @@
   become: true
 
   vars:
+    nftables_enabled: false
     docker_users:
       - tester
 

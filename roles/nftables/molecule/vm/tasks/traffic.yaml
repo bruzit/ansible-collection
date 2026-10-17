@@ -112,5 +112,5 @@
 
 - name: Restore the drop-in under test
   ansible.builtin.include_role:
-    name: bruzit.ansible.{{ nftables_traffic_without }}
+    name: "{{ nftables_traffic_restore | default('bruzit.ansible.' ~ nftables_traffic_without) }}"
   when: nftables_traffic_without is defined

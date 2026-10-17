@@ -9,6 +9,9 @@ table inet bruzit {
 	chain allow_out {
 	}
 
+	chain allow_fwd {
+	}
+
 	chain input {
 		type filter hook input priority filter; policy {{ policy }};
 	}
@@ -22,7 +25,7 @@ table inet bruzit {
 	}
 }
 
-{% for chain in ['allow_in', 'allow_out', 'input', 'output', 'forward'] %}
+{% for chain in ['allow_in', 'allow_out', 'allow_fwd', 'input', 'output', 'forward'] %}
 flush chain inet bruzit {{ chain }}
 {% endfor %}
 
@@ -55,10 +58,7 @@ table inet bruzit {
 
 	chain forward {
 		ct state established,related accept
-		iifname "docker0" accept
-		iifname "br-*" accept
-		oifname "docker0" accept
-		oifname "br-*" accept
+		jump allow_fwd
 {% if nftables_mode != 'quiet' %}
 		limit rate 10/minute burst 20 packets log prefix "bruzit-drop-fwd: "
 {% endif %}

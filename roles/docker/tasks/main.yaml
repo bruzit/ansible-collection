@@ -1,4 +1,11 @@
 ---
+- name: Install the nftables rules of docker
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: docker
+
 - name: Add Docker apt repository
   ansible.builtin.include_role:
     name: bruzit.ansible.apt_source
