@@ -1,0 +1,25 @@
+---
+argument_specs:
+  main:
+    short_description: Install Claude Code, latest, checksum verified, and deep-merge its user and project local settings.
+    options:
+      claude_settings:
+        type: dict
+        default: {}
+        description:
+          - Deep-merged into C(~/.claude/settings.json); lists are replaced, other keys kept.
+      claude_local_settings:
+        type: list
+        elements: dict
+        default: []
+        description:
+          - Deep-merged into C(<path>/.claude/settings.local.json) per project; lists are replaced, other keys kept.
+        options:
+          path:
+            type: str
+            required: true
+            description: Project directory.
+          settings:
+            type: dict
+            required: true
+            description: Settings to merge.
