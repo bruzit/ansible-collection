@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.51.1](https://github.com/bruzit/ansible-collection/compare/v0.51.0...v0.51.1) (2026-10-17)
+
+### Bug Fixes
+
+* declare the license once in galaxy.yml ([31f9f41](https://github.com/bruzit/ansible-collection/commit/31f9f4132f9131095da8e98b2c6f86ac60930984))
+
 ## [0.51.0](https://github.com/bruzit/ansible-collection/compare/v0.50.0...v0.51.0) (2026-10-17)
 
 ### Features
