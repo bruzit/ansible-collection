@@ -8,7 +8,6 @@ authors:
 description: Molecule-tested roles that provision and maintain Kubuntu desktops and Ubuntu servers.
 license:
   - MIT
-license_file: LICENSE
 repository: https://github.com/bruzit/ansible-collection
 homepage: https://github.com/bruzit/ansible-collection
 dependencies:
