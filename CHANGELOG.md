@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.54.0](https://github.com/bruzit/ansible-collection/compare/v0.53.0...v0.54.0) (2026-10-17)
+
+### Features
+
+* move docker forward rules to the docker role ([f562688](https://github.com/bruzit/ansible-collection/commit/f5626888ae2cf8dc5d7dfe2fe715fe071ee421f2))
+
 ## [0.53.0](https://github.com/bruzit/ansible-collection/compare/v0.52.0...v0.53.0) (2026-10-17)
 
 ### Features
