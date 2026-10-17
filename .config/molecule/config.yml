@@ -22,6 +22,8 @@ provisioner:
   name: ansible
   playbooks:
     prepare: ../../../../.config/molecule/prepare.yaml
+    converge: converge.yaml
+    verify: verify.yaml
   env:
     ANSIBLE_ROLES_PATH: "../../.."
 
