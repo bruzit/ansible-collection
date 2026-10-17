@@ -1,14 +1,16 @@
 ---
+- name: Detect WSL interop
+  ansible.builtin.stat:
+    path: /proc/sys/fs/binfmt_misc/WSLInterop
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+  register: nftables_wsl_interop
+
 - name: Configure the nftables firewall
   when: nftables_enabled
   become: true
   block:
-    - name: Assert the host is not WSL
-      ansible.builtin.assert:
-        that: "'microsoft' not in ansible_facts['kernel'] | lower"
-        fail_msg: WSL is not supported; set nftables_enabled to false.
-        quiet: true
-
     - name: Install nftables
       ansible.builtin.apt:
         name: nftables

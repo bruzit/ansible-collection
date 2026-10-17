@@ -21,12 +21,13 @@ argument_specs:
       - Changes are validated with C(nft -c -f) first. The base ruleset is applied by the C(Reload nftables)
         handler, or earlier by a C(rules) call.
       - Enforce or quiet mode over SSH can lock the connection out; recovery is manual, via the console.
-      - Fails on WSL unless O(nftables_enabled) is false.
+      - Off by default on WSL, which supports nftables on WSL2; O(nftables_enabled=true) opts in.
     options:
       nftables_enabled:
         type: bool
-        default: true
-        description: Manage the firewall. When false, this role and every C(rules) call do nothing.
+        description: >-
+          Manage the firewall. When false, this role and every C(rules) call do nothing. Defaults to false on WSL,
+          detected by C(microsoft) in the kernel release or C(/proc/sys/fs/binfmt_misc/WSLInterop), else true.
       nftables_mode:
         type: str
         choices: [audit, enforce, quiet]
@@ -56,8 +57,7 @@ argument_specs:
     options:
       nftables_enabled:
         type: bool
-        default: true
-        description: When false, does nothing.
+        description: When false, does nothing. Same default as for the main entry point.
       nftables_rules_name:
         type: str
         required: true

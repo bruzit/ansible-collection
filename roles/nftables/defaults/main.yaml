@@ -1,4 +1,4 @@
 ---
-nftables_enabled: true
+nftables_enabled: "{{ 'microsoft' not in ansible_facts['kernel'] | lower and not nftables_wsl_interop.stat.exists | default(false) }}"
 nftables_mode: audit
 nftables_rules_state: present

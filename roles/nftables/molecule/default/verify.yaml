@@ -54,3 +54,44 @@
           - nftables_quiet is search('hook output priority filter; policy drop;')
           - nftables_quiet is search('hook forward priority filter; policy drop;')
           - nftables_quiet is not search('log prefix')
+
+    - name: Delete the live table
+      ansible.builtin.command: nft delete table inet bruzit
+      changed_when: true
+
+    - name: Run on a WSL kernel
+      ansible.builtin.include_role:
+        name: nftables
+      vars:
+        ansible_facts: {kernel: 6.6.87.2-microsoft-standard-WSL2}
+
+    - name: Apply the ruleset on a WSL kernel
+      ansible.builtin.meta: flush_handlers
+
+    - name: Read the live table on a WSL kernel
+      ansible.builtin.command: nft list table inet bruzit
+      register: nftables_wsl
+      changed_when: false
+      failed_when: false
+
+    - name: Run on a WSL kernel when enabled
+      ansible.builtin.include_role:
+        name: nftables
+      vars:
+        ansible_facts: {kernel: 6.6.87.2-microsoft-standard-WSL2}
+        nftables_enabled: true
+
+    - name: Apply the ruleset on a WSL kernel when enabled
+      ansible.builtin.meta: flush_handlers
+
+    - name: Read the live table on a WSL kernel when enabled
+      ansible.builtin.command: nft list table inet bruzit
+      register: nftables_wsl_enabled
+      changed_when: false
+      failed_when: false
+
+    - name: Assert WSL disables the firewall by default and nftables_enabled true opts in
+      ansible.builtin.assert:
+        that:
+          - nftables_wsl.rc != 0
+          - nftables_wsl_enabled.rc == 0
