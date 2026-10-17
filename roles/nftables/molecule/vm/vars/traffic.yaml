@@ -3,7 +3,7 @@ nftables_traffic_targets:
   host: {dev: nft-peer, ipv4: 192.0.2.1, ipv6: "fd51::1"}
   lo: {dev: lo, ipv4: 127.0.0.1, ipv6: "::1"}
   peer: {netns: peer, link: nft-peer, gateway: 192.0.2.1, ipv4: 192.0.2.2, ipv6: "fd51::2"}
-  # Forward accepts the Docker bridges docker0 and br-*
+  # The rules of docker accept forward through the Docker bridges docker0 and br-*
   docker: {netns: docker, link: br-nft, gateway: 198.51.100.1, ipv4: 198.51.100.2}
   docker0: {netns: docker0, link: docker0, gateway: 198.18.0.1, ipv4: 198.18.0.2}
   routed: {netns: routed, link: nft-routed, gateway: 203.0.113.1, ipv4: 203.0.113.2}
@@ -48,8 +48,8 @@ nftables_traffic_probes:
   - {direction: in, proto: tcp, port: 8080, family: ipv6, expect: drop}
   - {direction: in, proto: udp, port: 8080, family: ipv4, expect: drop}
   - {direction: in, proto: udp, port: 8080, family: ipv6, expect: drop}
-  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, to: docker}
+  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, to: docker, rules: docker}
   - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: drop, to: routed}
-  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, from: docker, to: peer}
-  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, to: docker0}
-  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, from: docker0, to: peer}
+  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, from: docker, to: peer, rules: docker}
+  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, to: docker0, rules: docker}
+  - {direction: fwd, proto: tcp, port: 80, family: ipv4, expect: pass, from: docker0, to: peer, rules: docker}

@@ -1,0 +1,8 @@
+table inet bruzit {
+	chain allow_fwd {
+		iifname "docker0" accept
+		iifname "br-*" accept
+		oifname "docker0" accept
+		oifname "br-*" accept
+	}
+}
