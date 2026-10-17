@@ -61,6 +61,7 @@ jobs:
           printf 'roles=%s\nvm_roles=%s\n' "$roles" "$vm_roles" | tee -a "$GITHUB_OUTPUT"
 
   molecule-docker-driver:
+    name: Molecule (${{ matrix.core }}, ${{ matrix.role }})
     needs: gate
     if: needs.gate.outputs.run == 'true' && needs.gate.outputs.roles != '[]'
     runs-on: ubuntu-latest
@@ -99,6 +100,7 @@ jobs:
         run: molecule test
 
   vm:
+    name: Molecule VM (${{ matrix.core }}, ${{ matrix.target.role }}, ${{ matrix.target.scenario }})
     needs: gate
     if: needs.gate.outputs.run == 'true' && needs.gate.outputs.vm_roles != '[]'
     runs-on: ubuntu-latest
