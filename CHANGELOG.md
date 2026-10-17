@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.52.0](https://github.com/bruzit/ansible-collection/compare/v0.51.1...v0.52.0) (2026-10-17)
+
+### Features
+
+* add argument specs for claude and docker ([49de9bb](https://github.com/bruzit/ansible-collection/commit/49de9bbbee1a3b0d4b82db66828f77101852809d))
+
 ## [0.51.1](https://github.com/bruzit/ansible-collection/compare/v0.51.0...v0.51.1) (2026-10-17)
 
 ### Bug Fixes
