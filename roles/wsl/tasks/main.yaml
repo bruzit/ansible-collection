@@ -38,7 +38,7 @@
   notify: Remind to restart WSL
   loop:
     - { section: user, option: default, value: "{{ wsl_default_user }}" }
-    - { section: boot, option: systemd, value: "false" }
+    - { section: boot, option: systemd, value: "{{ wsl_systemd | lower }}" }
     - { section: network, option: generateResolvConf, value: "false", present: "{{ wsl_dns_gateway }}" }
     - { section: boot, option: command, value: /usr/local/sbin/wsl-resolv-conf, present: "{{ wsl_dns_gateway }}" }
 

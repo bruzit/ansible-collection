@@ -1,5 +1,5 @@
 ---
-- name: Verify the gateway DNS
+- name: Verify the gateway DNS with systemd
   hosts: all
   become: true
 
@@ -43,12 +43,12 @@
           - >-
             (wsl_dns_content[1] | community.general.from_ini) == {
               'user': {'default': 'molecule'},
-              'boot': {'systemd': 'false', 'command': '/usr/local/sbin/wsl-resolv-conf'},
+              'boot': {'systemd': 'true', 'command': '/usr/local/sbin/wsl-resolv-conf'},
               'network': {'generateResolvConf': 'false'}}
           - wsl_dns_content[2] == 'nameserver ' ~ ansible_facts.default_ipv4.gateway ~ '\nsearch example.com example.org\n'
           - wsl_dns_stat.results[1].stat.isreg
 
-- name: Disable the gateway DNS
+- name: Disable the gateway DNS and systemd
   hosts: all
   become: true
 

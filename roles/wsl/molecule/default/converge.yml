@@ -13,6 +13,7 @@
     - role: wsl
       wsl_default_user: molecule
       wsl_dns_gateway: true
+      wsl_systemd: true
       wsl_dns_search:
         - example.com
         - example.org
