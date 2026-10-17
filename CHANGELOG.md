@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.51.0](https://github.com/bruzit/ansible-collection/compare/v0.50.0...v0.51.0) (2026-10-17)
+
+### Features
+
+* **wsl:** optional systemd ([b76a117](https://github.com/bruzit/ansible-collection/commit/b76a1170b1eeb46d660beb4b9deac58c3604169c))
+
 ## [0.50.0](https://github.com/bruzit/ansible-collection/compare/v0.49.0...v0.50.0) (2026-10-15)
 
 ### Features
