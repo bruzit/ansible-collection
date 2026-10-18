@@ -2,8 +2,7 @@ name: Ansible Molecule Test
 
 on:
   push:
-    branches: ['**']
-    tags-ignore: ['**']
+    branches: [main]
   pull_request:
 
 permissions:
@@ -179,3 +178,13 @@ jobs:
             /tmp/molecule-vm/*.log
           retention-days: 7
           if-no-files-found: ignore
+
+  required:
+    name: Required (Ansible Molecule Test)
+    needs: [gate, molecule-docker-driver, vm]
+    if: always()
+    runs-on: ubuntu-slim
+    permissions: {}
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
