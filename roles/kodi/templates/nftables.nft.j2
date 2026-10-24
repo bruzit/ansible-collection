@@ -1,0 +1,12 @@
+table inet bruzit {
+	chain allow_in {
+		udp dport 5353 accept
+{% if kodi_webserver_password %}
+		tcp dport { 8080, 9090 } accept
+{% endif %}
+	}
+
+	chain allow_out {
+		udp dport 5353 accept
+	}
+}

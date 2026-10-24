@@ -3,12 +3,41 @@
   hosts: all
   become: true
 
+  vars:
+    nftables_enabled: false
+    kodi_monitor: HDMI-A-1
+    kodi_audio_device: ALSA:hdmi:CARD=PCH,DEV=0|HDA Intel PCH
+    kodi_webserver_password: molecule
+
   pre_tasks:
     # Ubuntu Server ships systemd; the container image does not, and it brings the render and input groups.
     - name: Install systemd
       ansible.builtin.apt:
         name: systemd
         state: present
+
+    - name: Read the Kodi settings directory
+      ansible.builtin.stat:
+        path: /var/lib/kodi/.kodi/userdata
+      register: kodi_userdata
+
+    - name: Create the Kodi settings directory
+      ansible.builtin.file:
+        path: /var/lib/kodi/.kodi/userdata
+        state: directory
+        mode: "0755"
+      when: not kodi_userdata.stat.exists
+
+    - name: Seed the Kodi settings as Kodi writes them
+      ansible.builtin.copy:
+        dest: /var/lib/kodi/.kodi/userdata/guisettings.xml
+        content: |
+          <settings version="2">
+              <setting id="videoscreen.monitor" default="true">Default</setting>
+              <setting id="services.webserver" default="true">false</setting>
+          </settings>
+        force: false
+        mode: "0644"
 
   roles:
     - role: kodi

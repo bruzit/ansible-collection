@@ -36,10 +36,21 @@
       register: kodi_enabled
       changed_when: false
 
+    - name: Read the Kodi settings metadata
+      ansible.builtin.stat:
+        path: /var/lib/kodi/.kodi/userdata/guisettings.xml
+      register: kodi_settings_stat
+
+    - name: Read the Kodi settings
+      ansible.builtin.slurp:
+        src: /var/lib/kodi/.kodi/userdata/guisettings.xml
+      register: kodi_settings
+
     - name: Assert Kodi setup
       ansible.builtin.assert:
         that:
           - "'kodi' in ansible_facts.packages"
+          - "'avahi-daemon' in ansible_facts.packages"
           - ansible_facts.getent_passwd['kodi'][4] == '/var/lib/kodi'
           - ansible_facts.getent_passwd['kodi'][5] == '/usr/sbin/nologin'
           - kodi_groups.stdout.split() | sort == ['audio', 'input', 'kodi', 'render', 'video']
@@ -47,3 +58,10 @@
           - "'TTYPath=/dev/tty1' in (kodi_unit.content | b64decode)"
           - "'PAMName=login' in (kodi_unit.content | b64decode)"
           - kodi_enabled.stdout == 'enabled'
+          - kodi_settings_stat.stat.pw_name == 'kodi'
+          - kodi_settings_stat.stat.mode == '0600'
+          - "'<setting id=\"videoscreen.monitor\">HDMI-A-1</setting>' in (kodi_settings.content | b64decode)"
+          - "'<setting id=\"audiooutput.audiodevice\">ALSA:hdmi:CARD=PCH,DEV=0|HDA Intel PCH</setting>' in (kodi_settings.content | b64decode)"
+          - "'<setting id=\"services.webserver\">true</setting>' in (kodi_settings.content | b64decode)"
+          - "'<setting id=\"services.esallinterfaces\">true</setting>' in (kodi_settings.content | b64decode)"
+          - "'<setting id=\"services.webserverpassword\">molecule</setting>' in (kodi_settings.content | b64decode)"
