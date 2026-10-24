@@ -1,8 +1,15 @@
 ---
+- name: Install the nftables rules of kodi
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: kodi
+
 - name: Install Kodi
   become: true
   ansible.builtin.apt:
-    name: kodi
+    name: [kodi, avahi-daemon, python3-lxml]
     state: present
 
 - name: Create the kodi user
@@ -55,6 +62,85 @@
     enabled: true
     daemon_reload: "{{ kodi_systemd.stat.exists }}"
   when: not (ansible_check_mode and kodi_unit is changed)
+
+- name: Create the Kodi settings directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: kodi
+    group: kodi
+    mode: "0700"
+  loop:
+    - /var/lib/kodi/.kodi
+    - /var/lib/kodi/.kodi/userdata
+
+- name: Create the Kodi settings
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ kodi_settings_path }}"
+    content: |
+      <settings version="2" />
+    force: false
+    owner: kodi
+    group: kodi
+    mode: "0600"
+  register: kodi_settings_file
+
+- name: Restrict the Kodi settings
+  become: true
+  ansible.builtin.file:
+    path: "{{ kodi_settings_path }}"
+    owner: kodi
+    group: kodi
+    mode: "0600"
+  when: not (ansible_check_mode and kodi_settings_file is changed)
+
+- name: Compare the Kodi settings
+  become: true
+  community.general.xml:
+    path: "{{ kodi_settings_path }}"
+    xpath: "/settings/setting[@id='{{ item.id }}']"
+    value: "{{ item.value }}"
+  check_mode: true
+  loop: "{{ kodi_settings }}"
+  loop_control:
+    label: "{{ item.id }}"
+  no_log: "{{ item.id == 'services.webserverpassword' }}"
+  register: kodi_settings_compare
+  when: not (ansible_check_mode and kodi_settings_file is changed)
+
+# Kodi rewrites guisettings.xml on exit, so it must not run while the file changes.
+- name: Stop Kodi for its settings
+  become: true
+  ansible.builtin.systemd_service:
+    name: kodi
+    state: stopped
+  when:
+    - kodi_systemd.stat.exists and not (ansible_check_mode and kodi_unit is changed)
+    - kodi_settings_compare.results | default([]) | selectattr('changed') | list | length > 0
+
+- name: Write the Kodi settings
+  become: true
+  community.general.xml:
+    path: "{{ kodi_settings_path }}"
+    xpath: "/settings/setting[@id='{{ item.id }}']"
+    value: "{{ item.value }}"
+  loop: "{{ kodi_settings_compare.results | default([]) | selectattr('changed') | map(attribute='item') | list }}"
+  loop_control:
+    label: "{{ item.id }}"
+  no_log: "{{ item.id == 'services.webserverpassword' }}"
+
+- name: Drop the default markers of the written Kodi settings
+  become: true
+  community.general.xml:
+    path: "{{ kodi_settings_path }}"
+    xpath: "/settings/setting[@id='{{ item.id }}']/@default"
+    state: absent
+  loop: "{{ kodi_settings_compare.results | default([]) | selectattr('changed') | map(attribute='item') | list }}"
+  loop_control:
+    label: "{{ item.id }}"
+  no_log: "{{ item.id == 'services.webserverpassword' }}"
 
 - name: Start Kodi
   become: true

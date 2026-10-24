@@ -1,0 +1,10 @@
+---
+kodi_settings_path: /var/lib/kodi/.kodi/userdata/guisettings.xml
+kodi_remote: "{{ (kodi_webserver_password | length > 0) | string | lower }}"
+kodi_settings: >-
+  {{
+    ([{'id': 'videoscreen.monitor', 'value': kodi_monitor}] if kodi_monitor else [])
+    + ([{'id': 'audiooutput.audiodevice', 'value': kodi_audio_device}] if kodi_audio_device else [])
+    + [{'id': 'services.webserver', 'value': kodi_remote}, {'id': 'services.esallinterfaces', 'value': kodi_remote}]
+    + ([{'id': 'services.webserverpassword', 'value': kodi_webserver_password}] if kodi_webserver_password else [])
+  }}

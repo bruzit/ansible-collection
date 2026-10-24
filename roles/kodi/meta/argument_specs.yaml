@@ -1,0 +1,22 @@
+---
+argument_specs:
+  main:
+    short_description: Kodi from the Ubuntu archive as the C(kodi) systemd service on tty1.
+    description:
+      - Settings are written to C(guisettings.xml) with Kodi stopped, since Kodi rewrites the file on exit.
+    options:
+      kodi_monitor:
+        type: str
+        default: ""
+        description: DRM connector Kodi renders to, e.g. C(HDMI-A-1); empty leaves Kodi's choice.
+      kodi_audio_device:
+        type: str
+        default: ""
+        description: Kodi audio output device, e.g. C(ALSA:hdmi:CARD=PCH,DEV=0|HDA Intel PCH); empty leaves Kodi's choice.
+      kodi_webserver_password:
+        type: str
+        default: ""
+        no_log: true
+        description: >-
+          Password of the C(kodi) web server user; set enables remote control over HTTP 8080 and JSON-RPC 9090
+          from other systems, empty disables it.
