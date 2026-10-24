@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.55.0](https://github.com/bruzit/ansible-collection/compare/v0.54.0...v0.55.0) (2026-10-24)
+
+### Features
+
+* add kodi monitor, audio device and remote control settings ([6201fd8](https://github.com/bruzit/ansible-collection/commit/6201fd86e9cef22b286933ccc65727bf85d8e973))
+
 ## [0.54.0](https://github.com/bruzit/ansible-collection/compare/v0.53.0...v0.54.0) (2026-10-17)
 
 ### Features
