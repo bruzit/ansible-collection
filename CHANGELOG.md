@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.57.0](https://github.com/bruzit/ansible-collection/compare/v0.56.0...v0.57.0) (2026-10-28)
+
+### Features
+
+* add kodi youtube add-on with inputstream role ([9cc314b](https://github.com/bruzit/ansible-collection/commit/9cc314b2cfa85ef3900389ebee861e010d4be08f))
+
 ## [0.56.0](https://github.com/bruzit/ansible-collection/compare/v0.55.0...v0.56.0) (2026-10-28)
 
 ### Features
