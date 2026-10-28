@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert InputStream Adaptive setup
+      ansible.builtin.assert:
+        that:
+          - "'kodi-inputstream-adaptive' in ansible_facts.packages"
