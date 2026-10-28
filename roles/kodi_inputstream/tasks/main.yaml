@@ -1,0 +1,6 @@
+---
+- name: Install the InputStream Adaptive add-on
+  become: true
+  ansible.builtin.apt:
+    name: kodi-inputstream-adaptive
+    state: present

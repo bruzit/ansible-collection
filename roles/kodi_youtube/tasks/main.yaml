@@ -1,0 +1,82 @@
+---
+- name: Fetch the latest YouTube add-on release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/anxdpanic/plugin.video.youtube/releases/latest
+  register: kodi_youtube_release
+  until: kodi_youtube_release is succeeded
+  retries: 3
+  delay: 5
+  check_mode: false
+
+- name: Set the release facts of the YouTube add-on
+  ansible.builtin.set_fact:
+    kodi_youtube_version: "{{ kodi_youtube_release.json.tag_name | regex_replace('^v', '') }}"
+    kodi_youtube_dir: /var/lib/kodi/.kodi/addons/plugin.video.youtube
+
+- name: Set the asset facts of the YouTube add-on
+  ansible.builtin.set_fact:
+    kodi_youtube_asset: "plugin.video.youtube-{{ kodi_youtube_version }}.zip"
+
+- name: Set the checksum of the YouTube add-on
+  ansible.builtin.set_fact:
+    kodi_youtube_checksum: >-
+      {{ kodi_youtube_release.json.assets | selectattr('name', '==', kodi_youtube_asset) | map(attribute='digest')
+         | first | default('', true) | regex_replace('^sha256:', '') }}
+
+- name: Read the installed version of the YouTube add-on
+  ansible.builtin.slurp:
+    src: "{{ kodi_youtube_dir }}/.version"
+  register: kodi_youtube_marker
+  failed_when: false
+
+- name: Install the YouTube add-on
+  when: kodi_youtube_marker.content | default('') | b64decode | trim != kodi_youtube_version
+  become: true
+  block:
+    - name: Download the YouTube add-on
+      ansible.builtin.get_url:
+        url: "https://github.com/anxdpanic/plugin.video.youtube/releases/download/{{ kodi_youtube_release.json.tag_name }}/{{ kodi_youtube_asset }}"
+        dest: "/tmp/{{ kodi_youtube_asset }}"
+        checksum: "sha256:{{ kodi_youtube_checksum }}"
+        mode: "0600"
+
+    - name: Create the Kodi add-ons directory
+      ansible.builtin.file:
+        path: /var/lib/kodi/.kodi/addons
+        state: directory
+        owner: kodi
+        group: kodi
+        mode: "0700"
+
+    # Replaces the whole add-on so files removed upstream do not linger; user settings live in userdata.
+    - name: Remove the previous YouTube add-on
+      ansible.builtin.file:
+        path: "{{ kodi_youtube_dir }}"
+        state: absent
+
+    - name: Install unzip to unpack the YouTube add-on
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+
+    - name: Unpack the YouTube add-on
+      ansible.builtin.unarchive:
+        src: "/tmp/{{ kodi_youtube_asset }}"
+        dest: /var/lib/kodi/.kodi/addons
+        remote_src: true
+        owner: kodi
+        group: kodi
+
+    - name: Write the version marker of the YouTube add-on
+      ansible.builtin.copy:
+        dest: "{{ kodi_youtube_dir }}/.version"
+        content: "{{ kodi_youtube_version }}\n"
+        owner: kodi
+        group: kodi
+        mode: "0644"
+      notify: Restart Kodi
+
+    - name: Remove the downloaded YouTube add-on
+      ansible.builtin.file:
+        path: "/tmp/{{ kodi_youtube_asset }}"
+        state: absent

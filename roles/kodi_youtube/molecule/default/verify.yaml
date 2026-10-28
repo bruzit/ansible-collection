@@ -1,0 +1,38 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Fetch the latest YouTube add-on release
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/anxdpanic/plugin.video.youtube/releases/latest
+      register: kodi_youtube_release
+
+    - name: Read the version marker of the YouTube add-on
+      ansible.builtin.slurp:
+        src: /var/lib/kodi/.kodi/addons/plugin.video.youtube/.version
+      register: kodi_youtube_marker
+
+    - name: Read the manifest of the YouTube add-on
+      ansible.builtin.slurp:
+        src: /var/lib/kodi/.kodi/addons/plugin.video.youtube/addon.xml
+      register: kodi_youtube_manifest
+
+    - name: Stat the YouTube add-on directory
+      ansible.builtin.stat:
+        path: /var/lib/kodi/.kodi/addons/plugin.video.youtube
+      register: kodi_youtube_dir_stat
+
+    - name: Assert YouTube add-on setup
+      ansible.builtin.assert:
+        that:
+          - "'kodi-inputstream-adaptive' in ansible_facts.packages"
+          - kodi_youtube_marker.content | b64decode | trim == kodi_youtube_release.json.tag_name | regex_replace('^v', '')
+          - "('version=\"' ~ (kodi_youtube_release.json.tag_name | regex_replace('^v', '')) ~ '\"') in (kodi_youtube_manifest.content | b64decode)"
+          - kodi_youtube_dir_stat.stat.pw_name == 'kodi'
