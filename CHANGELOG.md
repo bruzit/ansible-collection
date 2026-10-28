@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.56.0](https://github.com/bruzit/ansible-collection/compare/v0.55.0...v0.56.0) (2026-10-28)
+
+### Features
+
+* install kodi inputstream adaptive ([5abb4b4](https://github.com/bruzit/ansible-collection/commit/5abb4b4929c57631decdc1b40456987cd5b5d80d))
+
 ## [0.55.0](https://github.com/bruzit/ansible-collection/compare/v0.54.0...v0.55.0) (2026-10-24)
 
 ### Features
