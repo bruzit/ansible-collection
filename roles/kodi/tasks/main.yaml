@@ -9,7 +9,7 @@
 - name: Install Kodi
   become: true
   ansible.builtin.apt:
-    name: [kodi, avahi-daemon, python3-lxml]
+    name: [kodi, kodi-inputstream-adaptive, avahi-daemon, python3-lxml]
     state: present
 
 - name: Create the kodi user
