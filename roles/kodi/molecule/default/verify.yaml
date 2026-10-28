@@ -50,6 +50,7 @@
       ansible.builtin.assert:
         that:
           - "'kodi' in ansible_facts.packages"
+          - "'kodi-inputstream-adaptive' in ansible_facts.packages"
           - "'avahi-daemon' in ansible_facts.packages"
           - ansible_facts.getent_passwd['kodi'][4] == '/var/lib/kodi'
           - ansible_facts.getent_passwd['kodi'][5] == '/usr/sbin/nologin'
