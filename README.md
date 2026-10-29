@@ -150,6 +150,7 @@ ansible-galaxy collection install --force "${GALAXY_BUILD_OUTPUT##* }"
 
 Use Ansible Molecule to test each role. All Ubuntu versions with standard support should be tested; desktop-only roles only Kubuntu-supported releases (flavour LTS gets 3 years).
 CI tests only changed roles and their dependants; changes to shared Molecule or CI config test all roles.
+`snap` is tested in Docker for the `snapd` package only; snapd needs systemd, which containers lack, and has no VM scenario.
 
 ## Copyright and Licensing
 
