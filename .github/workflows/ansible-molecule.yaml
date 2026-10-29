@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
@@ -18,23 +17,9 @@ jobs:
     name: Gate
     runs-on: ubuntu-slim
     outputs:
-      run: ${{ steps.check.outputs.run }}
       roles: ${{ steps.roles.outputs.roles }}
       vm_roles: ${{ steps.roles.outputs.vm_roles }}
     steps:
-      - name: Skip push with open PR
-        id: check
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          run=true
-          if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF_NAME" != main ] \
-            && [ "$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
-                    --jq '[.[] | select(.state == "open")] | length')" -gt 0 ]; then
-            run=false
-          fi
-          echo "run=$run" >>"$GITHUB_OUTPUT"
-
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
@@ -62,7 +47,7 @@ jobs:
   molecule-docker-driver:
     name: Molecule (${{ matrix.core }}, ${{ matrix.role }})
     needs: gate
-    if: needs.gate.outputs.run == 'true' && needs.gate.outputs.roles != '[]'
+    if: needs.gate.outputs.roles != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -101,7 +86,7 @@ jobs:
   vm:
     name: Molecule VM (${{ matrix.core }}, ${{ matrix.target.role }}, ${{ matrix.target.scenario }})
     needs: gate
-    if: needs.gate.outputs.run == 'true' && needs.gate.outputs.vm_roles != '[]'
+    if: needs.gate.outputs.vm_roles != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
