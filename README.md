@@ -4,6 +4,7 @@
 [![Last commit](https://img.shields.io/github/last-commit/bruzit/ansible-collection)](https://github.com/bruzit/ansible-collection/commits)
 [![MegaLinter](https://github.com/bruzit/ansible-collection/actions/workflows/megalinter.yaml/badge.svg)](https://github.com/bruzit/ansible-collection/actions/workflows/megalinter.yaml)
 [![Ansible Molecule Test](https://github.com/bruzit/ansible-collection/actions/workflows/ansible-molecule.yaml/badge.svg)](https://github.com/bruzit/ansible-collection/actions/workflows/ansible-molecule.yaml)
+[![Semantic Release](https://github.com/bruzit/ansible-collection/actions/workflows/semantic-release.yaml/badge.svg)](https://github.com/bruzit/ansible-collection/actions/workflows/semantic-release.yaml)
 
 Ansible collection of Molecule-tested roles that provision and maintain Kubuntu desktops and Ubuntu servers.
 
@@ -161,7 +162,7 @@ Update the Roles and Behaviour by Environment tables when a role is added, chang
 
 ## Support
 
-[Open a GitHub issue](../../issues).
+Community, best effort; [open a GitHub issue](../../issues).
 
 ## Development
 
