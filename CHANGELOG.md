@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.58.0](https://github.com/bruzit/ansible-collection/compare/v0.57.0...v0.58.0) (2026-10-31)
+
+### Features
+
+* enable kodi youtube add-ons over json-rpc ([eeaa4c9](https://github.com/bruzit/ansible-collection/commit/eeaa4c992c6699a56b0396867879186e4d7883ba))
+
 ## [0.57.0](https://github.com/bruzit/ansible-collection/compare/v0.56.0...v0.57.0) (2026-10-28)
 
 ### Features
