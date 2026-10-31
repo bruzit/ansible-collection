@@ -1,4 +1,9 @@
-# Ansible Collection
+# BruzIT Ansible Collection
+
+[![License](https://img.shields.io/github/license/bruzit/ansible-collection)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/bruzit/ansible-collection)](https://github.com/bruzit/ansible-collection/commits)
+[![MegaLinter](https://github.com/bruzit/ansible-collection/actions/workflows/megalinter.yaml/badge.svg)](https://github.com/bruzit/ansible-collection/actions/workflows/megalinter.yaml)
+[![Ansible Molecule Test](https://github.com/bruzit/ansible-collection/actions/workflows/ansible-molecule.yaml/badge.svg)](https://github.com/bruzit/ansible-collection/actions/workflows/ansible-molecule.yaml)
 
 Ansible collection of Molecule-tested roles that provision and maintain Kubuntu desktops and Ubuntu servers.
 
@@ -109,7 +114,13 @@ Roles that behave differently depending on the target environment; unlisted role
 - nftables: `nftables_enabled` defaults to false on WSL (`microsoft` in the kernel release or `/proc/sys/fs/binfmt_misc/WSLInterop`); `false` skips the role and the drop-ins its consumers add via `tasks_from: rules`; `nftables_mode` `audit` logs and accepts, `enforce` logs and drops, `quiet` drops.
 - Roles using `apt_source` or `github_binary` inherit their check mode and architecture behaviour.
 
-## Installation and Configuration
+## Requirements
+
+- Control node: ansible-core 2.20 or later ([`meta/runtime.yml`](meta/runtime.yml)).
+- Collections: `community.general`, `ansible.posix` ([`galaxy.yml`](galaxy.yml)).
+- Managed nodes: Ubuntu releases in standard support; Kubuntu for desktop roles.
+
+## Installation and Setup
 
 Add to `requirements.yaml`:
 
@@ -144,22 +155,48 @@ Run the Ansible playbook:
 ansible-playbook -i localhost, playbook.yaml
 ```
 
-## Contributing
+## Support
 
-### Development
+[Open a GitHub issue](../../issues).
+
+## Development
 
 ```shell
 GALAXY_BUILD_OUTPUT=$(ansible-galaxy collection build --force)
 ansible-galaxy collection install --force "${GALAXY_BUILD_OUTPUT##* }"
 ```
 
-### Testing
+## Testing
 
 Use Ansible Molecule to test each role. All Ubuntu versions with standard support should be tested; desktop-only roles only Kubuntu-supported releases (flavour LTS gets 3 years).
 CI tests only changed roles and their dependants; changes to shared Molecule or CI config test all roles.
 `snap` is tested in Docker for the `snapd` package only; snapd needs systemd, which containers lack, and has no VM scenario.
 
-## Copyright and Licensing
+## Integration and Deployment
 
-[MIT License](LICENSE)  
+| Workflow                                                            | Trigger                          | Purpose                                                                                            |
+|---------------------------------------------------------------------|----------------------------------|----------------------------------------------------------------------------------------------------|
+| [MegaLinter](.github/workflows/megalinter.yaml)                     | Pull request                     | Lint changed files; required check `Required (MegaLinter)`                                         |
+| [MegaLinter Scheduled](.github/workflows/megalinter-scheduled.yaml) | Weekly, Monday 06:00 UTC; manual | Lint the whole codebase                                                                            |
+| [Ansible Molecule Test](.github/workflows/ansible-molecule.yaml)    | Pull request; push to `main`     | Molecule tests of changed roles and dependants; required check `Required (Ansible Molecule Test)`  |
+| [Semantic Release](.github/workflows/semantic-release.yaml)         | Push to `main`                   | Version, changelog, `galaxy.yml` version and GitHub release via the shared semantic-release action |
+
+## Contributing
+
+Open a pull request to `main`. Commits follow the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/), from which semantic-release sets versions and the changelog automatically.
+
+## License and Copyright
+
+MIT License: [`LICENSE`](LICENSE)  
 Copyright © 2026 Martin Bružina
+
+## Stats
+
+| Metric           | Badges                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Commits          | [![Commits total](https://img.shields.io/github/commit-activity/t/bruzit/ansible-collection?label=commits%20total)](https://github.com/bruzit/ansible-collection/commits/main)                                                                                                                                                                                                                                                                                                 |
+| Issues           | [![Issues open](https://img.shields.io/github/issues/bruzit/ansible-collection?label=issues)](https://github.com/bruzit/ansible-collection/issues) [![Issues total](https://img.shields.io/github/issues-search?query=repo%3Abruzit%2Fansible-collection%20is%3Aissue&label=issues%20total)](https://github.com/bruzit/ansible-collection/issues?q=is%3Aissue)                                                                                                                 |
+| Pull requests    | [![Pull requests open, not draft](https://img.shields.io/github/issues-search?query=repo%3Abruzit%2Fansible-collection%20is%3Apr%20is%3Aopen%20draft%3Afalse&label=PRs%20open)](https://github.com/bruzit/ansible-collection/pulls?q=is%3Apr+is%3Aopen+draft%3Afalse) [![Pull requests total](https://img.shields.io/github/issues-search?query=repo%3Abruzit%2Fansible-collection%20is%3Apr&label=PRs%20total)](https://github.com/bruzit/ansible-collection/pulls?q=is%3Apr) |
+| Checks on `main` | [![Checks on main](https://img.shields.io/github/check-runs/bruzit/ansible-collection/main?label=checks%20%28main%29)](https://github.com/bruzit/ansible-collection/actions?query=branch%3Amain)                                                                                                                                                                                                                                                                               |
+| Releases         | [![Latest release](https://img.shields.io/github/v/release/bruzit/ansible-collection)](https://github.com/bruzit/ansible-collection/releases/latest) [![Commits since latest release](https://img.shields.io/github/commits-since/bruzit/ansible-collection/latest)](https://github.com/bruzit/ansible-collection/releases)                                                                                                                                                    |
+| Community        | [![Stargazers](https://img.shields.io/github/stars/bruzit/ansible-collection)](https://github.com/bruzit/ansible-collection/stargazers) [![Forks](https://img.shields.io/github/forks/bruzit/ansible-collection)](https://github.com/bruzit/ansible-collection/forks) [![Contributors](https://img.shields.io/github/contributors/bruzit/ansible-collection)](https://github.com/bruzit/ansible-collection/graphs/contributors)                                                |
