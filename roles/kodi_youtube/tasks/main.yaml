@@ -80,3 +80,56 @@
       ansible.builtin.file:
         path: "/tmp/{{ kodi_youtube_asset }}"
         state: absent
+
+- name: Restart Kodi to register the YouTube add-on
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable the add-ons over JSON-RPC
+  when:
+    - kodi_webserver_password | length > 0
+    - kodi_systemd.stat.exists
+    - not ansible_check_mode
+  no_log: true
+  block:
+    - name: Read the enabled state of the add-ons
+      ansible.builtin.uri:
+        url: http://localhost:8080/jsonrpc
+        method: POST
+        user: kodi
+        password: "{{ kodi_webserver_password }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          id: 1
+          method: Addons.GetAddonDetails
+          params:
+            addonid: "{{ item }}"
+            properties: [enabled]
+      loop: [plugin.video.youtube, inputstream.adaptive]
+      register: kodi_youtube_addons
+      until: kodi_youtube_addons.json.result is defined
+      retries: 12
+      delay: 5
+
+    - name: Enable the add-ons
+      ansible.builtin.uri:
+        url: http://localhost:8080/jsonrpc
+        method: POST
+        user: kodi
+        password: "{{ kodi_webserver_password }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          id: 1
+          method: Addons.SetAddonEnabled
+          params:
+            addonid: "{{ item.item }}"
+            enabled: true
+      loop: "{{ kodi_youtube_addons.results | rejectattr('json.result.addon.enabled') }}"
+      loop_control:
+        label: "{{ item.item }}"
+      register: kodi_youtube_enable
+      changed_when: true
+      failed_when: kodi_youtube_enable.json.result | default('') != 'OK'
