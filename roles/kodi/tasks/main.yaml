@@ -21,6 +21,31 @@
     shell: /usr/sbin/nologin
     groups: [audio, video, render, input]
 
+- name: Detect the i915 graphics driver
+  ansible.builtin.stat:
+    path: /sys/module/i915
+  register: kodi_i915
+
+# i915 fastboot inherits the firmware's HDMI mode without audio; only a full modeset enables HDMI audio.
+- name: Disable i915 fastboot
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/default/grub.d/kodi.cfg
+    mode: "0644"
+    content: |
+      GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT i915.fastboot=0"
+  when: kodi_i915.stat.exists
+  register: kodi_grub
+
+# A handler would run after the reboot handler of bruzit.ansible.system, which loads first.
+- name: Update GRUB
+  become: true
+  ansible.builtin.command:
+    cmd: update-grub
+  when: kodi_grub is changed  # noqa: no-handler
+  changed_when: true
+  notify: Reboot system
+
 - name: Install the Kodi systemd unit
   become: true
   ansible.builtin.copy:
