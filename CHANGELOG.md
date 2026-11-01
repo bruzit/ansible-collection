@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.59.0](https://github.com/bruzit/ansible-collection/compare/v0.58.1...v0.59.0) (2026-11-01)
+
+### Features
+
+* **kodi_netflix:** add netflix add-on role ([3161ac4](https://github.com/bruzit/ansible-collection/commit/3161ac4c2b8311e77d04819ae0bbf878cc3fcfbe))
+
 ## [0.58.1](https://github.com/bruzit/ansible-collection/compare/v0.58.0...v0.58.1) (2026-10-31)
 
 ### Bug Fixes
