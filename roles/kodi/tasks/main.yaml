@@ -79,6 +79,15 @@
     path: /run/systemd/system
   register: kodi_systemd
 
+# Resume re-enables the display without HDMI audio, the same as a boot with i915 fastboot.
+- name: Mask the sleep targets
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    masked: true
+  loop: [sleep.target, suspend.target, hibernate.target, hybrid-sleep.target]
+  when: kodi_systemd.stat.exists
+
 # Check mode on a fresh host has no unit file to enable or start.
 - name: Enable Kodi
   become: true
