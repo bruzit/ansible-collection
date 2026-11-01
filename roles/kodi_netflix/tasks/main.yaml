@@ -1,0 +1,199 @@
+---
+- name: Gather package facts for the Kodi version
+  ansible.builtin.package_facts:
+    manager: apt
+
+# Check mode on a fresh host has no Kodi to pick add-on builds for.
+- name: End the role without Kodi in check mode
+  ansible.builtin.meta: end_role
+  when: ansible_check_mode and 'kodi' not in ansible_facts.packages
+
+- name: Set the Kodi repository branch
+  ansible.builtin.set_fact:
+    kodi_netflix_branch: >-
+      {{ kodi_netflix_branches[ansible_facts.packages['kodi'][0].version
+         | regex_search('^(?:\d+:)?(\d+)\.', '\1') | first | int] | default('') }}
+
+- name: Assert a supported Kodi version
+  ansible.builtin.assert:
+    that: kodi_netflix_branch | length > 0
+    fail_msg: "Kodi {{ ansible_facts.packages['kodi'][0].version }} has no known add-on repository branch"
+    quiet: true
+
+- name: Fetch the latest Netflix add-on release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/CastagnaIT/plugin.video.netflix/releases/latest
+  register: kodi_netflix_release
+  until: kodi_netflix_release is succeeded
+  retries: 3
+  delay: 5
+  check_mode: false
+
+- name: Set the asset facts of the Netflix add-on
+  ansible.builtin.set_fact:
+    kodi_netflix_asset: >-
+      {{ kodi_netflix_release.json.assets | selectattr('name', 'match', '^plugin\.video\.netflix-.+\+matrix\.\d+\.zip$') | first }}
+
+# Temporary index of the official Kodi repository; the role keeps no state from it.
+- name: Read the dependency versions from the official Kodi repository
+  block:
+    - name: Create the temporary Kodi repository index
+      ansible.builtin.tempfile:
+        suffix: .xml
+      register: kodi_netflix_index
+      check_mode: false
+      changed_when: false
+
+    - name: Download the Kodi repository index
+      ansible.builtin.get_url:
+        url: "https://mirrors.kodi.tv/addons/{{ kodi_netflix_branch }}/addons.xml"
+        dest: "{{ kodi_netflix_index.path }}"
+        force: true
+        mode: "0600"
+      register: kodi_netflix_index_download
+      until: kodi_netflix_index_download is succeeded
+      retries: 3
+      delay: 5
+      check_mode: false
+      changed_when: false
+
+    - name: Read the dependency versions
+      community.general.xml:
+        path: "{{ kodi_netflix_index.path }}"
+        xpath: "/addons/addon[{{ kodi_netflix_dependencies | map('regex_replace', '^(.*)$', \"@id='\\1'\") | join(' or ') }}]"
+        content: attribute
+      register: kodi_netflix_index_matches
+
+  always:
+    - name: Remove the temporary Kodi repository index
+      ansible.builtin.file:
+        path: "{{ kodi_netflix_index.path }}"
+        state: absent
+      check_mode: false
+      changed_when: false
+      when: kodi_netflix_index.path is defined
+
+- name: Set the add-ons of the Netflix add-on
+  ansible.builtin.set_fact:
+    kodi_netflix_mirror: "https://mirrors.kodi.tv/addons/{{ kodi_netflix_branch }}"
+    kodi_netflix_versions: >-
+      {{
+        {'repository.castagnait': kodi_netflix_repository_version | string,
+         'plugin.video.netflix': kodi_netflix_asset.name | regex_replace('^plugin\.video\.netflix-(.+)\.zip$', '\1')}
+        | combine(kodi_netflix_index_matches.matches | map(attribute='addon') | items2dict(key_name='id', value_name='version'))
+      }}
+    kodi_netflix_sources:
+      repository.castagnait:
+        url: "https://github.com/CastagnaIT/repository.castagnait/raw/kodi/repository.castagnait-{{ kodi_netflix_repository_version }}.zip"
+        checksum: "{{ kodi_netflix_repository_checksum }}"
+      plugin.video.netflix:
+        url: "{{ kodi_netflix_asset.browser_download_url }}"
+        checksum: "sha256:{{ kodi_netflix_asset.digest | default('', true) | regex_replace('^sha256:', '') }}"
+
+- name: Assert the dependencies in the Kodi repository
+  ansible.builtin.assert:
+    that: kodi_netflix_dependencies | difference(kodi_netflix_versions) | length == 0
+    fail_msg: "Not in the Kodi {{ kodi_netflix_branch }} repository: {{ kodi_netflix_dependencies | difference(kodi_netflix_versions) | sort | join(', ') }}"
+    quiet: true
+
+- name: Read the installed versions of the add-ons
+  become: true
+  community.general.xml:
+    path: "/var/lib/kodi/.kodi/addons/{{ item }}/addon.xml"
+    xpath: /addon
+    content: attribute
+  loop: "{{ kodi_netflix_versions.keys() | list }}"
+  register: kodi_netflix_installed
+  failed_when: false
+
+- name: Set the outdated add-ons
+  ansible.builtin.set_fact:
+    kodi_netflix_outdated: >-
+      {{ kodi_netflix_versions | dict2items
+         | difference(kodi_netflix_installed.results | selectattr('matches', 'defined') | map(attribute='matches')
+                      | map('first') | map(attribute='addon') | items2dict(key_name='id', value_name='version') | dict2items)
+         | map(attribute='key') | list }}
+
+- name: Install the outdated add-ons
+  when: kodi_netflix_outdated | length > 0
+  block:
+    - name: Create the Kodi add-ons directory
+      become: true
+      ansible.builtin.file:
+        path: /var/lib/kodi/.kodi/addons
+        state: directory
+        owner: kodi
+        group: kodi
+        mode: "0700"
+
+    - name: Install unzip to unpack the add-ons
+      become: true
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+
+    - name: Install the add-on
+      ansible.builtin.include_tasks: addon.yaml
+      vars:
+        kodi_netflix_addon:
+          id: "{{ item }}"
+          url: >-
+            {{ kodi_netflix_sources[item].url if item in kodi_netflix_sources
+               else kodi_netflix_mirror ~ '/' ~ item ~ '/' ~ item ~ '-' ~ kodi_netflix_versions[item] ~ '.zip' }}
+          checksum: >-
+            {{ kodi_netflix_sources[item].checksum if item in kodi_netflix_sources
+               else 'sha256:' ~ kodi_netflix_mirror ~ '/' ~ item ~ '/' ~ item ~ '-' ~ kodi_netflix_versions[item] ~ '.zip.sha256' }}
+      loop: "{{ kodi_netflix_outdated }}"
+
+- name: Restart Kodi to register the add-ons
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable the add-ons over JSON-RPC
+  when:
+    - kodi_webserver_password | length > 0
+    - kodi_systemd.stat.exists
+    - not ansible_check_mode
+  no_log: true
+  block:
+    - name: Read the enabled state of the add-ons
+      ansible.builtin.uri:
+        url: http://localhost:8080/jsonrpc
+        method: POST
+        user: kodi
+        password: "{{ kodi_webserver_password }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          id: 1
+          method: Addons.GetAddonDetails
+          params:
+            addonid: "{{ item }}"
+            properties: [enabled]
+      loop: "{{ kodi_netflix_versions.keys() | list + ['inputstream.adaptive'] }}"
+      register: kodi_netflix_addons
+      until: kodi_netflix_addons.json.result is defined
+      retries: 12
+      delay: 5
+
+    - name: Enable the add-ons
+      ansible.builtin.uri:
+        url: http://localhost:8080/jsonrpc
+        method: POST
+        user: kodi
+        password: "{{ kodi_webserver_password }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          id: 1
+          method: Addons.SetAddonEnabled
+          params:
+            addonid: "{{ item.item }}"
+            enabled: true
+      loop: "{{ kodi_netflix_addons.results | rejectattr('json.result.addon.enabled') }}"
+      loop_control:
+        label: "{{ item.item }}"
+      register: kodi_netflix_enable
+      changed_when: true
+      failed_when: kodi_netflix_enable.json.result | default('') != 'OK'

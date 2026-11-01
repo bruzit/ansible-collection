@@ -1,0 +1,3 @@
+dependencies:
+  - role: bruzit.ansible.kodi
+  - role: bruzit.ansible.kodi_inputstream

@@ -1,0 +1,31 @@
+---
+- name: Download the add-on {{ kodi_netflix_addon.id }}
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ kodi_netflix_addon.url }}"
+    dest: "/tmp/{{ kodi_netflix_addon.url | basename }}"
+    checksum: "{{ kodi_netflix_addon.checksum }}"
+    mode: "0600"
+
+# Replaces the whole add-on so files removed upstream do not linger; user settings live in userdata.
+- name: Remove the previous add-on {{ kodi_netflix_addon.id }}
+  become: true
+  ansible.builtin.file:
+    path: "/var/lib/kodi/.kodi/addons/{{ kodi_netflix_addon.id }}"
+    state: absent
+
+- name: Unpack the add-on {{ kodi_netflix_addon.id }}
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ kodi_netflix_addon.url | basename }}"
+    dest: /var/lib/kodi/.kodi/addons
+    remote_src: true
+    owner: kodi
+    group: kodi
+  notify: Restart Kodi
+
+- name: Remove the downloaded add-on {{ kodi_netflix_addon.id }}
+  become: true
+  ansible.builtin.file:
+    path: "/tmp/{{ kodi_netflix_addon.url | basename }}"
+    state: absent

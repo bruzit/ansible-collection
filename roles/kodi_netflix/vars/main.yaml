@@ -1,0 +1,23 @@
+---
+# Kodi major version to the official Kodi repository branch; the Netflix add-on ships one +matrix build for Kodi 19 and later.
+kodi_netflix_branches:
+  19: matrix
+  20: nexus
+  21: omega
+  22: piers
+
+# Not on GitHub releases; pinned, Kodi updates it from the repository itself.
+kodi_netflix_repository_version: 2.0.1
+kodi_netflix_repository_checksum: sha256:887a9e87b9c4e18cb83fd05a7c7da76674c568c9759084f16ed10bfc596b2a41
+
+# Required add-ons of plugin.video.netflix and of their requirements from the official Kodi repository;
+# Kodi ships xbmc.python and script.module.pycryptodome.
+kodi_netflix_dependencies:
+  - script.module.addon.signals
+  - script.module.certifi
+  - script.module.chardet
+  - script.module.idna
+  - script.module.inputstreamhelper
+  - script.module.myconnpy
+  - script.module.requests
+  - script.module.urllib3
