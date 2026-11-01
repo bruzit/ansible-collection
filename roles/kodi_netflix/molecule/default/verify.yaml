@@ -1,0 +1,52 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    kodi_netflix_ids:
+      - repository.castagnait
+      - plugin.video.netflix
+      - script.module.inputstreamhelper
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Fetch the latest Netflix add-on release
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/CastagnaIT/plugin.video.netflix/releases/latest
+      register: kodi_netflix_release
+
+    - name: Find the add-ons
+      ansible.builtin.find:
+        paths: [/var/lib/kodi/.kodi/addons, /usr/share/kodi/addons]
+        file_type: directory
+      register: kodi_netflix_dirs
+
+    - name: Read the manifests of the installed add-ons
+      ansible.builtin.slurp:
+        src: "{{ item }}/addon.xml"
+      loop: "{{ kodi_netflix_dirs.files | map(attribute='path') | select('match', '/var/lib/kodi/') | list }}"
+      register: kodi_netflix_manifests
+
+    - name: Assert Netflix add-on setup
+      vars:
+        kodi_netflix_found: "{{ kodi_netflix_dirs.files | map(attribute='path') | map('basename') | list }}"
+        kodi_netflix_owned: "{{ kodi_netflix_dirs.files | selectattr('path', 'match', '/var/lib/kodi/') | map(attribute='pw_name') | unique }}"
+        kodi_netflix_manifest: >-
+          {{ (kodi_netflix_manifests.results | selectattr('item', 'search', '/plugin\.video\.netflix$') | first).content | b64decode }}
+        kodi_netflix_requires: >-
+          {{ kodi_netflix_manifests.results | map(attribute='content') | map('b64decode')
+             | map('regex_findall', '<import\s[^>]*>') | flatten | reject('search', 'optional="true"')
+             | map('regex_replace', '^.*\saddon="([^"]+)".*$', '\1') | unique }}
+      ansible.builtin.assert:
+        that:
+          - "'kodi-inputstream-adaptive' in ansible_facts.packages"
+          - kodi_netflix_ids | difference(kodi_netflix_found) | length == 0
+          - kodi_netflix_requires | difference(kodi_netflix_found) | length == 0
+          - kodi_netflix_owned == ['kodi']
+          - "('version=\"' ~ (kodi_netflix_release.json.tag_name | regex_replace('^v', '')) ~ '+matrix.') in kodi_netflix_manifest"
+        fail_msg: "Missing: {{ kodi_netflix_ids | union(kodi_netflix_requires) | difference(kodi_netflix_found) | sort | join(', ') }}"
