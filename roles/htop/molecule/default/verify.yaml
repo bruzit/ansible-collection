@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert htop is installed
+      ansible.builtin.assert:
+        that:
+          - "'htop' in ansible_facts['packages']"
+
+    - name: Check htop runs
+      ansible.builtin.command: htop --version
+      register: htop_output
+      changed_when: false
+
+    - name: Assert htop output
+      ansible.builtin.assert:
+        that:
+          - "'htop' in htop_output.stdout"
