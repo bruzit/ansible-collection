@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.59.1](https://github.com/bruzit/ansible-collection/compare/v0.59.0...v0.59.1) (2026-11-02)
+
+### Bug Fixes
+
+* mask sleep targets on kodi hosts ([6aaec9c](https://github.com/bruzit/ansible-collection/commit/6aaec9c4d2390e5af74ecd3ded14bca6f9a80650))
+
 ## [0.59.0](https://github.com/bruzit/ansible-collection/compare/v0.58.1...v0.59.0) (2026-11-01)
 
 ### Features
