@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.59.2](https://github.com/bruzit/ansible-collection/compare/v0.59.1...v0.59.2) (2026-11-02)
+
+### Bug Fixes
+
+* remove ineffective i915 fastboot parameter from kodi ([52814ef](https://github.com/bruzit/ansible-collection/commit/52814ef11a7bb3b8e3e091d3c7ea03aa7b4d43b5))
+
 ## [0.59.1](https://github.com/bruzit/ansible-collection/compare/v0.59.0...v0.59.1) (2026-11-02)
 
 ### Bug Fixes
