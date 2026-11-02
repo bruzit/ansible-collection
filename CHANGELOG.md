@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.60.0](https://github.com/bruzit/ansible-collection/compare/v0.59.2...v0.60.0) (2026-11-02)
+
+### Features
+
+* add htop role ([1613a6a](https://github.com/bruzit/ansible-collection/commit/1613a6ad03c21d91e3c6d4050746b615f3130cb8))
+
 ## [0.59.2](https://github.com/bruzit/ansible-collection/compare/v0.59.1...v0.59.2) (2026-11-02)
 
 ### Bug Fixes
