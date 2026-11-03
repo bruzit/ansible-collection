@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.61.0](https://github.com/bruzit/ansible-collection/compare/v0.60.1...v0.61.0) (2026-11-03)
+
+### Features
+
+* **claude:** set defaultToAgentsView in global config ([e257262](https://github.com/bruzit/ansible-collection/commit/e257262f790930997679b456022747804d60fb5d))
+
 ## [0.60.1](https://github.com/bruzit/ansible-collection/compare/v0.60.0...v0.60.1) (2026-11-03)
 
 ### Bug Fixes
