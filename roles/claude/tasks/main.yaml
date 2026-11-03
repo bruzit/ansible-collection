@@ -59,3 +59,11 @@
   loop: "{{ claude_local_settings }}"
   loop_control:
     label: "{{ item.path }}"
+
+- name: Set Claude Code default agent view in global config
+  ansible.builtin.include_tasks: settings.yaml
+  vars:
+    claude_settings_path: "{{ ansible_facts['env']['HOME'] }}/.claude.json"
+    claude_settings_merge:
+      defaultToAgentsView: "{{ claude_default_agents_view }}"
+  when: claude_default_agents_view is not none

@@ -13,6 +13,11 @@
         src: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
       register: claude_user_settings
 
+    - name: Read Claude Code global config
+      ansible.builtin.slurp:
+        src: "{{ ansible_facts['env']['HOME'] }}/.claude.json"
+      register: claude_global_config
+
     - name: Read Claude Code project local settings
       ansible.builtin.slurp:
         src: "{{ ansible_facts['env']['HOME'] }}/Projects/demo/.claude/settings.local.json"
@@ -37,3 +42,13 @@
           - user_settings.extraKnownMarketplaces['demo-marketplace'].source.source == 'directory'
           - "local_settings == {'enabledPlugins': {'local@demo-marketplace': true}}"
           - claude_project_local_settings_stat.stat.mode == '0600'
+          - "'defaultToAgentsView' not in user_settings"
+
+    - name: Assert Claude Code global config
+      vars:
+        global_config: "{{ claude_global_config.content | b64decode | from_json }}"
+      ansible.builtin.assert:
+        that:
+          - global_config.defaultToAgentsView is true
+          - global_config.numStartups == 3
+        fail_msg: "{{ claude_global_config.content | b64decode }}"

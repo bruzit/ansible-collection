@@ -8,6 +8,11 @@ argument_specs:
         default: {}
         description:
           - Deep-merged into C(~/.claude/settings.json); lists are replaced, other keys kept.
+      claude_default_agents_view:
+        type: bool
+        default: null
+        description:
+          - Sets C(defaultToAgentsView) in C(~/.claude.json) (global config, not C(settings.json)). Unset leaves it alone.
       claude_local_settings:
         type: list
         elements: dict
