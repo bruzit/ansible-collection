@@ -42,6 +42,21 @@
     - { section: network, option: generateResolvConf, value: "false", present: "{{ wsl_dns_gateway }}" }
     - { section: boot, option: command, value: /usr/local/sbin/wsl-resolv-conf, present: "{{ wsl_dns_gateway }}" }
 
+- name: Stat /etc/wsl.conf
+  become: true
+  ansible.builtin.stat:
+    path: /etc/wsl.conf
+  register: wsl_conf_stat
+
+- name: Remove empty managed section headers from /etc/wsl.conf
+  become: true
+  ansible.builtin.replace:
+    path: /etc/wsl.conf
+    regexp: '^\[(network|boot)\]\n(?=\s*(\[|\Z))'
+    replace: ''
+  notify: Remind to restart WSL
+  when: wsl_conf_stat.stat.exists
+
 - name: Create the needrestart drop-in directory
   become: true
   ansible.builtin.file:

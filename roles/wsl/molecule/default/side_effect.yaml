@@ -72,7 +72,7 @@
         that:
           - >-
             (wsl_dns_content[0] | community.general.from_ini) == {
-              'user': {'default': 'molecule'}, 'boot': {'systemd': 'false'}, 'network': {}}
+              'user': {'default': 'molecule'}, 'boot': {'systemd': 'false'}}
           - wsl_dns_content[1] == 'nameserver ' ~ ansible_facts.default_ipv4.gateway ~ '\nsearch example.com example.org\n'
 
 - name: Disable the gateway DNS from a clean state
