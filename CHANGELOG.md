@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.60.1](https://github.com/bruzit/ansible-collection/compare/v0.60.0...v0.60.1) (2026-11-03)
+
+### Bug Fixes
+
+* **wsl:** remove empty managed section headers from wsl.conf ([9df8ce6](https://github.com/bruzit/ansible-collection/commit/9df8ce65d4130fd16e975effa5ccadf6f6ab1dda))
+
 ## [0.60.0](https://github.com/bruzit/ansible-collection/compare/v0.59.2...v0.60.0) (2026-11-02)
 
 ### Features
