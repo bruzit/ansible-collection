@@ -23,6 +23,13 @@
         mode: "0600"
         force: false
 
+    - name: Seed Claude Code global config with unmanaged keys
+      ansible.builtin.copy:
+        content: '{"numStartups": 3}'
+        dest: "{{ ansible_facts['env']['HOME'] }}/.claude.json"
+        mode: "0600"
+        force: false
+
     - name: Create project directory
       ansible.builtin.file:
         path: "{{ ansible_facts['env']['HOME'] }}/Projects/demo"
@@ -31,6 +38,7 @@
 
   roles:
     - role: claude
+      claude_default_agents_view: true
       claude_settings:
         permissions:
           allow:
