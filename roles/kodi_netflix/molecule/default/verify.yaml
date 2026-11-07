@@ -32,6 +32,11 @@
       loop: "{{ kodi_netflix_dirs.files | map(attribute='path') | select('match', '/var/lib/kodi/') | list }}"
       register: kodi_netflix_manifests
 
+    - name: Read the login code of the Netflix add-on
+      ansible.builtin.slurp:
+        src: /var/lib/kodi/.kodi/addons/plugin.video.netflix/resources/lib/services/nfsession/session/access.py
+      register: kodi_netflix_login
+
     - name: Assert Netflix add-on setup
       vars:
         kodi_netflix_found: "{{ kodi_netflix_dirs.files | map(attribute='path') | map('basename') | list }}"
@@ -49,4 +54,5 @@
           - kodi_netflix_requires | difference(kodi_netflix_found) | length == 0
           - kodi_netflix_owned == ['kodi']
           - "('version=\"' ~ (kodi_netflix_release.json.tag_name | regex_replace('^v', '')) ~ '+matrix.') in kodi_netflix_manifest"
+          - not (kodi_netflix_login.content | b64decode | regex_search('(?m)^\\s+raise\\n\\s+common\\.set_credentials'))
         fail_msg: "Missing: {{ kodi_netflix_ids | union(kodi_netflix_requires) | difference(kodi_netflix_found) | sort | join(', ') }}"
