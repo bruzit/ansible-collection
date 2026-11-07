@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.62.1](https://github.com/bruzit/ansible-collection/compare/v0.62.0...v0.62.1) (2026-11-07)
+
+### Bug Fixes
+
+* read the youtube add-on version marker as root ([dffce37](https://github.com/bruzit/ansible-collection/commit/dffce371d952a3fa0b72fb74c8379a7efa643a43))
+
 ## [0.62.0](https://github.com/bruzit/ansible-collection/compare/v0.61.0...v0.62.0) (2026-11-07)
 
 ### Features
