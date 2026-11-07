@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.62.2](https://github.com/bruzit/ansible-collection/compare/v0.62.1...v0.62.2) (2026-11-07)
+
+### Bug Fixes
+
+* patch the removed password check of the netflix login ([b5d0f7d](https://github.com/bruzit/ansible-collection/commit/b5d0f7dcb9bd0535e977ec7cec4e37371bedf662))
+
 ## [0.62.1](https://github.com/bruzit/ansible-collection/compare/v0.62.0...v0.62.1) (2026-11-07)
 
 ### Bug Fixes
