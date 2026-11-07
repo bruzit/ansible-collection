@@ -1,0 +1,27 @@
+---
+- name: Check for GRUB
+  ansible.builtin.stat:
+    path: /etc/default/grub
+  register: grub_default
+
+- name: Configure GRUB
+  when: grub_default.stat.exists
+  block:
+    - name: Create the GRUB drop-in directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/default/grub.d
+        state: directory
+        mode: "0755"
+
+    # Sourced last, so it wins over /etc/default/grub and distribution drop-ins (e.g. 50-cloudimg-settings.cfg)
+    - name: Set the GRUB menu timeout
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/default/grub.d/99-bruzit.cfg
+        content: |
+          GRUB_TIMEOUT_STYLE={{ grub_timeout_style }}
+          GRUB_TIMEOUT={{ grub_timeout }}
+          GRUB_RECORDFAIL_TIMEOUT={{ grub_recordfail_timeout }}
+        mode: "0644"
+      notify: Update GRUB

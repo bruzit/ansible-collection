@@ -1,0 +1,22 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the effective GRUB settings
+      ansible.builtin.shell: |
+        set -e
+        . /etc/default/grub
+        for f in /etc/default/grub.d/*.cfg; do . "$f"; done
+        printf '%s %s %s\n' "$GRUB_TIMEOUT_STYLE" "$GRUB_TIMEOUT" "$GRUB_RECORDFAIL_TIMEOUT"
+      args:
+        executable: /bin/bash
+      register: grub_settings
+      changed_when: false
+
+    - name: Assert the GRUB settings
+      ansible.builtin.assert:
+        that:
+          - grub_settings.stdout == 'menu 10 10'

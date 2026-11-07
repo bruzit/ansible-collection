@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  pre_tasks:
+    # Containers ship no bootloader; Ubuntu's defaults stand in for /etc/default/grub
+    - name: Create a stand-in /etc/default/grub
+      ansible.builtin.copy:
+        dest: /etc/default/grub
+        content: |
+          GRUB_DEFAULT=0
+          GRUB_TIMEOUT_STYLE=hidden
+          GRUB_TIMEOUT=0
+        mode: "0644"
+
+  roles:
+    - role: grub
+      grub_timeout: 10
