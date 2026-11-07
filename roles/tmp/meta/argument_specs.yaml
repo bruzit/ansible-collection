@@ -1,0 +1,17 @@
+---
+argument_specs:
+  main:
+    short_description: /tmp as tmpfs via a systemd tmp.mount, effective after a reboot.
+    options:
+      tmp_size:
+        type: str
+        default: 50%
+        description: tmpfs size, absolute (C(4G)) or share of RAM (C(50%)).
+      tmp_nr_inodes:
+        type: str
+        default: 1m
+        description: Maximum number of inodes.
+      tmp_noexec:
+        type: bool
+        default: false
+        description: Mount with C(noexec); breaks installers that run from /tmp.
