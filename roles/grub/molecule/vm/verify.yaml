@@ -1,0 +1,23 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the generated GRUB configuration
+      ansible.builtin.slurp:
+        src: /boot/grub/grub.cfg
+      register: grub_cfg
+
+    - name: Assert the menu and both timeouts
+      vars:
+        grub_cfg_text: "{{ grub_cfg.content | b64decode }}"
+      ansible.builtin.assert:
+        that:
+          - grub_cfg_text is search('set timeout_style=menu')
+          - grub_cfg_text is search('set timeout=10')
+          - grub_cfg_text is not search('set timeout=30')
+
+    - name: Reboot through the menu timeout
+      ansible.builtin.reboot:

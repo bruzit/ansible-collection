@@ -1,0 +1,17 @@
+---
+argument_specs:
+  main:
+    short_description: GRUB menu timeout via a drop-in in /etc/default/grub.d.
+    options:
+      grub_timeout:
+        type: int
+        default: 5
+        description: Seconds the GRUB menu waits before booting the default entry.
+      grub_timeout_style:
+        type: str
+        default: menu
+        choices: [menu, countdown, hidden]
+        description: GRUB_TIMEOUT_STYLE; C(menu) shows the menu during O(grub_timeout).
+      grub_recordfail_timeout:
+        type: int
+        description: Ubuntu timeout after a failed or interrupted boot; defaults to O(grub_timeout) so unattended hosts do not wait 30 s.
