@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the tmp.mount unit
+      ansible.builtin.slurp:
+        src: /etc/systemd/system/tmp.mount
+      register: tmp_unit
+
+    - name: Assert the mount options
+      ansible.builtin.assert:
+        that:
+          - (tmp_unit.content | b64decode) is search('Options=mode=1777,strictatime,nosuid,nodev,size=25%%,nr_inodes=1m\n')
