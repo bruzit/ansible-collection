@@ -6,3 +6,4 @@
   roles:
     - role: grub
       grub_timeout: 10
+      grub_cmdline_linux_default_extra: [preempt=full]

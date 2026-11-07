@@ -12,8 +12,10 @@
           GRUB_DEFAULT=0
           GRUB_TIMEOUT_STYLE=hidden
           GRUB_TIMEOUT=0
+          GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
         mode: "0644"
 
   roles:
     - role: grub
       grub_timeout: 10
+      grub_cmdline_linux_default_extra: [preempt=full]
