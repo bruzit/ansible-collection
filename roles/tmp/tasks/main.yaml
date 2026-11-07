@@ -1,0 +1,26 @@
+---
+- name: Mount /tmp as tmpfs from the next boot
+  become: true
+  ansible.posix.mount:
+    path: /tmp
+    src: tmpfs
+    fstype: tmpfs
+    opts: mode=1777,strictatime,nosuid,nodev{{ ',noexec' if tmp_noexec else '' }},size={{ tmp_size }},nr_inodes={{ tmp_nr_inodes }}
+    state: present
+
+# Not mounted live: mounting over the live /tmp hides sockets of running sessions
+- name: Read the /tmp file system type
+  ansible.builtin.command: findmnt --noheadings --output FSTYPE --target /tmp
+  register: tmp_fstype
+  changed_when: false
+  check_mode: false
+
+- name: Request a reboot to mount tmpfs
+  become: true
+  ansible.builtin.file:
+    path: /run/reboot-required
+    state: touch
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+  when: tmp_fstype.stdout != 'tmpfs'

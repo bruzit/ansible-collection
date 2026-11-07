@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the /tmp fstab entry
+      ansible.builtin.command: findmnt --fstab --noheadings --output SOURCE,FSTYPE,OPTIONS /tmp
+      register: tmp_fstab
+      changed_when: false
+
+    - name: Assert the mount options
+      ansible.builtin.assert:
+        that:
+          - tmp_fstab.stdout is match('tmpfs\s+tmpfs\s+mode=1777,strictatime,nosuid,nodev,size=25%,nr_inodes=1m$')

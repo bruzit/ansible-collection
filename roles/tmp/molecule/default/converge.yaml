@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  roles:
+    - role: tmp
+      tmp_size: 25%
