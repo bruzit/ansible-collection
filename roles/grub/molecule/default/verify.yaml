@@ -7,7 +7,7 @@
   tasks:
     - name: Read the effective GRUB settings
       ansible.builtin.shell: |
-        set -e
+        set -eo pipefail
         . /etc/default/grub
         for f in /etc/default/grub.d/*.cfg; do . "$f"; done
         printf '%s %s %s|%s\n' "$GRUB_TIMEOUT_STYLE" "$GRUB_TIMEOUT" "$GRUB_RECORDFAIL_TIMEOUT" "$GRUB_CMDLINE_LINUX_DEFAULT"
