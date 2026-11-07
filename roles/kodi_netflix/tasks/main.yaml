@@ -145,6 +145,17 @@
                else 'sha256:' ~ kodi_netflix_mirror ~ '/' ~ item ~ '/' ~ item ~ '-' ~ kodi_netflix_versions[item] ~ '.zip.sha256' }}
       loop: "{{ kodi_netflix_outdated }}"
 
+# Netflix removed the endpoint behind the password check of the key login; upstream issue 1806.
+# Matches only the unfixed code, so it does nothing once an add-on release fixes it.
+- name: Skip the removed password check of the Netflix login
+  become: true
+  ansible.builtin.replace:
+    path: /var/lib/kodi/.kodi/addons/plugin.video.netflix/resources/lib/services/nfsession/session/access.py
+    regexp: '^(\s+raise LoginError\(common\.get_local_string\(12344\)\) from exc\n)\s+raise\n(\s+common\.set_credentials)'
+    replace: "\\1            LOG.warn('Password verification skipped, HTTP error {}', exc.response.status_code)\n\\2"
+  notify: Restart Kodi
+  when: not (ansible_check_mode and kodi_netflix_outdated | length > 0)
+
 - name: Restart Kodi to register the add-ons
   ansible.builtin.meta: flush_handlers
 
