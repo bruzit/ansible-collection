@@ -10,7 +10,7 @@
         set -e
         . /etc/default/grub
         for f in /etc/default/grub.d/*.cfg; do . "$f"; done
-        printf '%s %s %s\n' "$GRUB_TIMEOUT_STYLE" "$GRUB_TIMEOUT" "$GRUB_RECORDFAIL_TIMEOUT"
+        printf '%s %s %s|%s\n' "$GRUB_TIMEOUT_STYLE" "$GRUB_TIMEOUT" "$GRUB_RECORDFAIL_TIMEOUT" "$GRUB_CMDLINE_LINUX_DEFAULT"
       args:
         executable: /bin/bash
       register: grub_settings
@@ -19,4 +19,4 @@
     - name: Assert the GRUB settings
       ansible.builtin.assert:
         that:
-          - grub_settings.stdout == 'menu 10 10'
+          - grub_settings.stdout == 'menu 10 10|quiet splash preempt=full'
