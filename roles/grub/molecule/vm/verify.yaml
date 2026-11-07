@@ -18,6 +18,17 @@
           - grub_cfg_text is search('set timeout_style=menu')
           - grub_cfg_text is search('set timeout=10')
           - grub_cfg_text is not search('set timeout=30')
+          - grub_cfg_text is search('linux\\s.*preempt=full')
 
     - name: Reboot through the menu timeout
       ansible.builtin.reboot:
+
+    - name: Read the kernel command line
+      ansible.builtin.slurp:
+        src: /proc/cmdline
+      register: grub_proc_cmdline
+
+    - name: Assert the extra kernel argument is active
+      ansible.builtin.assert:
+        that:
+          - (grub_proc_cmdline.content | b64decode) is search('preempt=full')
