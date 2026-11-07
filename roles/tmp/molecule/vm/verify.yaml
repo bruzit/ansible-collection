@@ -1,0 +1,27 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Stat the reboot request
+      ansible.builtin.stat:
+        path: /run/reboot-required
+      register: tmp_reboot_required
+
+    - name: Reboot to mount tmpfs
+      ansible.builtin.reboot:
+
+    - name: Read the /tmp mount
+      ansible.builtin.command: findmnt --noheadings --output FSTYPE,OPTIONS --target /tmp
+      register: tmp_mount
+      changed_when: false
+
+    - name: Assert tmpfs with nosuid and nodev
+      ansible.builtin.assert:
+        that:
+          - tmp_reboot_required.stat.exists or tmp_mount.stdout is match('tmpfs')
+          - tmp_mount.stdout is match('tmpfs\s')
+          - tmp_mount.stdout is search('nosuid')
+          - tmp_mount.stdout is search('nodev')
