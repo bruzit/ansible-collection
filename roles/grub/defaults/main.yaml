@@ -2,3 +2,4 @@
 grub_timeout: 5
 grub_timeout_style: menu
 grub_recordfail_timeout: "{{ grub_timeout }}"
+grub_cmdline_linux_default_extra: []

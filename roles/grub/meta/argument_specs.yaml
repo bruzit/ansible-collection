@@ -1,7 +1,7 @@
 ---
 argument_specs:
   main:
-    short_description: GRUB menu timeout via a drop-in in /etc/default/grub.d.
+    short_description: GRUB menu timeout and extra kernel arguments via a drop-in in /etc/default/grub.d.
     options:
       grub_timeout:
         type: int
@@ -15,3 +15,8 @@ argument_specs:
       grub_recordfail_timeout:
         type: int
         description: Ubuntu timeout after a failed or interrupted boot; defaults to O(grub_timeout) so unattended hosts do not wait 30 s.
+      grub_cmdline_linux_default_extra:
+        type: list
+        elements: str
+        default: []
+        description: Kernel arguments appended to GRUB_CMDLINE_LINUX_DEFAULT, e.g. C(preempt=full); effective after a reboot.

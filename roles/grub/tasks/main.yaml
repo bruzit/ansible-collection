@@ -15,7 +15,7 @@
         mode: "0755"
 
     # Sourced last, so it wins over /etc/default/grub and distribution drop-ins (e.g. 50-cloudimg-settings.cfg)
-    - name: Set the GRUB menu timeout
+    - name: Set the GRUB menu and kernel arguments
       become: true
       ansible.builtin.copy:
         dest: /etc/default/grub.d/99-bruzit.cfg
@@ -23,5 +23,8 @@
           GRUB_TIMEOUT_STYLE={{ grub_timeout_style }}
           GRUB_TIMEOUT={{ grub_timeout }}
           GRUB_RECORDFAIL_TIMEOUT={{ grub_recordfail_timeout }}
+          {% if grub_cmdline_linux_default_extra %}
+          GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT {{ grub_cmdline_linux_default_extra | join(' ') }}"
+          {% endif %}
         mode: "0644"
       notify: Update GRUB
