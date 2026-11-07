@@ -24,6 +24,7 @@
          | first | default('', true) | regex_replace('^sha256:', '') }}
 
 - name: Read the installed version of the YouTube add-on
+  become: true
   ansible.builtin.slurp:
     src: "{{ kodi_youtube_dir }}/.version"
   register: kodi_youtube_marker
