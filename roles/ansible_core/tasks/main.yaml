@@ -1,0 +1,6 @@
+---
+- name: Install ansible-core
+  become: true
+  ansible.builtin.apt:
+    name: ansible-core
+    state: present

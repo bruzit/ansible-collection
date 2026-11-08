@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert ansible-core is installed
+      ansible.builtin.assert:
+        that:
+          - "'ansible-core' in ansible_facts['packages']"
+
+    - name: Check ansible runs
+      ansible.builtin.command: ansible --version
+      register: ansible_core_output
+      changed_when: false
+
+    - name: Assert ansible output
+      ansible.builtin.assert:
+        that:
+          - ansible_core_output.stdout_lines[0] is match('ansible \[core ')
