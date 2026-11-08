@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.64.0](https://github.com/bruzit/ansible-collection/compare/v0.63.0...v0.64.0) (2026-11-08)
+
+### Features
+
+* add ansible_core role ([094bce3](https://github.com/bruzit/ansible-collection/commit/094bce31452510d94cbf00d87834a754ca14a319))
+
 ## [0.63.0](https://github.com/bruzit/ansible-collection/compare/v0.62.2...v0.63.0) (2026-11-08)
 
 ### Features
