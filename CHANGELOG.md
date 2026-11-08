@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.63.0](https://github.com/bruzit/ansible-collection/compare/v0.62.2...v0.63.0) (2026-11-08)
+
+### Features
+
+* **grub:** append extra kernel arguments ([2cea322](https://github.com/bruzit/ansible-collection/commit/2cea3223993bcb67a3ec216feb3ef8cd40819c28))
+
 ## [0.62.2](https://github.com/bruzit/ansible-collection/compare/v0.62.1...v0.62.2) (2026-11-07)
 
 ### Bug Fixes
