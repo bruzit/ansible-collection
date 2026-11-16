@@ -13,6 +13,13 @@ argument_specs:
         default: null
         description:
           - Sets C(defaultToAgentsView) in C(~/.claude.json) (global config, not C(settings.json)). Unset leaves it alone.
+      claude_statusline_src:
+        type: path
+        default: null
+        description:
+          - Copied to C(~/.claude/statusline.sh) (mode C(0755)) and set as C(statusLine) command in C(~/.claude/settings.json). Unset leaves both alone.
+          - Other C(statusLine) keys come from C(claude_settings).
+          - The script needs C(jq) at run time.
       claude_local_settings:
         type: list
         elements: dict
