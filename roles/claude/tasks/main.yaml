@@ -44,12 +44,29 @@
         path: "/tmp/claude-{{ claude_version }}-{{ claude_platform }}"
         state: absent
 
+- name: Install Claude Code status line script
+  when: claude_statusline_src is not none
+  block:
+    - name: Create Claude Code directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.claude"
+        state: directory
+        mode: "0700"
+
+    - name: Copy Claude Code status line script
+      ansible.builtin.copy:
+        src: "{{ claude_statusline_src }}"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.claude/statusline.sh"
+        mode: "0755"
+
 - name: Merge Claude Code user settings
   ansible.builtin.include_tasks: settings.yaml
   vars:
     claude_settings_path: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
-    claude_settings_merge: "{{ claude_settings }}"
-  when: claude_settings | length > 0
+    claude_settings_merge: >-
+      {{ claude_settings | combine({'statusLine': {'type': 'command', 'command': '~/.claude/statusline.sh'}}
+         if claude_statusline_src is not none else {}, recursive=true) }}
+  when: claude_settings | length > 0 or claude_statusline_src is not none
 
 - name: Merge Claude Code project local settings
   ansible.builtin.include_tasks: settings.yaml

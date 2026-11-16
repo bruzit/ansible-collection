@@ -2,3 +2,4 @@
 claude_settings: {}
 claude_local_settings: []
 claude_default_agents_view: null
+claude_statusline_src: null

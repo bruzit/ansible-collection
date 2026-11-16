@@ -13,6 +13,11 @@
         src: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
       register: claude_user_settings
 
+    - name: Stat Claude Code status line script
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['env']['HOME'] }}/.claude/statusline.sh"
+      register: claude_statusline_stat
+
     - name: Read Claude Code global config
       ansible.builtin.slurp:
         src: "{{ ansible_facts['env']['HOME'] }}/.claude.json"
@@ -42,6 +47,8 @@
           - user_settings.extraKnownMarketplaces['demo-marketplace'].source.source == 'directory'
           - "local_settings == {'enabledPlugins': {'local@demo-marketplace': true}}"
           - claude_project_local_settings_stat.stat.mode == '0600'
+          - claude_statusline_stat.stat.mode == '0755'
+          - "user_settings.statusLine == {'refreshInterval': 60, 'type': 'command', 'command': '~/.claude/statusline.sh'}"
           - "'defaultToAgentsView' not in user_settings"
 
     - name: Assert Claude Code global config
