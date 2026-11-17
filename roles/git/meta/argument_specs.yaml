@@ -13,3 +13,8 @@ argument_specs:
             C(~/Projects/repo) if absent, never updated) and C(signing_key) (path to the SSH commit and tag signing
             private key, e.g. C(~/.ssh/id_ed25519_signing), generated if absent, never overwritten; requires C(email)).
           - Other keys are ignored, so the same list can be passed to other roles, such as C(users).
+      git_lfs:
+        type: bool
+        default: false
+        description:
+          - Install C(git-lfs) and set its C(filter.lfs.*) in C(/etc/gitconfig) for all users, as C(git lfs install --system) does.

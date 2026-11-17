@@ -17,6 +17,7 @@
 
   roles:
     - role: git
+      git_lfs: true
       git_users:
         - name: molecule
           full_name: Molecule Tester
