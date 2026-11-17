@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.68.0](https://github.com/bruzit/ansible-collection/compare/v0.67.0...v0.68.0) (2026-11-17)
+
+### Features
+
+* **playwright_deps:** add role installing playwright system libraries ([1aaa7b8](https://github.com/bruzit/ansible-collection/commit/1aaa7b8afb49bc981e6f297c2e20bd1821b6281c))
+
 ## [0.67.0](https://github.com/bruzit/ansible-collection/compare/v0.66.1...v0.67.0) (2026-11-17)
 
 ### Features
