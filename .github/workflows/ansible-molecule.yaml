@@ -64,9 +64,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
-
       - name: Install dependencies
         run: >
           pip install
@@ -114,9 +111,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-system-x86 qemu-utils cloud-image-utils cpu-checker
           kvm-ok || (echo "KVM not available" && exit 1)
-
-      - name: Set up Python
-        uses: actions/setup-python@v7
 
       - name: Install Ansible and Molecule
         run: pip install "ansible-core~=${{ matrix.core }}.0" molecule "molecule-plugins[docker]"
