@@ -1,0 +1,27 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read the NFS fstab entries
+      ansible.builtin.command: findmnt --fstab --noheadings --output SOURCE,TARGET,FSTYPE,OPTIONS --types nfs
+      register: nfs_client_fstab
+      changed_when: false
+
+    - name: Assert the automounts
+      ansible.builtin.assert:
+        that:
+          - nfs_client_fstab.stdout_lines | length == 2
+          - nfs_client_fstab.stdout_lines[0] is match('nas0:/volume1/mm\s+/mnt/nas0/mm\s+nfs\s+ro,nofail,_netdev,x-systemd.automount$')
+          - nfs_client_fstab.stdout_lines[1] is match('nas1:/volume2/mb\s+/mnt/nas1/mb\s+nfs\s+rw,nofail,_netdev,x-systemd.automount$')
+
+    - name: Check mount.nfs
+      ansible.builtin.stat:
+        path: /usr/sbin/mount.nfs
+      register: nfs_client_helper
+
+    - name: Assert the NFS client is installed
+      ansible.builtin.assert:
+        that: nfs_client_helper.stat.exists

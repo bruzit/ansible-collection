@@ -1,0 +1,23 @@
+---
+argument_specs:
+  main:
+    short_description: NFS client with systemd automounts from /etc/fstab.
+    options:
+      nfs_client_mounts:
+        type: list
+        elements: dict
+        default: []
+        description: NFS exports mounted on first access; a missing server never blocks boot.
+        options:
+          src:
+            type: str
+            required: true
+            description: Export, C(host:/path).
+          path:
+            type: str
+            required: true
+            description: Mount point.
+          ro:
+            type: bool
+            default: false
+            description: Mount read-only.
