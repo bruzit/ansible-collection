@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.69.0](https://github.com/bruzit/ansible-collection/compare/v0.68.0...v0.69.0) (2026-11-17)
+
+### Features
+
+* **nfs_client:** add role mounting nfs exports on demand ([a061651](https://github.com/bruzit/ansible-collection/commit/a06165114da725cfdb0aaa3c44f133e41bac8213))
+
 ## [0.68.0](https://github.com/bruzit/ansible-collection/compare/v0.67.0...v0.68.0) (2026-11-17)
 
 ### Features
