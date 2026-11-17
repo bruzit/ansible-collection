@@ -1,4 +1,8 @@
 ---
+provisioner:
+  playbooks:
+    converge: converge.yaml
+
 scenario:
   # The converge deliberately notifies the reboot handler via an
   # always-changed task to exercise the no-reboot path, so it can never

@@ -1,4 +1,5 @@
 ---
 provisioner:
   playbooks:
+    converge: converge.yaml
     prepare: prepare.yaml

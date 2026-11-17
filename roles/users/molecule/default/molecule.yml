@@ -1,4 +1,8 @@
 ---
+provisioner:
+  playbooks:
+    converge: converge.yaml
+
 scenario:
   # First check runs on a fresh host, where the accounts do not exist yet.
   test_sequence:

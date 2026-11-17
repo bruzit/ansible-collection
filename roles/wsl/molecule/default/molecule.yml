@@ -21,6 +21,7 @@ platforms:
 
 provisioner:
   playbooks:
+    converge: converge.yaml
     prepare: prepare.yaml
     side_effect: side_effect.yaml
 

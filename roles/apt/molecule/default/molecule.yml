@@ -1,1 +1,6 @@
 ---
+provisioner:
+  inventory:
+    group_vars:
+      all:
+        nftables_enabled: false
