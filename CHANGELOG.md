@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.66.0](https://github.com/bruzit/ansible-collection/compare/v0.65.0...v0.66.0) (2026-11-17)
+
+### Features
+
+* **tmp:** add role mounting /tmp as tmpfs ([87c068c](https://github.com/bruzit/ansible-collection/commit/87c068cf0a4dfc83dbca907e526eb7c0fc784bab))
+
 ## [0.65.0](https://github.com/bruzit/ansible-collection/compare/v0.64.0...v0.65.0) (2026-11-17)
 
 ### Features
