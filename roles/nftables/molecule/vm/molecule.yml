@@ -11,6 +11,7 @@ platforms:
 
 provisioner:
   playbooks:
+    converge: converge.yaml
     prepare: prepare.yaml
   options:
     diff: true
