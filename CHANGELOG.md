@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.67.0](https://github.com/bruzit/ansible-collection/compare/v0.66.1...v0.67.0) (2026-11-17)
+
+### Features
+
+* **git:** add git_lfs option ([7e6d307](https://github.com/bruzit/ansible-collection/commit/7e6d307d979c007b598599695f6642d674837a3f))
+
 ## [0.66.1](https://github.com/bruzit/ansible-collection/compare/v0.66.0...v0.66.1) (2026-11-17)
 
 ### Bug Fixes
