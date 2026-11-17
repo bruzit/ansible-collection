@@ -1,0 +1,19 @@
+---
+- name: Install the NFS client
+  become: true
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present
+
+- name: Add the NFS automounts to /etc/fstab
+  become: true
+  ansible.posix.mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: nfs
+    opts: "{{ 'ro' if item.ro | default(false) else 'rw' }},nofail,_netdev,x-systemd.automount"
+    state: present
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.path }}"
+  notify: Activate the NFS automounts
