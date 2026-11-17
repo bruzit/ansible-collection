@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.65.0](https://github.com/bruzit/ansible-collection/compare/v0.64.0...v0.65.0) (2026-11-17)
+
+### Features
+
+* **claude:** add claude_statusline_src option ([939d744](https://github.com/bruzit/ansible-collection/commit/939d7441346c1298d182932d9b3ef284ed30d15a))
+
 ## [0.64.0](https://github.com/bruzit/ansible-collection/compare/v0.63.0...v0.64.0) (2026-11-08)
 
 ### Features
