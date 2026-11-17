@@ -1,0 +1,22 @@
+---
+- name: Assert the Ubuntu release has a Playwright dependency list
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['distribution'] == 'Ubuntu'
+      - ansible_facts['distribution_version'] in ['24.04', '26.04']
+    fail_msg: >-
+      No Playwright dependency list for {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }};
+      supported: Ubuntu 24.04, 26.04
+    quiet: true
+
+- name: Load the Playwright dependency list
+  ansible.builtin.include_vars: ubuntu-{{ ansible_facts['distribution_version'] }}.yaml
+
+- name: Install the Playwright system dependencies
+  become: true
+  ansible.builtin.apt:
+    name: >-
+      {{ (playwright_deps_packages['tools']
+          + playwright_deps_browsers | map('extract', playwright_deps_packages) | flatten) | unique }}
+    install_recommends: false
+    state: present
