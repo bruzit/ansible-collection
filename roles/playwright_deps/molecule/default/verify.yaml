@@ -1,0 +1,18 @@
+---
+- name: Verify
+  hosts: all
+
+  tasks:
+    - name: Load the Playwright dependency list
+      ansible.builtin.include_vars: ../../vars/ubuntu-{{ ansible_facts['distribution_version'] }}.yaml
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert every listed package is installed
+      vars:
+        playwright_deps_missing: "{{ playwright_deps_packages.values() | flatten | unique | difference(ansible_facts['packages'].keys()) }}"
+      ansible.builtin.assert:
+        that: playwright_deps_missing | length == 0
+        fail_msg: "Not installed: {{ playwright_deps_missing | join(', ') }}"

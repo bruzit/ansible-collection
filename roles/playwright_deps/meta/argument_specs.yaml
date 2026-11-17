@@ -1,0 +1,14 @@
+---
+argument_specs:
+  main:
+    short_description: Install the system libraries and fonts Playwright browsers need, from the Ubuntu archive.
+    description:
+      - Browsers stay per project, installed by C(npx playwright install) into the user cache.
+    options:
+      playwright_deps_browsers:
+        type: list
+        elements: str
+        choices: [chromium, firefox, webkit]
+        default: [chromium]
+        description:
+          - Browsers whose libraries are installed; Playwright's tools and fonts are always installed.
