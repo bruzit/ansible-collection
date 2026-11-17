@@ -39,7 +39,7 @@
   roles:
     - role: claude
       claude_default_agents_view: true
-      claude_statusline_src: "{{ playbook_dir }}/statusline.sh"
+      claude_statusline_src: "{{ playbook_dir }}/statusline"
       claude_settings:
         statusLine:
           refreshInterval: 60

@@ -56,7 +56,7 @@
     - name: Copy Claude Code status line script
       ansible.builtin.copy:
         src: "{{ claude_statusline_src }}"
-        dest: "{{ ansible_facts['env']['HOME'] }}/.claude/statusline.sh"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.claude/statusline"
         mode: "0755"
 
 - name: Merge Claude Code user settings
@@ -64,7 +64,7 @@
   vars:
     claude_settings_path: "{{ ansible_facts['env']['HOME'] }}/.claude/settings.json"
     claude_settings_merge: >-
-      {{ claude_settings | combine({'statusLine': {'type': 'command', 'command': '~/.claude/statusline.sh'}}
+      {{ claude_settings | combine({'statusLine': {'type': 'command', 'command': '~/.claude/statusline'}}
          if claude_statusline_src is not none else {}, recursive=true) }}
   when: claude_settings | length > 0 or claude_statusline_src is not none
 
