@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.66.1](https://github.com/bruzit/ansible-collection/compare/v0.66.0...v0.66.1) (2026-11-17)
+
+### Bug Fixes
+
+* **claude:** install status line script without extension ([3d8cb36](https://github.com/bruzit/ansible-collection/commit/3d8cb363b2594182ec6898450164332879cc0860))
+
 ## [0.66.0](https://github.com/bruzit/ansible-collection/compare/v0.65.0...v0.66.0) (2026-11-17)
 
 ### Features
