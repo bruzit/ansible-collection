@@ -9,8 +9,25 @@
 - name: Install git
   become: true
   ansible.builtin.package:
-    name: git
+    name: "{{ ['git'] + (['git-lfs'] if git_lfs else []) }}"
     state: present
+
+- name: Set git-lfs filters system-wide
+  become: true
+  community.general.git_config:
+    name: filter.lfs.{{ item.key }}
+    scope: system
+    value: "{{ item.value }}"
+  loop: "{{ git_lfs_filters | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  vars:
+    git_lfs_filters:
+      clean: git-lfs clean -- %f
+      smudge: git-lfs smudge -- %f
+      process: git-lfs filter-process
+      required: "true"
+  when: git_lfs
 
 - name: Set git push.autoSetupRemote to true
   community.general.git_config:
