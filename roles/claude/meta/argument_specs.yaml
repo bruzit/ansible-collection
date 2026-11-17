@@ -17,7 +17,7 @@ argument_specs:
         type: path
         default: null
         description:
-          - Copied to C(~/.claude/statusline.sh) (mode C(0755)) and set as C(statusLine) command in C(~/.claude/settings.json). Unset leaves both alone.
+          - Copied to C(~/.claude/statusline) (mode C(0755)) and set as C(statusLine) command in C(~/.claude/settings.json). Unset leaves both alone.
           - Other C(statusLine) keys come from C(claude_settings).
           - The script needs C(jq) at run time.
       claude_local_settings:
