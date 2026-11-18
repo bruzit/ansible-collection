@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.69.1](https://github.com/bruzit/ansible-collection/compare/v0.69.0...v0.69.1) (2026-11-18)
+
+### Bug Fixes
+
+* **kodi_netflix:** retry add-on downloads and authenticate github api ([8da00b3](https://github.com/bruzit/ansible-collection/commit/8da00b3a31a3d8129db3e269d7cfafda470b81f2))
+
 ## [0.69.0](https://github.com/bruzit/ansible-collection/compare/v0.68.0...v0.69.0) (2026-11-17)
 
 ### Features
