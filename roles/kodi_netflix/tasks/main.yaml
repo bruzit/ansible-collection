@@ -23,6 +23,7 @@
 - name: Fetch the latest Netflix add-on release
   ansible.builtin.uri:
     url: https://api.github.com/repos/CastagnaIT/plugin.video.netflix/releases/latest
+    headers: "{{ {'Authorization': 'Bearer ' ~ lookup('env', 'GITHUB_TOKEN')} if lookup('env', 'GITHUB_TOKEN') else {} }}"
   register: kodi_netflix_release
   until: kodi_netflix_release is succeeded
   retries: 3

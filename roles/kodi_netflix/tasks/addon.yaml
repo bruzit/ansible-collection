@@ -6,6 +6,11 @@
     dest: "/tmp/{{ kodi_netflix_addon.url | basename }}"
     checksum: "{{ kodi_netflix_addon.checksum }}"
     mode: "0600"
+    timeout: 60
+  register: kodi_netflix_download
+  until: kodi_netflix_download is succeeded
+  retries: 3
+  delay: 5
 
 # Replaces the whole add-on so files removed upstream do not linger; user settings live in userdata.
 - name: Remove the previous add-on {{ kodi_netflix_addon.id }}
