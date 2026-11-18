@@ -20,3 +20,24 @@ argument_specs:
         description: >-
           Password of the C(kodi) web server user; set enables remote control over HTTP 8080 and JSON-RPC 9090
           from other systems, empty disables it.
+      kodi_sources:
+        type: list
+        elements: dict
+        default: []
+        description: >-
+          Media sources written to C(sources.xml), replacing sources added in the UI; empty leaves the file to Kodi.
+          Content type and scraper of a video source stay manual (Set content).
+        options:
+          type:
+            type: str
+            required: true
+            choices: [video, music, pictures]
+            description: Source section.
+          name:
+            type: str
+            required: true
+            description: Name shown in Kodi.
+          path:
+            type: str
+            required: true
+            description: Directory, e.g. C(/mnt/nas0/mm/Videa).

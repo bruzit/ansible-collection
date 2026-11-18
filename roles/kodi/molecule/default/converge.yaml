@@ -8,6 +8,13 @@
     kodi_monitor: HDMI-A-1
     kodi_audio_device: ALSA:hdmi:CARD=PCH,DEV=0|HDA Intel PCH
     kodi_webserver_password: molecule
+    kodi_sources:
+      - type: video
+        name: Videa
+        path: /mnt/nas0/mm/Videa
+      - type: music
+        name: Hudba & co
+        path: /mnt/nas0/mm/Hudba/
 
   pre_tasks:
     # Ubuntu Server ships systemd; the container image does not, and it brings the render and input groups.

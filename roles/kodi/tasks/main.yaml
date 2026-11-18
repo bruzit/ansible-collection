@@ -151,9 +151,21 @@
     label: "{{ item.id }}"
   no_log: "{{ item.id == 'services.webserverpassword' }}"
 
+# Kodi reads sources.xml only at start.
+- name: Write the Kodi sources
+  become: true
+  ansible.builtin.template:
+    src: sources.xml.j2
+    dest: /var/lib/kodi/.kodi/userdata/sources.xml
+    owner: kodi
+    group: kodi
+    mode: "0600"
+  when: kodi_sources | length > 0
+  register: kodi_sources_file
+
 - name: Start Kodi
   become: true
   ansible.builtin.systemd_service:
     name: kodi
-    state: "{{ 'restarted' if kodi_unit is changed else 'started' }}"
+    state: "{{ 'restarted' if kodi_unit is changed or kodi_sources_file is changed else 'started' }}"
   when: kodi_systemd.stat.exists and not (ansible_check_mode and kodi_unit is changed)

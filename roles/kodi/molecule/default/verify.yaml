@@ -46,6 +46,25 @@
         src: /var/lib/kodi/.kodi/userdata/guisettings.xml
       register: kodi_settings
 
+    - name: Read the Kodi sources metadata
+      ansible.builtin.stat:
+        path: /var/lib/kodi/.kodi/userdata/sources.xml
+      register: kodi_sources_stat
+
+    - name: Read the Kodi video source
+      community.general.xml:
+        path: /var/lib/kodi/.kodi/userdata/sources.xml
+        xpath: /sources/video/source/path
+        content: text
+      register: kodi_video_source
+
+    - name: Read the Kodi music source
+      community.general.xml:
+        path: /var/lib/kodi/.kodi/userdata/sources.xml
+        xpath: /sources/music/source/name
+        content: text
+      register: kodi_music_source
+
     - name: Assert Kodi setup
       ansible.builtin.assert:
         that:
@@ -65,3 +84,7 @@
           - "'<setting id=\"services.webserver\">true</setting>' in (kodi_settings.content | b64decode)"
           - "'<setting id=\"services.esallinterfaces\">true</setting>' in (kodi_settings.content | b64decode)"
           - "'<setting id=\"services.webserverpassword\">molecule</setting>' in (kodi_settings.content | b64decode)"
+          - kodi_sources_stat.stat.pw_name == 'kodi'
+          - kodi_sources_stat.stat.mode == '0600'
+          - "kodi_video_source.matches == [{'path': '/mnt/nas0/mm/Videa/'}]"
+          - "kodi_music_source.matches == [{'name': 'Hudba & co'}]"
