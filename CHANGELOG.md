@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.70.0](https://github.com/bruzit/ansible-collection/compare/v0.69.1...v0.70.0) (2026-11-18)
+
+### Features
+
+* **kodi:** add kodi_sources writing sources.xml ([9720b0a](https://github.com/bruzit/ansible-collection/commit/9720b0a7c83f408d906039773fd7044a1de8fd55))
+
 ## [0.69.1](https://github.com/bruzit/ansible-collection/compare/v0.69.0...v0.69.1) (2026-11-18)
 
 ### Bug Fixes
