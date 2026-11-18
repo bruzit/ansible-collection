@@ -1,0 +1,15 @@
+<sources>
+{% for type in ['video', 'music', 'pictures'] %}
+{% set sources = kodi_sources | selectattr('type', 'equalto', type) | list %}
+{% if sources %}
+    <{{ type }}>
+{% for source in sources %}
+        <source>
+            <name>{{ source.name | e }}</name>
+            <path pathversion="1">{{ source.path.rstrip('/') | e }}/</path>
+        </source>
+{% endfor %}
+    </{{ type }}>
+{% endif %}
+{% endfor %}
+</sources>
