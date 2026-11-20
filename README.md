@@ -71,12 +71,12 @@ Ansible collection of Molecule-tested roles that provision and maintain Kubuntu 
 | `bruzit.ansible.wsl`                 | WSL tweaks: default user, snapd purged, browser via rundll32. `wsl_default_user` [string, required]. `wsl_dns_gateway` [boolean, default `false`] DNS via the WSL NAT gateway, now and as `[boot] command` (fails if set otherwise); false undoes it. `wsl_dns_search` [list, default `[]`] Search domains. `wsl_systemd` [boolean, default `false`] Boot with systemd; WSL guards interop itself. `/etc/wsl.conf` changes need `wsl --shutdown` from Windows.                                                                                                                                                         | apt              |                                                               |
 | `bruzit.ansible.yq`                  | yq YAML processor from checksum-verified GitHub releases.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | upstream         | `bruzit.ansible.github_binary`                                |
 
-- Channel `apt` is the Ubuntu archive, `vendor apt` the vendor apt repository, `upstream` checksum- or digest-verified release downloads.
+- Channel `apt` is the Ubuntu archive, `vendor apt` the vendor's apt repository, `upstream` release downloads verified by checksum or digest.
 - `bitwarden_cli` upstream: Snap needs systemd, WSL runs without it (`wsl_systemd: false`).
-- `claude` vendor installer, checksum verified: npm install deprecated.
+- `claude` vendor installer, checksum verified: the npm install is deprecated.
 - `starship` upstream: not in apt on 24.04, Snap from an unverified publisher.
 - `widelands` Flatpak: apt release too old for online play.
-- `yq` upstream: apt `yq` is the Python jq wrapper, the strict Snap cannot read hidden files or `/etc`.
+- `yq` upstream: apt `yq` is the Python jq wrapper, and the strict Snap can't read hidden files or `/etc`.
 
 ### Behaviour by Environment
 
@@ -124,8 +124,8 @@ Roles that behave differently depending on the target environment; unlisted role
 | `bruzit.ansible.yq`              |                                                                           | amd64 only           |                |                                         |                                     |                            |                                      |                                         |
 
 - Ubuntu release: the vendor apt suite is the release codename, so a new release waits for the vendor repository.
-- systemd running: `/run/systemd/system` exists, absent in containers and on WSL with the `wsl` role unless `wsl_systemd`; `users` checks the `service_mgr` fact instead.
-- nftables: `nftables_enabled` defaults to false on WSL (`microsoft` in the kernel release or `/proc/sys/fs/binfmt_misc/WSLInterop`); `false` skips the role and the drop-ins its consumers add via `tasks_from: rules`; `nftables_mode` `audit` logs and accepts, `enforce` logs and drops, `quiet` drops.
+- systemd running: `/run/systemd/system` exists; it's absent in containers, and on WSL with the `wsl` role unless `wsl_systemd`. `users` checks the `service_mgr` fact instead.
+- nftables: `nftables_enabled` defaults to false on WSL (`microsoft` in the kernel release or `/proc/sys/fs/binfmt_misc/WSLInterop`). `false` skips the role and the drop-ins its consumers add via `tasks_from: rules`. `nftables_mode`: `audit` logs and accepts, `enforce` logs and drops, `quiet` drops.
 - Roles using `apt_source` or `github_binary` inherit their check mode and architecture behaviour.
 
 ## Requirements
@@ -175,7 +175,7 @@ Update the Roles and Behaviour by Environment tables when a role is added, chang
 
 ## Support
 
-Community, best effort; [open a GitHub issue](../../issues).
+[Open a GitHub issue](../../issues). I answer best effort, as a community project.
 
 ## Development
 
@@ -188,9 +188,9 @@ ansible-galaxy collection install --force "${GALAXY_BUILD_OUTPUT##* }"
 
 ## Testing
 
-Run `molecule test` in `roles/<role>`; shared Docker platforms in [`.config/molecule/config.yml`](.config/molecule/config.yml). All Ubuntu versions with standard support should be tested; desktop-only roles only Kubuntu-supported releases (flavour LTS gets 3 years).
+Run `molecule test` in `roles/<role>`; the shared Docker platforms are in [`.config/molecule/config.yml`](.config/molecule/config.yml). Test all Ubuntu versions with standard support; test desktop-only roles on Kubuntu-supported releases only (flavour LTS gets 3 years).
 CI tests only changed roles and their dependants; changes to shared Molecule or CI config test all roles.
-`snap` is tested in Docker for the `snapd` package only; snapd needs systemd, which containers lack, and has no VM scenario.
+`snap` is tested in Docker for the `snapd` package only: snapd needs systemd, which containers lack, and the role has no VM scenario.
 
 ## Integration and Deployment
 
@@ -203,7 +203,7 @@ CI tests only changed roles and their dependants; changes to shared Molecule or 
 
 ## Contributing
 
-Open a pull request to `main`. Commits follow the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/), from which semantic-release sets versions and the changelog automatically.
+Open a pull request to `main`. Write commits per the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/); semantic-release sets the version and changelog from them.
 
 ## License and Copyright
 
