@@ -1,0 +1,6 @@
+---
+argument_specs:
+  main:
+    short_description: Install the Bitwarden desktop app from Flathub.
+    description:
+      - Flatpak, not apt; the Ubuntu archive has no Bitwarden desktop package and the vendor C(.deb) has no apt repository.

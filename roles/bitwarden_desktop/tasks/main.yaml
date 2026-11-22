@@ -1,0 +1,6 @@
+---
+- name: Install Bitwarden
+  become: true
+  community.general.flatpak:
+    name: com.bitwarden.desktop
+    state: present
