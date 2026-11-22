@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.71.0](https://github.com/bruzit/ansible-collection/compare/v0.70.0...v0.71.0) (2026-11-22)
+
+### Features
+
+* **nfs_client:** allow nfs out through nftables ([def5256](https://github.com/bruzit/ansible-collection/commit/def5256c773feea17f88b7a7417574098bd48974))
+
 ## [0.70.0](https://github.com/bruzit/ansible-collection/compare/v0.69.1...v0.70.0) (2026-11-18)
 
 ### Features
