@@ -1,0 +1,8 @@
+---
+- name: Install LibreOffice
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libreoffice
+      - "{{ 'libreoffice-kf6' if ansible_facts['distribution_version'] is version('26.04', '>=') else 'libreoffice-kf5' }}"
+    state: present
