@@ -3,6 +3,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        nftables_enabled: false
         nfs_client_mounts:
           - src: nas0:/volume1/mm
             path: /mnt/nas0/mm
