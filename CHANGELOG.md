@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.74.0](https://github.com/bruzit/ansible-collection/compare/v0.73.0...v0.74.0) (2026-11-22)
+
+### Features
+
+* **libreoffice:** add role installing libreoffice from apt ([a12db53](https://github.com/bruzit/ansible-collection/commit/a12db53646147af29688e2ed3c6282560bbb8569))
+
 ## [0.73.0](https://github.com/bruzit/ansible-collection/compare/v0.72.0...v0.73.0) (2026-11-22)
 
 ### Features
