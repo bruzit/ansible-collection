@@ -1,4 +1,11 @@
 ---
+- name: Install the nftables rules of nfs_client
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: nfs_client
+
 - name: Install the NFS client
   become: true
   ansible.builtin.apt:
