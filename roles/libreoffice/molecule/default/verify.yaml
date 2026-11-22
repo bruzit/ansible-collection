@@ -1,0 +1,30 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert LibreOffice is installed
+      ansible.builtin.assert:
+        that:
+          - "'libreoffice' in ansible_facts['packages']"
+          - "('libreoffice-kf6' if ansible_facts['distribution_version'] is version('26.04', '>=') else 'libreoffice-kf5') in ansible_facts['packages']"
+
+    - name: Check LibreOffice exports PDF
+      ansible.builtin.command:
+        argv: [soffice, --headless, --convert-to, pdf, --outdir, /tmp, /etc/hostname]
+        creates: /tmp/hostname.pdf
+
+    - name: Stat exported PDF
+      ansible.builtin.stat:
+        path: /tmp/hostname.pdf
+      register: libreoffice_pdf
+
+    - name: Assert PDF exported
+      ansible.builtin.assert:
+        that:
+          - libreoffice_pdf.stat.size > 0
