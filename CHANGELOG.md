@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.72.0](https://github.com/bruzit/ansible-collection/compare/v0.71.0...v0.72.0) (2026-11-22)
+
+### Features
+
+* **thunderbird:** add role installing thunderbird from flathub ([29758a3](https://github.com/bruzit/ansible-collection/commit/29758a3732bd0781590555cad6a390afa2ee32a7))
+
 ## [0.71.0](https://github.com/bruzit/ansible-collection/compare/v0.70.0...v0.71.0) (2026-11-22)
 
 ### Features
