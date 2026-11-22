@@ -1,0 +1,6 @@
+---
+- name: Install Ente Auth
+  become: true
+  community.general.flatpak:
+    name: io.ente.auth
+    state: present
