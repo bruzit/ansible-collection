@@ -1,0 +1,24 @@
+---
+- name: Install Thunderbird
+  become: true
+  community.general.flatpak:
+    name: org.mozilla.thunderbird
+    state: present
+
+- name: Remove the transitional Thunderbird package
+  become: true
+  ansible.builtin.apt:
+    name: thunderbird
+    state: absent
+
+- name: Stat the snap command
+  ansible.builtin.stat:
+    path: /usr/bin/snap
+  register: thunderbird_snap_command
+
+- name: Remove the Thunderbird snap
+  become: true
+  community.general.snap:
+    name: thunderbird
+    state: absent
+  when: thunderbird_snap_command.stat.exists

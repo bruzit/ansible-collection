@@ -1,0 +1,9 @@
+---
+argument_specs:
+  main:
+    short_description: Install Thunderbird from Flathub and remove the Thunderbird snap.
+    description:
+      - Flatpak, not apt; the Ubuntu archive C(thunderbird) is a transitional package to the snap.
+      - The transitional package and the snap, preseeded on Kubuntu, are removed so only the Flatpak remains.
+      - C(snap remove) deletes C(~/snap/thunderbird) after an automatic snapshot (C(snap saved)); migrating the
+        profile to C(~/.var/app/org.mozilla.thunderbird) is manual.
