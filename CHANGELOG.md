@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.73.0](https://github.com/bruzit/ansible-collection/compare/v0.72.0...v0.73.0) (2026-11-22)
+
+### Features
+
+* **bitwarden:** add bitwarden_desktop role from flatpak and bitwarden_chrome extension policy role ([fca86d7](https://github.com/bruzit/ansible-collection/commit/fca86d7dbcd2777c39b257fcc47c14ae017e2dcd))
+
 ## [0.72.0](https://github.com/bruzit/ansible-collection/compare/v0.71.0...v0.72.0) (2026-11-22)
 
 ### Features
