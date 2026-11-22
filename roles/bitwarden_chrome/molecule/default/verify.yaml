@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Read the Chrome policy
+      ansible.builtin.slurp:
+        src: /etc/opt/chrome/policies/managed/bitwarden.json
+      register: bitwarden_chrome_policy
+
+    - name: Assert the extension is force-installed
+      ansible.builtin.assert:
+        that:
+          - (bitwarden_chrome_policy.content | b64decode | from_json).ExtensionInstallForcelist == ['nngceckbapebfimnlniiiahkandclblb']

@@ -1,0 +1,14 @@
+---
+- name: Create the Chrome managed policy directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/opt/chrome/policies/managed
+    state: directory
+    mode: "0755"
+
+- name: Force-install the Bitwarden Chrome extension
+  become: true
+  ansible.builtin.copy:
+    content: "{{ {'ExtensionInstallForcelist': ['nngceckbapebfimnlniiiahkandclblb']} | to_nice_json }}\n"
+    dest: /etc/opt/chrome/policies/managed/bitwarden.json
+    mode: "0644"
