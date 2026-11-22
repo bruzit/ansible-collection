@@ -1,0 +1,20 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: List installed Flatpak applications
+      ansible.builtin.command: flatpak list --app --columns=application
+      register: thunderbird_flatpak_apps
+      changed_when: false
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert only the Flatpak is installed
+      ansible.builtin.assert:
+        that:
+          - "'org.mozilla.thunderbird' in thunderbird_flatpak_apps.stdout"
+          - "'thunderbird' not in ansible_facts.packages"
