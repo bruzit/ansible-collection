@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.75.0](https://github.com/bruzit/ansible-collection/compare/v0.74.0...v0.75.0) (2026-11-23)
+
+### Features
+
+* **ente_auth:** add role installing ente auth from flatpak ([0c01c2c](https://github.com/bruzit/ansible-collection/commit/0c01c2ceb56c06e6672f824558af4e2fa0cf9087))
+
 ## [0.74.0](https://github.com/bruzit/ansible-collection/compare/v0.73.0...v0.74.0) (2026-11-22)
 
 ### Features
