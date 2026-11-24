@@ -10,3 +10,10 @@
     github_binary_sums: "helm-v{version}-linux-amd64.tar.gz.sha256sum"
     github_binary_member: linux-amd64/helm
     github_binary_version_command: helm version
+
+- name: Install the bash completion of helm
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: helm
+    bash_completion_command: helm completion bash

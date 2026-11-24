@@ -9,3 +9,10 @@
     github_binary_sums: checksums-bsd
     github_binary_sums_regex: "^SHA256 +\\(yq_linux_amd64\\) = ([0-9a-f]{64})$"
     github_binary_version_command: yq --version
+
+- name: Install the bash completion of yq
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: yq
+    bash_completion_command: yq completion bash

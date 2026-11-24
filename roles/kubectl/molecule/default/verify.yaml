@@ -33,3 +33,19 @@
       ansible.builtin.assert:
         that:
           - kubectl_apt_source.stdout | length > 0
+
+    - name: Stat the bash completion of kubectl
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/kubectl
+      register: kubectl_completion
+
+    - name: Assert the bash completion of kubectl is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - kubectl_completion.stat.exists
+          - kubectl_completion.stat.pw_name == 'root'
+          - kubectl_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of kubectl registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/kubectl && complete -p kubectl'
+      changed_when: false

@@ -1,0 +1,16 @@
+---
+argument_specs:
+  main:
+    short_description: Write the bash completion one command prints to C(/usr/share/bash-completion/completions).
+    description:
+      - Skipped when that directory is missing and in check mode.
+      - Regenerated on every run, so the file follows the installed version.
+    options:
+      bash_completion_name:
+        type: str
+        required: true
+        description: Command name, the completion file name.
+      bash_completion_command:
+        type: str
+        required: true
+        description: Command printing the bash completion script.

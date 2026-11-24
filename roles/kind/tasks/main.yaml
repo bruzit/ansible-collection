@@ -8,3 +8,10 @@
     github_binary_asset: "kind-linux-{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
     github_binary_sums: "{{ github_binary_asset }}.sha256sum"
     github_binary_version_command: kind version
+
+- name: Install the bash completion of kind
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: kind
+    bash_completion_command: kind completion bash

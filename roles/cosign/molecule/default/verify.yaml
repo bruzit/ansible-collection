@@ -13,3 +13,19 @@
       ansible.builtin.assert:
         that:
           - "'GitVersion' in cosign_version.stdout"
+
+    - name: Stat the bash completion of cosign
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/cosign
+      register: cosign_completion
+
+    - name: Assert the bash completion of cosign is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - cosign_completion.stat.exists
+          - cosign_completion.stat.pw_name == 'root'
+          - cosign_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of cosign registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/cosign && complete -p cosign'
+      changed_when: false

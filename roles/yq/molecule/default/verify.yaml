@@ -13,3 +13,19 @@
       ansible.builtin.assert:
         that:
           - "'mikefarah/yq' in yq_version.stdout"
+
+    - name: Stat the bash completion of yq
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/yq
+      register: yq_completion
+
+    - name: Assert the bash completion of yq is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - yq_completion.stat.exists
+          - yq_completion.stat.pw_name == 'root'
+          - yq_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of yq registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/yq && complete -p yq'
+      changed_when: false

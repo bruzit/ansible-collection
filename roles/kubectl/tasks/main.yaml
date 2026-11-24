@@ -30,3 +30,10 @@
     name: kubectl
     state: present
     update_cache: true
+
+- name: Install the bash completion of kubectl
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: kubectl
+    bash_completion_command: kubectl completion bash

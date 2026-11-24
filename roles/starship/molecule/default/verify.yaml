@@ -56,3 +56,19 @@
           - starship_console.stdout is not search(starship_pua)
           - starship_terminal.stdout_lines | first == ''
           - starship_terminal.stdout is search(starship_pua)
+
+    - name: Stat the bash completion of starship
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/starship
+      register: starship_completion
+
+    - name: Assert the bash completion of starship is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - starship_completion.stat.exists
+          - starship_completion.stat.pw_name == 'root'
+          - starship_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of starship registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/starship && complete -p starship'
+      changed_when: false
