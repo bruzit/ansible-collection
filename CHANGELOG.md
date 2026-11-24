@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.76.0](https://github.com/bruzit/ansible-collection/compare/v0.75.0...v0.76.0) (2026-11-24)
+
+### Features
+
+* **bash_completion:** add role writing bash completion of cli tool roles ([41c0e7b](https://github.com/bruzit/ansible-collection/commit/41c0e7b0fb12759ecf24f3ff9444fbdcab75381c))
+
+### Bug Fixes
+
+* **bitwarden_cli:** install renamed bw-bit-linux release asset ([c948609](https://github.com/bruzit/ansible-collection/commit/c948609b567f33c2b359c033258bf1c1940db4d1))
+
 ## [0.75.0](https://github.com/bruzit/ansible-collection/compare/v0.74.0...v0.75.0) (2026-11-23)
 
 ### Features
