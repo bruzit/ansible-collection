@@ -13,3 +13,19 @@
       ansible.builtin.assert:
         that:
           - "'argocd:' in argocd_cli_version.stdout"
+
+    - name: Stat the bash completion of argocd
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/argocd
+      register: argocd_cli_completion
+
+    - name: Assert the bash completion of argocd is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - argocd_cli_completion.stat.exists
+          - argocd_cli_completion.stat.pw_name == 'root'
+          - argocd_cli_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of argocd registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/argocd && complete -p argocd'
+      changed_when: false

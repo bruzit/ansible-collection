@@ -13,3 +13,19 @@
       ansible.builtin.assert:
         that:
           - "'Version' in k9s_version.stdout"
+
+    - name: Stat the bash completion of k9s
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/k9s
+      register: k9s_completion
+
+    - name: Assert the bash completion of k9s is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - k9s_completion.stat.exists
+          - k9s_completion.stat.pw_name == 'root'
+          - k9s_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of k9s registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/k9s && complete -p k9s'
+      changed_when: false

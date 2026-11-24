@@ -13,3 +13,19 @@
       ansible.builtin.assert:
         that:
           - "'Version:' in oras_version.stdout"
+
+    - name: Stat the bash completion of oras
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/oras
+      register: oras_completion
+
+    - name: Assert the bash completion of oras is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - oras_completion.stat.exists
+          - oras_completion.stat.pw_name == 'root'
+          - oras_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of oras registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/oras && complete -p oras'
+      changed_when: false

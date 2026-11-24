@@ -13,3 +13,19 @@
       ansible.builtin.assert:
         that:
           - "'Version:' in helm_version.stdout"
+
+    - name: Stat the bash completion of helm
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/helm
+      register: helm_completion
+
+    - name: Assert the bash completion of helm is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - helm_completion.stat.exists
+          - helm_completion.stat.pw_name == 'root'
+          - helm_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of helm registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/helm && complete -p helm'
+      changed_when: false

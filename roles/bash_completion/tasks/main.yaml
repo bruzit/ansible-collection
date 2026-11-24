@@ -1,0 +1,22 @@
+---
+- name: Stat the bash-completion directory for {{ bash_completion_name }}
+  ansible.builtin.stat:
+    path: /usr/share/bash-completion/completions
+  register: bash_completion_dir
+
+- name: Install the bash completion of {{ bash_completion_name }}
+  when: bash_completion_dir.stat.exists and not ansible_check_mode
+  block:
+    - name: Generate the bash completion of {{ bash_completion_name }}
+      ansible.builtin.command: "{{ bash_completion_command }}"
+      register: bash_completion_script
+      changed_when: false
+
+    - name: Write the bash completion of {{ bash_completion_name }}
+      become: true
+      ansible.builtin.copy:
+        content: "{{ bash_completion_script.stdout }}\n"
+        dest: /usr/share/bash-completion/completions/{{ bash_completion_name }}
+        owner: root
+        group: root
+        mode: "0644"

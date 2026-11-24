@@ -19,3 +19,19 @@
     - name: Assert kind reports the latest release
       ansible.builtin.assert:
         that: kind_version.stdout.startswith('kind ' ~ kind_latest.location | basename ~ ' ')
+
+    - name: Stat the bash completion of kind
+      ansible.builtin.stat:
+        path: /usr/share/bash-completion/completions/kind
+      register: kind_completion
+
+    - name: Assert the bash completion of kind is root-owned 0644
+      ansible.builtin.assert:
+        that:
+          - kind_completion.stat.exists
+          - kind_completion.stat.pw_name == 'root'
+          - kind_completion.stat.mode == '0644'
+
+    - name: Check the bash completion of kind registers
+      ansible.builtin.command: bash -c '. /usr/share/bash-completion/completions/kind && complete -p kind'
+      changed_when: false

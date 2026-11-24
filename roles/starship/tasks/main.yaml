@@ -41,3 +41,10 @@
     block: |
       [ "$TERM" = linux ] && export STARSHIP_CONFIG="${STARSHIP_CONFIG:-/etc/starship/plain-text-symbols.toml}"
       eval "$(starship init bash)"
+
+- name: Install the bash completion of starship
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: starship
+    bash_completion_command: starship completions bash

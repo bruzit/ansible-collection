@@ -9,3 +9,10 @@
     github_binary_sums: checksums.sha256
     github_binary_member: k9s
     github_binary_version_command: k9s version --short
+
+- name: Install the bash completion of k9s
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: k9s
+    bash_completion_command: k9s completion bash

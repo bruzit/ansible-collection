@@ -9,3 +9,10 @@
     github_binary_sums: "oras_{version}_checksums.txt"
     github_binary_member: oras
     github_binary_version_command: oras version
+
+- name: Install the bash completion of oras
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: oras
+    bash_completion_command: oras completion bash

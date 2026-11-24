@@ -8,3 +8,10 @@
     github_binary_asset: argocd-linux-amd64
     github_binary_sums: cli_checksums.txt
     github_binary_version_command: argocd version --client
+
+- name: Install the bash completion of argocd
+  ansible.builtin.include_role:
+    name: bruzit.ansible.bash_completion
+  vars:
+    bash_completion_name: argocd
+    bash_completion_command: argocd completion bash
