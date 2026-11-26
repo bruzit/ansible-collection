@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.76.1](https://github.com/bruzit/ansible-collection/compare/v0.76.0...v0.76.1) (2026-11-26)
+
+### Bug Fixes
+
+* **nfs_client:** soft mount read-only shares ([081119d](https://github.com/bruzit/ansible-collection/commit/081119df82e2d8d8aa8c552eee4936e0da134de4))
+
 ## [0.76.0](https://github.com/bruzit/ansible-collection/compare/v0.75.0...v0.76.0) (2026-11-24)
 
 ### Features
