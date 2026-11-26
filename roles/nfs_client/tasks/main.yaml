@@ -18,7 +18,7 @@
     src: "{{ item.src }}"
     path: "{{ item.path }}"
     fstype: nfs
-    opts: "{{ 'ro' if item.ro | default(false) else 'rw' }},nofail,_netdev,x-systemd.automount"
+    opts: "{{ 'ro,soft,timeo=100,retrans=2' if item.ro | default(false) else 'rw,hard' }},nofail,_netdev,x-systemd.automount"
     state: present
   loop: "{{ nfs_client_mounts }}"
   loop_control:
