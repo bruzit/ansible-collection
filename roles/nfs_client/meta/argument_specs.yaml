@@ -20,4 +20,4 @@ argument_specs:
           ro:
             type: bool
             default: false
-            description: Mount read-only.
+            description: Mount read-only and soft; an unreachable server returns an I/O error instead of hanging. Read-write mounts are hard.
