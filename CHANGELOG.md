@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.78.0](https://github.com/bruzit/ansible-collection/compare/v0.77.0...v0.78.0) (2026-11-28)
+
+### Features
+
+* **wireguard:** add role configuring hub and spoke wg0 ([2157735](https://github.com/bruzit/ansible-collection/commit/21577354b8de09af1fb89e13b0ed312f49104a55))
+
 ## [0.77.0](https://github.com/bruzit/ansible-collection/compare/v0.76.1...v0.77.0) (2026-11-28)
 
 ### Features
