@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.77.0](https://github.com/bruzit/ansible-collection/compare/v0.76.1...v0.77.0) (2026-11-28)
+
+### Features
+
+* **nftables:** add allow_nat chain for source nat drop-ins ([b839ced](https://github.com/bruzit/ansible-collection/commit/b839ced68a8978d7410ff38ec1db23416b778211))
+
 ## [0.76.1](https://github.com/bruzit/ansible-collection/compare/v0.76.0...v0.76.1) (2026-11-26)
 
 ### Bug Fixes

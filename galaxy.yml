@@ -1,7 +1,7 @@
 ---
 namespace: bruzit
 name: ansible
-version: 0.76.1
+version: 0.77.0
 readme: README.md
 authors:
   - Martin Bružina
