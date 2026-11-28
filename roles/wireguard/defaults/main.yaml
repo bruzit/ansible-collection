@@ -1,0 +1,5 @@
+---
+wireguard_port: 51820
+wireguard_egress_interface: ""
+wireguard_routes: []
+wireguard_autostart: true

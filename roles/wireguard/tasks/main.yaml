@@ -1,0 +1,76 @@
+---
+- name: Install WireGuard tools
+  become: true
+  ansible.builtin.apt:
+    name: wireguard-tools
+    state: present
+
+- name: Generate the private key
+  become: true
+  ansible.builtin.shell: umask 077 && wg genkey >/etc/wireguard/wg0.key
+  args:
+    creates: /etc/wireguard/wg0.key
+
+- name: Read the public key
+  become: true
+  ansible.builtin.shell: wg pubkey </etc/wireguard/wg0.key
+  register: wireguard_public_key
+  changed_when: false
+  check_mode: false
+  failed_when: wireguard_public_key.rc != 0 and not ansible_check_mode
+
+- name: Show the public key
+  ansible.builtin.debug:
+    msg: "{{ inventory_hostname }} wg0 public key: {{ wireguard_public_key.stdout }}"
+
+- name: Install the preshared keys
+  become: true
+  ansible.builtin.copy:
+    content: "{{ item.preshared_key }}\n"
+    dest: /etc/wireguard/wg0-{{ item.name }}.psk
+    owner: root
+    group: root
+    mode: "0600"
+  loop: "{{ wireguard_peers }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
+  notify: Restart WireGuard
+
+- name: Configure wg0
+  become: true
+  ansible.builtin.template:
+    src: wg0.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Restart WireGuard
+
+- name: Forward IPv4 on the hub
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_file: /etc/sysctl.d/60-wireguard.conf
+  when: wireguard_egress_interface | length > 0
+
+- name: Install the nftables rules of wireguard
+  ansible.builtin.include_role:
+    name: bruzit.ansible.nftables
+    tasks_from: rules
+  vars:
+    nftables_rules_name: wireguard
+
+- name: Detect running systemd
+  ansible.builtin.stat:
+    path: /run/systemd/system
+  register: wireguard_systemd
+
+- name: Enable and start wg-quick@wg0
+  become: true
+  ansible.builtin.systemd_service:
+    name: wg-quick@wg0
+    enabled: true
+    state: started
+  when: wireguard_autostart and wireguard_systemd.stat.exists

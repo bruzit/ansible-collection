@@ -1,0 +1,64 @@
+---
+argument_specs:
+  main:
+    short_description: WireGuard interface wg0 via wg-quick, hub or spoke of a hub-and-spoke VPN.
+    description:
+      - The private key is generated on the host in C(/etc/wireguard/wg0.key) and never leaves it; the public key is
+        printed for the peer list. Each peer's preshared key goes to C(/etc/wireguard/wg0-<name>.psk); both are set by
+        C(PostUp), so C(wg0.conf) holds no secret.
+      - Hub when O(wireguard_egress_interface) is set - listens on O(wireguard_port), forwards new connections only
+        from wg0 to that interface and masquerades the peers' IPv4 there. Internet to peers and peer to peer stay
+        dropped by the nftables forward policy in enforce mode.
+      - Spoke otherwise - connects out to peers with an endpoint, keepalive 25 s, no listener.
+      - Every host allows out the WireGuard port and everything on wg0; the hub's policy governs the overlay.
+    options:
+      wireguard_address:
+        type: str
+        required: true
+        description: Address of wg0 with prefix, e.g. C(198.51.100.1/32).
+      wireguard_peers:
+        type: list
+        elements: dict
+        required: true
+        description: Peers of wg0.
+        options:
+          name:
+            type: str
+            required: true
+            description: Peer name, part of its preshared key file name.
+          public_key:
+            type: str
+            required: true
+            description: Peer public key.
+          preshared_key:
+            type: str
+            required: true
+            no_log: true
+            description: Preshared key shared with the peer, e.g. from a password manager lookup.
+          allowed_ips:
+            type: list
+            elements: str
+            required: true
+            description: Prefixes routed to and accepted from the peer.
+          endpoint:
+            type: str
+            description: Host name or address of the peer; the port is O(wireguard_port). Set on spokes for the hub.
+      wireguard_port:
+        type: int
+        default: 51820
+        description: UDP port the hub listens on and spokes connect to.
+      wireguard_egress_interface:
+        type: str
+        default: ""
+        description: Interface the hub forwards and masquerades peer traffic to; empty makes the host a spoke.
+      wireguard_routes:
+        type: list
+        elements: str
+        default: []
+        description: >-
+          Prefixes routed into wg0. Empty routes every peer's O(wireguard_peers[].allowed_ips) (wg-quick C(Table =
+          auto)); set, only these, so a spoke can accept C(0.0.0.0/0) from the hub and keep its local breakout.
+      wireguard_autostart:
+        type: bool
+        default: true
+        description: Enable and start wg-quick@wg0; when false it is started by hand and only restarted while running.

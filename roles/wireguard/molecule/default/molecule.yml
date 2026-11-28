@@ -1,0 +1,58 @@
+---
+# NET_ADMIN lets nft manage the container's own network namespace; /proc/sys is read-only, so forwarding is preset
+platforms:
+  - name: ubuntu-22
+    image: docker.io/library/ubuntu:22.04
+    pre_build_image: true
+    capabilities:
+      - NET_ADMIN
+
+  - name: ubuntu-24
+    image: docker.io/library/ubuntu:24.04
+    pre_build_image: true
+    capabilities:
+      - NET_ADMIN
+
+  - name: ubuntu-26
+    image: docker.io/library/ubuntu:26.04
+    pre_build_image: true
+    capabilities:
+      - NET_ADMIN
+    sysctls:
+      net.ipv4.ip_forward: "1"
+
+provisioner:
+  inventory:
+    group_vars:
+      all:
+        nftables_enabled: true
+        wireguard_peers:
+          - name: hub
+            public_key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+            preshared_key: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBA=
+            allowed_ips: [198.51.100.0/24]
+            endpoint: hub.example.com
+    host_vars:
+      ubuntu-22:
+        wireguard_address: 198.51.100.2/32
+      ubuntu-24:
+        wireguard_address: 198.51.100.4/32
+        wireguard_peers:
+          - name: hub
+            public_key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+            preshared_key: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBA=
+            allowed_ips: [0.0.0.0/0]
+            endpoint: hub.example.com
+        wireguard_routes: [198.51.100.0/24]
+      ubuntu-26:
+        wireguard_address: 198.51.100.1/32
+        wireguard_egress_interface: eth0
+        wireguard_peers:
+          - name: alice
+            public_key: CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCA=
+            preshared_key: DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDA=
+            allowed_ips: [198.51.100.2/32]
+          - name: bob
+            public_key: EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEA=
+            preshared_key: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA=
+            allowed_ips: [198.51.100.4/32]
