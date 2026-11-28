@@ -12,6 +12,9 @@ table inet bruzit {
 	chain allow_fwd {
 	}
 
+	chain allow_nat {
+	}
+
 	chain input {
 		type filter hook input priority filter; policy {{ policy }};
 	}
@@ -23,9 +26,13 @@ table inet bruzit {
 	chain forward {
 		type filter hook forward priority filter; policy {{ policy }};
 	}
+
+	chain postrouting {
+		type nat hook postrouting priority srcnat; policy accept;
+	}
 }
 
-{% for chain in ['allow_in', 'allow_out', 'allow_fwd', 'input', 'output', 'forward'] %}
+{% for chain in ['allow_in', 'allow_out', 'allow_fwd', 'allow_nat', 'input', 'output', 'forward', 'postrouting'] %}
 flush chain inet bruzit {{ chain }}
 {% endfor %}
 
@@ -62,6 +69,10 @@ table inet bruzit {
 {% if nftables_mode != 'quiet' %}
 		limit rate 10/minute burst 20 packets log prefix "bruzit-drop-fwd: "
 {% endif %}
+	}
+
+	chain postrouting {
+		jump allow_nat
 	}
 }
 
