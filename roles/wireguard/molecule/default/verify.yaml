@@ -1,0 +1,67 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Stat the key files
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: wireguard_keys
+      loop:
+        - /etc/wireguard/wg0.key
+        - /etc/wireguard/wg0.conf
+        - /etc/wireguard/wg0-{{ wireguard_peers[0].name }}.psk
+
+    - name: Parse wg0.conf as wg-quick does
+      ansible.builtin.command: wg-quick strip wg0
+      register: wireguard_strip
+      changed_when: false
+
+    - name: Read wg0.conf
+      ansible.builtin.slurp:
+        src: /etc/wireguard/wg0.conf
+      register: wireguard_conf
+
+    - name: Read the live table
+      ansible.builtin.command: nft list table inet bruzit
+      register: wireguard_table
+      changed_when: false
+
+    - name: Assert private files and no secret in wg0.conf
+      vars:
+        wireguard_conf_text: "{{ wireguard_conf.content | b64decode }}"
+      ansible.builtin.assert:
+        that:
+          - wireguard_keys.results | map(attribute='stat.mode') | unique == ['0600']
+          - wireguard_conf_text is not search('PrivateKey|PresharedKey')
+          - wireguard_conf_text is search('PostUp = wg set %i private-key /etc/wireguard/%i.key peer ')
+          - wireguard_table.stdout is search('udp dport 51820 accept')
+          - wireguard_table.stdout is search('oifname "wg0" accept')
+
+    - name: Assert the spoke connects out without a listener
+      when: inventory_hostname != 'ubuntu-26'
+      ansible.builtin.assert:
+        that:
+          - wireguard_strip.stdout is not search('ListenPort')
+          - wireguard_strip.stdout is search('Endpoint = hub.example.com:51820')
+          - wireguard_strip.stdout is search('PersistentKeepalive = 25')
+          - wireguard_table.stdout is not search('masquerade')
+
+    - name: Assert routes only into wg0 with Table off
+      when: inventory_hostname == 'ubuntu-24'
+      ansible.builtin.assert:
+        that:
+          - (wireguard_conf.content | b64decode) is search('Table = off')
+          - (wireguard_conf.content | b64decode) is search('PostUp = ip route add 198.51.100.0/24 dev %i')
+
+    - name: Assert the hub listens, forwards only out and masquerades its peers
+      when: inventory_hostname == 'ubuntu-26'
+      ansible.builtin.assert:
+        that:
+          - wireguard_strip.stdout is search('ListenPort = 51820')
+          - wireguard_strip.stdout is not search('Endpoint')
+          - wireguard_table.stdout is search('iifname "eth0" udp dport 51820 accept')
+          - wireguard_table.stdout is search('iifname "wg0" oifname "eth0" accept')
+          - wireguard_table.stdout is search('oifname "eth0" ip saddr \{ 198.51.100.2, 198.51.100.4 \} masquerade')

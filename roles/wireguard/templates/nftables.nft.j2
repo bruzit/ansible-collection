@@ -1,0 +1,20 @@
+table inet bruzit {
+	chain allow_out {
+		udp dport {{ wireguard_port }} accept
+		oifname "wg0" accept
+	}
+{% if wireguard_egress_interface %}
+
+	chain allow_in {
+		iifname "{{ wireguard_egress_interface }}" udp dport {{ wireguard_port }} accept
+	}
+
+	chain allow_fwd {
+		iifname "wg0" oifname "{{ wireguard_egress_interface }}" accept
+	}
+
+	chain allow_nat {
+		oifname "{{ wireguard_egress_interface }}" ip saddr { {{ wireguard_peers | map(attribute='allowed_ips') | flatten | reject('search', ':') | join(', ') }} } masquerade
+	}
+{% endif %}
+}
